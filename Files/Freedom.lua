@@ -841,7 +841,7 @@ Cheats:AddToggle('Infinite Gas', {
 		elseif getgenv().Timer == true then
 			getgenv().Timer = false
 			for _, Object in pairs(Character:GetDescendants()) do
-				if Object:IsA("Folder") and string.find(Object.Name, "Local") then
+				if Object:IsA("LocalScript") and string.find(Object.Name, "Local") then
 					local TimeValue = Instance.new("IntValue")
 					local BuffedValue = Instance.new("BoolValue")
 					TimeValue.Name = "Time"
