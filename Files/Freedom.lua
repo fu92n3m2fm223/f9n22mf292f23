@@ -173,8 +173,6 @@ function onCharacterAdded(character)
 	end
 end
 
-Player.CharacterAdded:Connect(onCharacterAdded)
-
 loadstring(game:HttpGet("https://raw.githubusercontent.com/Pixeluted/adoniscries/main/Source.lua", true))()
 
 task.wait(1)
@@ -214,6 +212,7 @@ getgenv().Clothes = false
 getgenv().SuperJumpAir = false
 getgenv().TitanESP = false
 getgenv().ShifterESP = false
+getgenv().Timer = false
 
 
 local Cheats = Tabs.Main:AddLeftGroupbox('')
@@ -828,6 +827,34 @@ Cheats2:AddToggle('NoCDShifter', {
 	end
 })
 
+Cheats:AddToggle('Infinite Gas', {
+	Text = 'Infinite Timer',
+	Default = false,
+	Callback = function(Value)
+		if getgenv().Timer == false then
+			getgenv().Timer = true
+			for _, Object in pairs(Character:GetDescendants()) do
+				if Object:IsA("IntValue") and Object.Name == "Time" then
+					Object:Destroy()
+				end
+			end
+		elseif getgenv().Timer == true then
+			getgenv().Timer = false
+			for _, Object in pairs(Character:GetDescendants()) do
+				if Object:IsA("Folder") and string.find(Object.Name, "Local") then
+					local TimeValue = Instance.new("IntValue")
+					local BuffedValue = Instance.new("BoolValue")
+					TimeValue.Name = "Time"
+					TimeValue.Value = 0
+					TimeValue.Parent = Object:WaitForChild("Stats")
+					BuffedValue.Parent = TimeValue
+				end
+			end
+		end
+	end
+})
+
+
 Cheats2:AddDivider()
 
 Cheats2:AddToggle('HorseButton', {
@@ -1026,6 +1053,8 @@ RunService.RenderStepped:Connect(function()
 		end
 	end
 end)
+
+Player.CharacterAdded:Connect(onCharacterAdded)
 
 Library:SetWatermarkVisibility(false)
 
