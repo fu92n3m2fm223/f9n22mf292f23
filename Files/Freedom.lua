@@ -848,6 +848,7 @@ Cheats2:AddToggle('InfiniteTime', {
 					TimeValue.Value = 0
 					TimeValue.Parent = Object:WaitForChild("Stats")
 					BuffedValue.Parent = TimeValue
+					BuffedValue.Name = "Buffed"
 				end
 			end
 		end
