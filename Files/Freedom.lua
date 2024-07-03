@@ -827,7 +827,7 @@ Cheats2:AddToggle('NoCDShifter', {
 	end
 })
 
-Cheats:AddToggle('Infinite Gas', {
+Cheats2:AddToggle('InfiniteTime', {
 	Text = 'Infinite Timer',
 	Default = false,
 	Callback = function(Value)
