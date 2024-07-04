@@ -679,19 +679,19 @@ Cheats2:AddButton({
 			if Object.Name == "FELocal" then
 				local Character = Object.Parent
 				local Player = game:GetService("Players"):GetPlayerFromCharacter(Character)
-				Female = Player.Name
+				Female = tostring("Female: " .. Player.Name)
 			end
 			
 			if Object.Name == "ARLocal" then
 				local Character = Object.Parent
 				local Player = game:GetService("Players"):GetPlayerFromCharacter(Character)
-				Armored = Player.Name
+				Armored = tostring("Armored: " .. Player.Name)
 			end
 			
 			if Object.Name == "COLocal" then
 				local Character = Object.Parent
 				local Player = game:GetService("Players"):GetPlayerFromCharacter(Character)
-				Colossal = Player.Name
+				Colossal = tostring("Colossal: " .. Player.Name)
 			end
 		end
 
