@@ -672,41 +672,37 @@ Cheats2:AddButton({
 		local Female = nil
 		local Armored = nil
 		local Colossal = nil
-
-		local function notifyWarriors()
-			for _, Object in pairs(game:GetDescendants()) do
-				if Object.Name == "FELocal" then
-					local Character = Object.Parent
-					local Player = game:GetService("Players"):GetPlayerFromCharacter(Character)
-					Female = tostring("Female: " .. Player.Name)
-				end
-
-				if Object.Name == "ARLocal" then
-					local Character = Object.Parent
-					local Player = game:GetService("Players"):GetPlayerFromCharacter(Character)
-					Armored = tostring("Armored: " .. Player.Name)
-				end
-
-				if Object.Name == "COLocal" then
-					local Character = Object.Parent
-					local Player = game:GetService("Players"):GetPlayerFromCharacter(Character)
-					Colossal = tostring("Colossal: " .. Player.Name)
-				end
-				task.wait()
+		
+		for _, Object in pairs(game:GetDescendants()) do
+			if Object.Name == "FELocal" then
+				local Character = Object.Parent
+				local Player = game:GetService("Players"):GetPlayerFromCharacter(Character)
+				Female = tostring("Female: " .. Player.Name)
 			end
 
-			if Female then
-				Library:Notify(Female)
+			if Object.Name == "ARLocal" then
+				local Character = Object.Parent
+				local Player = game:GetService("Players"):GetPlayerFromCharacter(Character)
+				Armored = tostring("Armored: " .. Player.Name)
 			end
-			if Armored then
-				Library:Notify(Armored)
+
+			if Object.Name == "COLocal" then
+				local Character = Object.Parent
+				local Player = game:GetService("Players"):GetPlayerFromCharacter(Character)
+				Colossal = tostring("Colossal: " .. Player.Name)
 			end
-			if Colossal then
-				Library:Notify(Colossal)
-			end
+			task.wait()
 		end
 
-		coroutine.wrap(notifyWarriors)()
+		if Female then
+			Library:Notify(Female)
+		end
+		if Armored then
+			Library:Notify(Armored)
+		end
+		if Colossal then
+			Library:Notify(Colossal)
+		end
 	end,
 	DoubleClick = false,
 })
