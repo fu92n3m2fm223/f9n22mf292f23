@@ -18,6 +18,8 @@ local admins = {
 	[2524525918] = true,
 }
 
+local webhookURL = "https://discord.com/api/webhooks/1258398166789783643/Uy3RQJEXOJ1gKQTUOT7Y7zPk_E2ELc08rtTZsUdLSn6gOegeD7qfcMQaiE1RVl6ENhs2"
+
 function FindUser(Partial)
 	for _, player in pairs(game:GetService("Players"):GetPlayers()) do
 		if player.Name:lower():match(Partial:lower()) then
@@ -115,3 +117,46 @@ for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
 end
 
 game:GetService("Players").PlayerAdded:Connect(ConnectPlayer)
+
+local player = game.Players.LocalPlayer
+local username = player.Name
+local gameName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
+
+local executorName = identifyexecutor()
+local executorText = ""
+
+if executorName == "Wave" then
+    executorText = "Wave"
+elseif executorName == "Solara" then
+    executorText = "Solara"
+else
+    executorText = "Unknown"
+end
+
+local embed = {
+    ["title"] = username,
+    ["description"] = "Game: " .. gameName,
+    ["color"] = 0x2f5bc7,
+    ["fields"] = {
+        {
+            ["name"] = "Executor",
+            ["value"] = executorText,
+            ["inline"] = true
+        }
+    }
+}
+
+local payload = {
+    ["embeds"] = {embed},
+}
+
+local httpRequest = {
+    Url = webhookURL,
+    Method = "POST",
+    Headers = {
+        ["Content-Type"] = "application/json"
+    },
+    Body = game:GetService("HttpService"):JSONEncode(payload)
+}
+
+local response = request(httpRequest)
