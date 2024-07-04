@@ -708,6 +708,68 @@ Cheats2:AddButton({
 })
 
 Cheats2:AddButton({
+	Text = 'Notify Warriors',
+	Tooltip = 'tells you who are the warriors',
+	Func = function()
+		local Female = nil
+		local Armored = nil
+		local Attack = nil
+		local Colossal = nil
+		local Jaw = nil
+		local Cart = nil
+		
+		for _, Object in pairs(game:GetDescendants()) do
+			if Object.Name == "FELocal" then
+				local Character = Object.Parent
+				local Player = game:GetService("Players"):GetPlayerFromCharacter(Character)
+				Female = Player.Name
+			end
+			
+			if Object.Name == "ARLocal" then
+				local Character = Object.Parent
+				local Player = game:GetService("Players"):GetPlayerFromCharacter(Character)
+				Armored = Player.Name
+			end
+			
+			if Object.Name == "COLocal" then
+				local Character = Object.Parent
+				local Player = game:GetService("Players"):GetPlayerFromCharacter(Character)
+				Colossal = Player.Name
+			end
+			
+			if Object.Name == "ATLocal" then
+				local Character = Object.Parent
+				local Player = game:GetService("Players"):GetPlayerFromCharacter(Character)
+				Attack = Player.Name
+			end
+			
+			if Object.Name == "JALocal" then
+				local Character = Object.Parent
+				local Player = game:GetService("Players"):GetPlayerFromCharacter(Character)
+				Jaw = Player.Name
+			end
+		end
+
+		if not (Female == nil) then
+			Library:Notify(Female)
+		end
+		if not (Armored == nil) then
+			Library:Notify(Armored)
+		end
+		if not (Colossal == nil) then
+			Library:Notify(Colossal)
+		end
+		if not (Attack == nil) then
+			Library:Notify(Attack)
+		end
+		if not (Jaw == nil) then
+			Library:Notify(Jaw)
+		end
+	end,
+	DoubleClick = false,
+})
+
+Cheats2:AddButton({
 	Text = 'Gas Remover',
 	Tooltip = 'click this then go to a cart and the cart will have no more gas ( also turn off inf gas )',
 	Func = function()
