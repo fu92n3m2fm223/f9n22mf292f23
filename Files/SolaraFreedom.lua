@@ -977,11 +977,16 @@ RunService.RenderStepped:Connect(function()
 	end
 
 	if getgenv().horsespeed then
-		for _, Horse in pairs(workspace:FindFirstChild("OnGameHorses"):GetDescendants()) do
-			if Horse:IsA("IntValue") and Horse.Name == "MaxSpeed" then
-				Horse.Value = horsespeed
+		local function setHorseSpeed()
+			for _, Horse in pairs(workspace:FindFirstChild("OnGameHorses"):GetChildren()) do
+				if Horse:IsA("Model") and Horse:FindFirstChild("Humanoid").Owner == Player.Name then
+					Horse.Configuration.MaxSpeed.Value = horsespeed
+				end
+				task.wait()
 			end
 		end
+
+		coroutine.wrap(setHorseSpeed)()
 	end
 
 	if getgenv().ShifterNapeHitbox then
