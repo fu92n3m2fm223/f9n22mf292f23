@@ -233,7 +233,7 @@ Cheats:AddToggle('Infinite Blades', {
 	end
 })
 
-Cheats:AddToggle('Infinite TS', {
+--[[Cheats:AddToggle('Infinite TS', {
 	Text = 'Infinite Thunderspears',
 	Default = false,
 	Callback = function(Value)
@@ -257,8 +257,7 @@ Cheats:AddToggle('Infinite TS', {
 			getgenv().InfiniteTS = false
 		end
 	end
-
-})
+})]]
 
 Cheats:AddToggle('Titan Detection', {
 	Text = 'Disable Titan Detection',
