@@ -592,6 +592,28 @@ Cheats:AddLabel('Regenerate Health'):AddKeyPicker('KeyPicker', {
 	end
 })
 
+Cheats:AddLabel('+100 Health'):AddKeyPicker('KeyPicker', {
+	Default = 'Six',
+	SyncToggleState = false,
+
+	Mode = 'Toggle',
+
+	Text = '',
+	NoUI = false,
+
+	Callback = function(Value)
+		local args = {
+			[1] = -100
+		}
+
+		workspace:WaitForChild("HumanEvents"):WaitForChild("DamageEvent"):FireServer(unpack(args))
+	end,
+
+	ChangedCallback = function(New)
+
+	end
+})
+
 Cheats2:AddButton({
 	Text = 'Rejoin Same Server',
 	Func = function()
