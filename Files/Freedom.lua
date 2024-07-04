@@ -707,46 +707,49 @@ Cheats2:AddButton({
 	DoubleClick = false,
 })
 
+
 Cheats2:AddButton({
 	Text = 'Notify Warriors',
 	Tooltip = 'tells you who are the warriors',
 	Func = function()
 		local Female = nil
 		local Armored = nil
-		local Attack = nil
 		local Colossal = nil
-		local Jaw = nil
-		local Cart = nil
-		
-		for _, Object in pairs(game:GetDescendants()) do
-			if Object.Name == "FELocal" then
-				local Character = Object.Parent
-				local Player = game:GetService("Players"):GetPlayerFromCharacter(Character)
-				Female = tostring("Female: " .. Player.Name)
+
+		local function notifyWarriors()
+			for _, Object in pairs(game:GetDescendants()) do
+				if Object.Name == "FELocal" then
+					local Character = Object.Parent
+					local Player = game:GetService("Players"):GetPlayerFromCharacter(Character)
+					Female = tostring("Female: " .. Player.Name)
+				end
+
+				if Object.Name == "ARLocal" then
+					local Character = Object.Parent
+					local Player = game:GetService("Players"):GetPlayerFromCharacter(Character)
+					Armored = tostring("Armored: " .. Player.Name)
+				end
+
+				if Object.Name == "COLocal" then
+					local Character = Object.Parent
+					local Player = game:GetService("Players"):GetPlayerFromCharacter(Character)
+					Colossal = tostring("Colossal: " .. Player.Name)
+				end
+				task.wait()
 			end
-			
-			if Object.Name == "ARLocal" then
-				local Character = Object.Parent
-				local Player = game:GetService("Players"):GetPlayerFromCharacter(Character)
-				Armored = tostring("Armored: " .. Player.Name)
+
+			if Female then
+				Library:Notify(Female)
 			end
-			
-			if Object.Name == "COLocal" then
-				local Character = Object.Parent
-				local Player = game:GetService("Players"):GetPlayerFromCharacter(Character)
-				Colossal = tostring("Colossal: " .. Player.Name)
+			if Armored then
+				Library:Notify(Armored)
+			end
+			if Colossal then
+				Library:Notify(Colossal)
 			end
 		end
 
-		if not (Female == nil) then
-			Library:Notify(Female)
-		end
-		if not (Armored == nil) then
-			Library:Notify(Armored)
-		end
-		if not (Colossal == nil) then
-			Library:Notify(Colossal)
-		end
+		coroutine.wrap(notifyWarriors)()
 	end,
 	DoubleClick = false,
 })
