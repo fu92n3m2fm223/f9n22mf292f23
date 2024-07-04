@@ -863,7 +863,6 @@ local Cart = nil
 	end
 })]]--
 
-local damage = Options.DamageSlider.Value
 local horsespeed = Options.HorseSlider.Value
 --getgenv().espdistance = Options.DistanceSlider.Value
 
@@ -877,10 +876,6 @@ local shifterz = Options.ShifterNapeSliderZ.Value
 
 local napetransparency = Options.TitanNapeTransparency.Value
 local shiftertransparency = Options.ShifterNapeTransparency.Value
-
-Options.DamageSlider:OnChanged(function()
-	damage = Options.DamageSlider.Value
-end)
 
 --[[Options.DistanceSlider:OnChanged(function()
 	espdistance = Options.DistanceSlider.Value
