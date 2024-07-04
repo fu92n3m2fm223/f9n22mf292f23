@@ -521,6 +521,53 @@ Cheats:AddSlider('ShifterNapeTransparency', {
 
 Cheats:AddDivider()
 
+Cheats:AddButton({
+	Text = 'God Mode',
+	Func = function()
+		local args = {
+			[1] = -math.huge
+		}
+
+		workspace:WaitForChild("HumanEvents"):WaitForChild("DamageEvent"):FireServer(unpack(args))
+	end,
+	DoubleClick = false,
+})
+
+Cheats:AddButton({
+	Text = 'Reset God Mode',
+	Func = function()
+		if Player.Backpack:FindFirstChild("Granada") then
+			Player.Backpack:FindFirstChild("Granada").Eat:FireServer()
+		elseif not Player.Backpack:FindFirstChild("Granada") then
+			local Granada = game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',100)
+
+			repeat task.wait() until Player.Backpack:FindFirstChild("Granada")
+
+			Player.Backpack:WaitForChild('Granada').Eat:FireServer()
+		end
+	end,
+	DoubleClick = false,
+})
+
+Cheats:AddButton({
+	Text = 'Spoof Death',
+	Tooltip = 'only use if your spawned in, this makes you look like your dead on the leaderboard',
+	Func = function()
+		local args = {
+			[1] = -math.huge
+		}
+
+		workspace:WaitForChild("HumanEvents"):WaitForChild("DamageEvent"):FireServer(unpack(args))
+		task.wait(0.5)
+		local args = {
+			[1] = math.huge
+		}
+
+		workspace:WaitForChild("HumanEvents"):WaitForChild("DamageEvent"):FireServer(unpack(args))
+	end,
+	DoubleClick = false,
+})
+
 Cheats:AddLabel('Regenerate Health'):AddKeyPicker('KeyPicker', {
 	Default = 'U',
 	SyncToggleState = false,
