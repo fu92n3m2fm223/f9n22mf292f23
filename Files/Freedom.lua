@@ -734,7 +734,6 @@ Cheats2:AddButton({
 				local Player = game:GetService("Players"):GetPlayerFromCharacter(Character)
 				Colossal = tostring("Colossal: " .. Player.Name)
 			end
-			task.wait()
 		end
 
 		if Female then
