@@ -736,18 +736,6 @@ Cheats2:AddButton({
 				local Player = game:GetService("Players"):GetPlayerFromCharacter(Character)
 				Colossal = Player.Name
 			end
-			
-			if Object.Name == "ATLocal" then
-				local Character = Object.Parent
-				local Player = game:GetService("Players"):GetPlayerFromCharacter(Character)
-				Attack = Player.Name
-			end
-			
-			if Object.Name == "JALocal" then
-				local Character = Object.Parent
-				local Player = game:GetService("Players"):GetPlayerFromCharacter(Character)
-				Jaw = Player.Name
-			end
 		end
 
 		if not (Female == nil) then
@@ -758,12 +746,6 @@ Cheats2:AddButton({
 		end
 		if not (Colossal == nil) then
 			Library:Notify(Colossal)
-		end
-		if not (Attack == nil) then
-			Library:Notify(Attack)
-		end
-		if not (Jaw == nil) then
-			Library:Notify(Jaw)
 		end
 	end,
 	DoubleClick = false,
