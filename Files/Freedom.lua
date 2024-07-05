@@ -15,7 +15,6 @@ local repo = 'https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main
 local Library = loadstring(game:HttpGet(repo .. 'Library.lua'))()
 local ThemeManager = loadstring(game:HttpGet(repo .. 'addons/ThemeManager.lua'))()
 local SaveManager = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
-local Sense = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Sirius/request/library/sense/source.lua'))()
 
 local Players = game:GetService("Players")
 
@@ -172,10 +171,6 @@ function onCharacterAdded(character)
 		Player.PlayerGui:WaitForChild("LowHealthGui").LoseHoodEvent:Destroy()
 	end
 end
-
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Pixeluted/adoniscries/main/Source.lua", true))()
-
-task.wait(1)
 
 local Window = Library:CreateWindow({
 	Title = tostring("Tear - " .. game.PlaceId),
