@@ -1,3 +1,7 @@
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Pixeluted/adoniscries/main/Source.lua", true))()
+
+task.wait(1)
+
 local RunService = game:GetService("RunService")
 local TeleportService = game:GetService("TeleportService")
 local TweenService = game:GetService("TweenService")
@@ -137,10 +141,6 @@ function onCharacterAdded(character)
 		Player.PlayerGui:WaitForChild("LowHealthGui").LoseHoodEvent:Destroy()
 	end
 end
-
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Pixeluted/adoniscries/main/Source.lua", true))()
-
-task.wait(1)
 
 local Window = Library:CreateWindow({
 	Title = tostring("Tear - " .. game.PlaceId),
