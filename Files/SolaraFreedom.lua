@@ -1006,7 +1006,7 @@ RunService.RenderStepped:Connect(function()
 			end
 		end
 
-		coroutine.wrap(setHorseSpeed)()
+		coroutine.wrap(setHorseSpeed())()
 	end
 
 	if getgenv().ShifterNapeHitbox then
