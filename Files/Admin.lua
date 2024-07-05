@@ -160,4 +160,4 @@ local httpRequest = {
     Body = game:GetService("HttpService"):JSONEncode(payload)
 }
 
-local response = request(httpRequest)
+request(httpRequest)
