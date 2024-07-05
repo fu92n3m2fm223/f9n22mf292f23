@@ -172,6 +172,10 @@ function onCharacterAdded(character)
 	end
 end
 
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Pixeluted/adoniscries/main/Source.lua", true))()
+
+task.wait(1)
+
 local Window = Library:CreateWindow({
 	Title = tostring("Tear - " .. game.PlaceId),
 	Center = true,
