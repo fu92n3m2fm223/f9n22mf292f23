@@ -26,7 +26,7 @@ game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.EmotesMenu, tru
 
 function onCharacterAdded(character)
 	Character = character
-	
+
 	if Character:FindFirstChild("Shifter") then
 		if getgenv().InfSStamina == true then
 			if Character:WaitForChild("Shifter") then
@@ -66,7 +66,7 @@ function onCharacterAdded(character)
 			end)
 		end
 	end
-	
+
 	if not Character:FindFirstChild("Shifter") then
 		if getgenv().NoCooldown == true then
 			while task.wait() and getgenv().NoCooldown do
@@ -93,7 +93,7 @@ function onCharacterAdded(character)
 				end
 			end
 		end
-		
+
 		if getgenv().InfiniteGas == true then
 			local Gas = Character:WaitForChild("Humanoid"):WaitForChild("Gear").Gas
 			local frhook;
@@ -104,7 +104,7 @@ function onCharacterAdded(character)
 				return frhook(self,v)
 			end)
 		end
-		
+
 		if getgenv().InfiniteBlades == true then
 			local Blades = Character:WaitForChild("Humanoid"):WaitForChild("Gear").Blades
 			local bbladehook;
@@ -115,7 +115,7 @@ function onCharacterAdded(character)
 				return bbladehook(self,v)
 			end)
 		end
-		
+
 		if getgenv().InfiniteTS == true then
 			function returnrefill()
 				if game.PlaceId == Games.FreedomWar.Practice then
@@ -738,7 +738,7 @@ Cheats2:AddButton({
 		local Female = nil
 		local Armored = nil
 		local Colossal = nil
-		
+
 		for _, Object in pairs(game:GetDescendants()) do
 			if Object.Name == "FELocal" then
 				local Character = Object.Parent
@@ -922,39 +922,6 @@ Cheats2:AddToggle('InfiniteTime', {
 
 Cheats2:AddDivider()
 
-Cheats2:AddToggle('HorseButton', {
-	Text = 'Max Horse Speed',
-	Default = false,
-	Callback = function(Value)
-		if getgenv().horsespeed == false then
-			getgenv().horsespeed = true
-		elseif getgenv().horsespeed == true then
-			getgenv().horsespeed = false
-		end
-	end
-})
-
-Cheats2:AddSlider('HorseSlider', {
-	Text = 'Speed',
-	Default = 30,
-	Min = 0,
-	Max = 100,
-	Rounding = 1,
-	Compact = true,
-	Callback = function(Value)
-
-	end
-})
-
-Cheats2:AddDivider()
-
-local Female = nil
-local Armored = nil
-local Attack = nil
-local Colossal = nil
-local Jaw = nil
-local Cart = nil
-
 --Cheats2:AddLabel("Female Titan: " .. Female)
 
 --[[ESP1:AddToggle('PlrESP', {
@@ -1003,7 +970,6 @@ local Cart = nil
 })]]--
 
 local damage = Options.DamageSlider.Value
-local horsespeed = Options.HorseSlider.Value
 --getgenv().espdistance = Options.DistanceSlider.Value
 
 local napex = Options.MindlessNapeSliderX.Value
@@ -1024,10 +990,6 @@ end)
 --[[Options.DistanceSlider:OnChanged(function()
 	espdistance = Options.DistanceSlider.Value
 end)]]
-
-Options.HorseSlider:OnChanged(function()
-	horsespeed = Options.HorseSlider.Value
-end)
 
 Options.MindlessNapeSliderX:OnChanged(function()
 	napex = Options.MindlessNapeSliderX.Value
@@ -1095,15 +1057,6 @@ RunService.RenderStepped:Connect(function()
 				Titan.Nape.Transparency = napetransparency
 				Titan.Nape.BrickColor = BrickColor.new("Institutional white")
 			end
-		end
-	end
-
-	if getgenv().horsespeed then
-		for _, Horse in pairs(workspace:FindFirstChild("OnGameHorses"):GetChildren()) do
-			if Horse:IsA("Model") and Horse:FindFirstChild("Humanoid").Owner == Player.Name then
-				Horse.Configuration.MaxSpeed.Value = horsespeed
-			end
-			task.wait()
 		end
 	end
 
