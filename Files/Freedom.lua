@@ -26,122 +26,6 @@ local Players = game:GetService("Players")
 local Player = Players.LocalPlayer
 local Character = Player.Character or Player.CharacterAdded:Wait()
 
-game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.EmotesMenu, true)
-
-function onCharacterAdded(character)
-	if character:FindFirstChild("Shifter") then
-		if getgenv().InfSStamina == true then
-			if character:WaitForChild("Shifter") then
-				local Stamina = character:WaitForChild("Humanoid"):WaitForChild("Stamina")
-				local StammHook
-				StammHook = hookmetamethod(game,'__index',function(self,v)
-					if self == Stamina and v == "Value" and getgenv().InfSStamina == true then
-						return 2400
-					end
-					return StammHook(self,v)
-				end)
-			end
-		end
-
-		if getgenv().ShifterNoCooldown == true then
-			for _, Move in pairs(Player.PlayerGui:WaitForChild("ShiftersGui"):GetDescendants()) do
-				if Move.Name == "HeavyAttack" then
-					Move.Cooldown.Value = 300
-				elseif Move.Name == "Roar" then
-					Move.Cooldown.Value = 500
-				end
-			end
-		end
-
-		if getgenv().TitanDetection == true then
-			character:WaitForChild("TitanDetector").Enabled = false
-			local ttitanhook
-			ttitanhook = hookmetamethod(game, '__namecall', function(self, ...)
-				local args = {...}
-				local call_type = getnamecallmethod()
-				if call_type == 'FireServer' and tostring(self) == 'TitanTouchedEvent' and getgenv().TitanDetection then 
-					args[1] = workspace.Camera:WaitForChild("CameraPart")
-					return ttitanhook(self, unpack(args))
-				else
-					return ttitanhook(self, ...)
-				end
-			end)
-		end
-	end
-
-	if not character:FindFirstChild("Shifter") then
-		if getgenv().NoCooldown == true then
-			while task.wait() and getgenv().NoCooldown do
-				for _, Move in pairs(character:WaitForChild("Gear").SkillsSpamLimit:GetChildren()) do
-					Move.Value = -1
-				end
-
-				for _, Skill in pairs(Player.PlayerGui:WaitForChild("SkillsGui"):GetChildren()) do
-					if Skill.Name == "Impulse" then
-						Skill.Cooldown.Value = 100
-					elseif Skill.Name == "Dodge" then
-						Skill.Cooldown.Value = 25
-					elseif Skill.Name == "HandCut" then
-						Skill.Cooldown.Value = 3000
-					elseif Skill.Name == "HandCutMk2" then
-						Skill.Cooldown.Value = 3000
-					elseif Skill.Name == "SuperJump" then
-						Skill.Cooldown.Value = 150
-					elseif Skill.Name == "BladeThrow" then
-						Skill.Cooldown.Value = 100
-					elseif Skill.Name == "Counter" then
-						Skill.Cooldown.Value = 2000
-					end
-				end
-			end
-		end
-
-		if getgenv().InfiniteGas == true then
-			local Gas = character:WaitForChild("Humanoid"):WaitForChild("Gear").Gas
-			local frhook
-			frhook = hookmetamethod(game,'__index',function(self,v)
-				if self == Gas and v == "Value" and getgenv().InfiniteGas == true then
-					return 2000
-				end
-				return frhook(self,v)
-			end)
-		end
-
-		if getgenv().InfiniteBlades == true then
-			local Blades = character:WaitForChild("Humanoid"):WaitForChild("Gear").Blades
-			local bbladehook
-			bbladehook = hookmetamethod(game,'__index',function(self,v)
-				if self == Blades and v == "Value" and getgenv().InfiniteBlades == true then
-					return 8
-				end
-				return bbladehook(self,v)
-			end)
-		end
-	end
-
-	if getgenv().Skills == true then
-		for _, v in pairs(Player.PlayerGui:WaitForChild("SkillsGui"):GetChildren()) do
-			v.Enabled = true
-		end
-		while task.wait(2) and getgenv().Skills == true do
-			character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.Dodge.Value = true
-			character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.Impulse.Value = true
-			character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.HandCut.Value = true
-			character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.HandCutMk2.Value = true
-			character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.SuperJump.Value = true
-			character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.BladeThrow.Value = true
-			character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.Counter.Value = true
-
-			character:WaitForChild("Humanoid"):WaitForChild("Gear").Upgrades.AttackSpeed.Value = 0.2
-			character:WaitForChild("Humanoid"):WaitForChild("Gear").Upgrades.HooksRange.Value = 160
-		end
-	end
-
-	if getgenv().Hood == true then
-		Player.PlayerGui:WaitForChild("LowHealthGui").LoseHoodEvent:Destroy()
-	end
-end
-
 local Window = Library:CreateWindow({
 	Title = tostring("Tear - " .. game.PlaceId),
 	Center = true,
@@ -184,39 +68,72 @@ local Cheats = Tabs.Main:AddLeftGroupbox('')
 local Cheats2 = Tabs.Main:AddRightGroupbox('')
 --local ESP1 = Tabs.ESP:AddLeftGroupbox('')
 
-function returnrefill()
-	if game.PlaceId == Games.FreedomWar.Practice then
-		return workspace:WaitForChild("PracticeMap"):WaitForChild("TSRefill"):WaitForChild("Main")
-	elseif game.PlaceId == Games.FreedomWar.Campaign then
-		if workspace:FindFirstChild("GameStateValues").Stage.Value == 14 then
-			return workspace:WaitForChild("OnGameHorses"):WaitForChild("HorseCarriage"):WaitForChild("Carriage"):WaitForChild("CarriageRefill"):WaitForChild("PromptPart")
-		elseif workspace:FindFirstChild("GameStateValues").Stage.Value == 7 then
-			return workspace:WaitForChild("WallRoseVillages"):WaitForChild("TSRefill"):WaitForChild("Main")
-		elseif workspace:FindFirstChild("GameStateValues").Stage.Value == 9 then
-			return workspace:WaitForChild("UtgardCastle"):WaitForChild("WallBase"):WaitForChild("TSRefill"):WaitForChild("Main")
-		elseif workspace:FindFirstChild("GameStateValues").Stage.Value == 11 then
-			return workspace:WaitForChild("Trost"):WaitForChild("GatesRefills"):WaitForChild("TSRefill"):WaitForChild("Main")
+
+local function setupInfiniteGas()
+	local Gas = Character:WaitForChild("Humanoid"):WaitForChild("Gear").Gas
+	local metahook;
+	metahook = hookmetamethod(game, '__index', function(self, v)
+		if self == Gas and v == "Value" and getgenv().InfiniteGas then
+			return 2000
 		end
-	end
+		return metahook(self, v)
+	end)
 end
 
+local function setupInfiniteBlades()
+	local Gas = Character:WaitForChild("Humanoid"):WaitForChild("Gear").Blades
+	local metahook;
+	metahook = hookmetamethod(game, '__index', function(self, v)
+		if self == Gas and v == "Value" and getgenv().InfiniteBlades then
+			return 2000
+		end
+		return metahook(self, v)
+	end)
+end
+
+local function setupTitandetection()
+	local titanhook;
+	titanhook = hookmetamethod(game, '__namecall', function(self, ...)
+		local args = {...}
+		local call_type = getnamecallmethod();
+		if call_type == 'FireServer' and tostring(self) == 'TitanTouchedEvent' and getgenv().TitanDetection then 
+			args[1] = workspace.Camera:WaitForChild("CameraPart")
+			return titanhook(self, unpack(args))
+		else
+			return titanhook(self, ...)
+		end
+	end)
+end
+
+local function setupShifterStamina()
+	local Stamina = Character:WaitForChild("Humanoid").Stamina
+	local StamHook;
+	StamHook = hookmetamethod(game,'__index',function(self,v)
+		if self == Stamina and v == "Value" and getgenv().InfSStamina == true then
+			return 2400
+		end
+		return StamHook(self,v)
+	end)
+end
+
+local function toggleTitanDetector()
+	local titanDetector = Character:FindFirstChild("TitanDetector")
+	if titanDetector then
+		titanDetector.Enabled = not getgenv().TitanDetection
+	end
+end
 
 Cheats:AddToggle('Infinite Gas', {
 	Text = 'Infinite Gas',
 	Default = false,
 	Callback = function(Value)
-		if getgenv().InfiniteGas == false then
-			getgenv().InfiniteGas = true
-			local Gas = Character:WaitForChild("Humanoid").Gear.Gas
-			local metahook;
-			metahook = hookmetamethod(game,'__index',function(self,v)
-				if self == Gas and v == "Value" and getgenv().InfiniteGas == true then
-					return 2000
-				end
-				return metahook(self,v)
+		getgenv().InfiniteGas = Value
+		if getgenv().InfiniteGas then
+			setupInfiniteGas()
+			Player.CharacterAdded:Connect(function(character)
+				Character = character
+				setupInfiniteGas()
 			end)
-		elseif getgenv().InfiniteGas == true then
-			getgenv().InfiniteGas = false
 		end
 	end
 })
@@ -225,18 +142,13 @@ Cheats:AddToggle('Infinite Blades', {
 	Text = 'Infinite Blades',
 	Default = false,
 	Callback = function(Value)
-		if getgenv().InfiniteBlades == false then
-			getgenv().InfiniteBlades = true
-			local Blades = Character:WaitForChild("Humanoid").Gear.Blades
-			local bladehook;
-			bladehook = hookmetamethod(game,'__index',function(self,v)
-				if self == Blades and v == "Value" and getgenv().InfiniteBlades == true then
-					return 8
-				end
-				return bladehook(self,v)
+		getgenv().InfiniteBlades = Value
+		if getgenv().InfiniteBlades then
+			setupInfiniteBlades()
+			Player.CharacterAdded:Connect(function(character)
+				Character = character
+				setupInfiniteBlades()
 			end)
-		elseif getgenv().InfiniteBlades == true then
-			getgenv().InfiniteBlades = false
 		end
 	end
 })
@@ -264,44 +176,22 @@ Cheats:AddToggle('Autoreload', {
 	end
 })
 
---[[Cheats:AddToggle('Infinite TS', {
-	Text = 'Infinite Thunderspears',
-	Default = false,
-	Callback = function(Value)
-		if getgenv().InfiniteTS == false then
-			getgenv().InfiniteTS = true
-			RunService.RenderStepped:Connect(function()
-				if not Character:FindFirstChild("Shifter") then
-					if Character:WaitForChild("Gear").Config.TS.Value == true then
-						if Character:WaitForChild("Humanoid").Gear.TS.Value == 0 and getgenv().InfiniteTS == true then
-							local args = {
-								[1] = "TS",
-								[2] = returnrefill()
-							}
-
-							Character:WaitForChild("Gear").Events.RefillEventServer:FireServer(unpack(args))
-						end
-					end
-				end
-			end)
-		elseif getgenv().InfiniteTS == true then
-			getgenv().InfiniteTS = false
-		end
-	end
-})]]
-
 Cheats:AddToggle('Titan Detection', {
-	Text = 'Disable Titan Detection',
+	Text = 'No Titan Detection',
 	Default = false,
-	Tooltip = "also makes it so you dont take dmg from their feet",
 	Callback = function(Value)
-		if getgenv().TitanDetection == false then
-			getgenv().TitanDetection = true
-			Character:FindFirstChild("TitanDetector").Enabled = false
-		elseif getgenv().TitanDetection == true then
-			getgenv().TitanDetection = false
-			Character:FindFirstChild("TitanDetector").Enabled = true
+		getgenv().TitanDetection = Value
+		toggleTitanDetector()
+		if getgenv().TitanDetection then
+			setupTitandetection()
 		end
+		Player.CharacterAdded:Connect(function(character)
+			Character = character
+			if getgenv().TitanDetection then
+				setupTitandetection()
+			end
+			toggleTitanDetector()
+		end)
 	end
 })
 
@@ -810,20 +700,15 @@ Cheats2:AddToggle('InfSStamina', {
 	Text = 'Infinite Shifter Stamina',
 	Default = false,
 	Callback = function(Value)
-		if getgenv().InfSStamina == false then
-			getgenv().InfSStamina = true
-			if Character:FindFirstChild("Shifter") then
-				local Stamina = Character:WaitForChild("Humanoid").Stamina
-				local StamHook;
-				StamHook = hookmetamethod(game,'__index',function(self,v)
-					if self == Stamina and v == "Value" and getgenv().InfSStamina == true then
-						return 2400
-					end
-					return StamHook(self,v)
-				end)
-			end
-		elseif getgenv().InfSStamina == true then
-			getgenv().InfSStamina = false
+		getgenv().InfSStamina = Value
+		if getgenv().InfSStamina then
+			setupShifterStamina()
+			Player.CharacterAdded:Connect(function(character)
+				Character = character
+				if character:FindFirstChild("Shifter") then
+					setupShifterStamina()
+				end
+			end)
 		end
 	end
 })
@@ -1002,18 +887,6 @@ hhook = hookmetamethod(game, '__namecall', function(self, ...)
 	end
 end)
 
-local titanhook;
-titanhook = hookmetamethod(game, '__namecall', function(self, ...)
-	local args = {...}
-	local call_type = getnamecallmethod();
-	if call_type == 'FireServer' and tostring(self) == 'TitanTouchedEvent' and getgenv().TitanDetection then 
-		args[1] = workspace.Camera:WaitForChild("CameraPart")
-		return titanhook(self, unpack(args))
-	else
-		return titanhook(self, ...)
-	end
-end)
-
 RunService.RenderStepped:Connect(function()
 	if getgenv().MindlessNapeHitbox then
 		for _, Titan in pairs(workspace.OnGameTitans:GetChildren()) do
@@ -1037,8 +910,6 @@ RunService.RenderStepped:Connect(function()
 		end
 	end
 end)
-
-Player.CharacterAdded:Connect(onCharacterAdded)
 
 Library:SetWatermarkVisibility(false)
 
