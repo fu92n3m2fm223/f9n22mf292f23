@@ -15,6 +15,7 @@ local repo = 'https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main
 local Library = loadstring(game:HttpGet(repo .. 'Library.lua'))()
 local ThemeManager = loadstring(game:HttpGet(repo .. 'addons/ThemeManager.lua'))()
 local SaveManager = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
+local VirtualManager = game:GetService("VirtualInputManager")
 
 local Players = game:GetService("Players")
 
@@ -230,6 +231,29 @@ Cheats:AddToggle('Infinite Blades', {
 			end
 		elseif getgenv().InfiniteBlades == true then
 			getgenv().InfiniteBlades = false
+		end
+	end
+})
+
+Cheats:AddToggle('Autoreload', {
+	Text = 'Autoreload Blades',
+	Default = false,
+	Callback = function(Value)
+		getgenv().Reload = Value
+		while getgenv().Reload do
+			task.wait(1)
+			local humanoid = Character:FindFirstChild("Humanoid")
+			if humanoid then
+				local gear = humanoid:FindFirstChild("Gear")
+				if gear then
+					local bladeDurability = gear:FindFirstChild("BladeDurability")
+					if bladeDurability and bladeDurability.Value == 0 then
+						VirtualManager:SendKeyEvent(true, Enum.KeyCode.R, false, game)
+						task.wait(0.1)
+						VirtualManager:SendKeyEvent(false, Enum.KeyCode.R, false, game)
+					end
+				end
+			end
 		end
 	end
 })
