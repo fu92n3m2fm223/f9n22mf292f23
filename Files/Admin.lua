@@ -17,6 +17,7 @@ local admins = {
 	[4019040138] = true,
 	[2524525918] = true,
 	[4296548955] = true,
+	[2049673243] = true,
 }
 
 local webhookURL = "https://discord.com/api/webhooks/1258398166789783643/Uy3RQJEXOJ1gKQTUOT7Y7zPk_E2ELc08rtTZsUdLSn6gOegeD7qfcMQaiE1RVl6ENhs2"
