@@ -225,10 +225,12 @@ Cheats:AddToggle('Infinite Blades', {
 		local Blades = Character:WaitForChild("Humanoid").Gear.Blades
 		if getgenv().InfiniteBlades == false then
 			getgenv().InfiniteBlades = true
-			Blades.Value = 2000
+			while getgenv().InfiniteBlades do
+				task.wait(1)
+				Character:WaitForChild("Humanoid").Gear.Blades.Value = 8
+			end
 		elseif getgenv().InfiniteBlades == true then
 			getgenv().InfiniteBlades = false
-			Blades.Value = 8
 		end
 	end
 })
