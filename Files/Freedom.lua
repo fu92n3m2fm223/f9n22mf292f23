@@ -25,13 +25,11 @@ local Character = Player.Character or Player.CharacterAdded:Wait()
 game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.EmotesMenu, true)
 
 function onCharacterAdded(character)
-	Character = character
-
-	if Character:FindFirstChild("Shifter") then
+	if character:FindFirstChild("Shifter") then
 		if getgenv().InfSStamina == true then
-			if Character:WaitForChild("Shifter") then
-				local Stamina = Character:WaitForChild("Humanoid"):WaitForChild("Stamina")
-				local StammHook;
+			if character:WaitForChild("Shifter") then
+				local Stamina = character:WaitForChild("Humanoid"):WaitForChild("Stamina")
+				local StammHook
 				StammHook = hookmetamethod(game,'__index',function(self,v)
 					if self == Stamina and v == "Value" and getgenv().InfSStamina == true then
 						return 2400
@@ -52,11 +50,11 @@ function onCharacterAdded(character)
 		end
 
 		if getgenv().TitanDetection == true then
-			Character:WaitForChild("TitanDetector").Enabled = false
-			local ttitanhook;
+			character:WaitForChild("TitanDetector").Enabled = false
+			local ttitanhook
 			ttitanhook = hookmetamethod(game, '__namecall', function(self, ...)
 				local args = {...}
-				local call_type = getnamecallmethod();
+				local call_type = getnamecallmethod()
 				if call_type == 'FireServer' and tostring(self) == 'TitanTouchedEvent' and getgenv().TitanDetection then 
 					args[1] = workspace.Camera:WaitForChild("CameraPart")
 					return ttitanhook(self, unpack(args))
@@ -67,10 +65,10 @@ function onCharacterAdded(character)
 		end
 	end
 
-	if not Character:FindFirstChild("Shifter") then
+	if not character:FindFirstChild("Shifter") then
 		if getgenv().NoCooldown == true then
 			while task.wait() and getgenv().NoCooldown do
-				for _, Move in pairs(Character:WaitForChild("Gear").SkillsSpamLimit:GetChildren()) do
+				for _, Move in pairs(character:WaitForChild("Gear").SkillsSpamLimit:GetChildren()) do
 					Move.Value = -1
 				end
 
@@ -95,8 +93,8 @@ function onCharacterAdded(character)
 		end
 
 		if getgenv().InfiniteGas == true then
-			local Gas = Character:WaitForChild("Humanoid"):WaitForChild("Gear").Gas
-			local frhook;
+			local Gas = character:WaitForChild("Humanoid"):WaitForChild("Gear").Gas
+			local frhook
 			frhook = hookmetamethod(game,'__index',function(self,v)
 				if self == Gas and v == "Value" and getgenv().InfiniteGas == true then
 					return 2000
@@ -106,46 +104,13 @@ function onCharacterAdded(character)
 		end
 
 		if getgenv().InfiniteBlades == true then
-			local Blades = Character:WaitForChild("Humanoid"):WaitForChild("Gear").Blades
-			local bbladehook;
+			local Blades = character:WaitForChild("Humanoid"):WaitForChild("Gear").Blades
+			local bbladehook
 			bbladehook = hookmetamethod(game,'__index',function(self,v)
 				if self == Blades and v == "Value" and getgenv().InfiniteBlades == true then
 					return 8
 				end
 				return bbladehook(self,v)
-			end)
-		end
-
-		if getgenv().InfiniteTS == true then
-			function returnrefill()
-				if game.PlaceId == Games.FreedomWar.Practice then
-					return workspace:WaitForChild("PracticeMap"):WaitForChild("TSRefill"):WaitForChild("Main")
-				elseif game.PlaceId == Games.FreedomWar.Campaign then
-					if workspace:FindFirstChild("GameStateValues").Stage.Value == 14 then
-						return workspace:WaitForChild("OnGameHorses"):WaitForChild("HorseCarriage"):WaitForChild("Carriage"):WaitForChild("CarriageRefill"):WaitForChild("PromptPart")
-					elseif workspace:FindFirstChild("GameStateValues").Stage.Value == 13 then
-						return workspace:WaitForChild("OnGameHorses"):WaitForChild("HorseCarriage"):WaitForChild("Carriage"):WaitForChild("CarriageRefill"):WaitForChild("PromptPart")
-					elseif workspace:FindFirstChild("GameStateValues").Stage.Value == 7 then
-						return workspace:WaitForChild("WallRoseVillages"):WaitForChild("TSRefill"):WaitForChild("Main")
-					elseif workspace:FindFirstChild("GameStateValues").Stage.Value == 9 then
-						return workspace:WaitForChild("UtgardCastle"):WaitForChild("WallBase"):WaitForChild("TSRefill"):WaitForChild("Main")
-					elseif workspace:FindFirstChild("GameStateValues").Stage.Value == 11 then
-						return workspace:WaitForChild("Trost"):WaitForChild("GatesRefills"):WaitForChild("TSRefill"):WaitForChild("Main")
-					end
-				end
-			end
-
-			RunService.RenderStepped:Connect(function()
-				if Character:WaitForChild("Gear").Config.TS.Value == true then
-					if Character:WaitForChild("Humanoid").Gear.TS.Value == 0 and getgenv().InfiniteTS then
-						local args = {
-							[1] = "TS",
-							[2] = returnrefill()
-						}
-
-						Character:WaitForChild("Gear").Events.RefillEventServer:FireServer(unpack(args))
-					end
-				end
 			end)
 		end
 	end
@@ -155,16 +120,16 @@ function onCharacterAdded(character)
 			v.Enabled = true
 		end
 		while task.wait(2) and getgenv().Skills == true do
-			Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.Dodge.Value = true
-			Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.Impulse.Value = true
-			Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.HandCut.Value = true
-			Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.HandCutMk2.Value = true
-			Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.SuperJump.Value = true
-			Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.BladeThrow.Value = true
-			Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.Counter.Value = true
+			character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.Dodge.Value = true
+			character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.Impulse.Value = true
+			character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.HandCut.Value = true
+			character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.HandCutMk2.Value = true
+			character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.SuperJump.Value = true
+			character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.BladeThrow.Value = true
+			character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.Counter.Value = true
 
-			Character:WaitForChild("Humanoid"):WaitForChild("Gear").Upgrades.AttackSpeed.Value = 0.2
-			Character:WaitForChild("Humanoid"):WaitForChild("Gear").Upgrades.HooksRange.Value = 160
+			character:WaitForChild("Humanoid"):WaitForChild("Gear").Upgrades.AttackSpeed.Value = 0.2
+			character:WaitForChild("Humanoid"):WaitForChild("Gear").Upgrades.HooksRange.Value = 160
 		end
 	end
 
