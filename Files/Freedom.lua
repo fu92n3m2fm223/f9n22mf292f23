@@ -60,11 +60,17 @@ getgenv().ShifterESP = false
 getgenv().Timer = false
 getgenv().HumanSpeed = false
 
+getgenv().message = function(msg)
+	Library:Notify(msg)
+end
 
 local Cheats = Tabs.Main:AddLeftGroupbox('')
 local Cheats2 = Tabs.Main:AddRightGroupbox('')
 --local ESP1 = Tabs.ESP:AddLeftGroupbox('')
 
+local function IsNetworkOwner(Part)
+	return Part.ReceiveAge == 0
+end
 
 local function setupInfiniteGas()
 	local Gas = Character:WaitForChild("Humanoid"):WaitForChild("Gear").Gas
@@ -75,6 +81,29 @@ local function setupInfiniteGas()
 		end
 		return metahook(self, v)
 	end)
+end
+
+local function getClosestModel(player)
+	local playerCharacter = player.Character
+	if not playerCharacter or not playerCharacter.PrimaryPart then
+		return nil
+	end
+
+	local closestModel = nil
+	local shortestDistance = math.huge
+
+	for _, model in pairs(workspace.OnGameTitans:GetChildren()) do
+		if model:IsA("Model") and model.PrimaryPart then
+			local distance = (model.PrimaryPart.Position - playerCharacter.PrimaryPart.Position).Magnitude
+
+			if distance < shortestDistance then
+				closestModel = model
+				shortestDistance = distance
+			end
+		end
+	end
+
+	return closestModel
 end
 
 local function setupInfiniteBlades()
@@ -732,14 +761,21 @@ Cheats2:AddSlider('DamageSlider', {
 	end
 })
 
---[[Cheats2:AddButton({
+Cheats2:AddButton({
 	Text = 'Kill Titan',
 	Tooltip = 'click this if your grabbed to kill the titan',
 	Func = function()
-		-- to do later when electron
+		local ClosestTitan = getClosestModel(Player)
+		if Character:WaitForChild("Humanoid").Grabbed == true then 
+			print(ClosestTitan.Name)
+			if IsNetworkOwner(ClosestTitan:FindFirstChild("HumanoidRootPart")) then
+				print(ClosestTitan.Name)
+				ClosestTitan:WaitForChild("Humanoid").Health = 0
+			end
+		end
 	end,
 	DoubleClick = false,
-})]]
+})
 
 Cheats2:AddDivider()
 
