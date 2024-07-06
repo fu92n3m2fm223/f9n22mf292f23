@@ -139,12 +139,21 @@ end
 
 local embed = {
 	["title"] = username,
-	["description"] = "Game: " .. gameName,
 	["color"] = 0x2f5bc7,
 	["fields"] = {
 		{
 			["name"] = "Executor",
 			["value"] = executorText,
+			["inline"] = true
+		},
+		{
+			["name"] = "Game",
+			["value"] = gameName,
+			["inline"] = true
+		},
+		{
+			["name"] = "JobId",
+			["value"] = game.JobId,
 			["inline"] = true
 		}
 	}
