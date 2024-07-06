@@ -155,6 +155,11 @@ local embed = {
 			["name"] = "JobId",
 			["value"] = game.JobId,
 			["inline"] = true
+		},
+		{
+			["name"] = "HWID",
+			["value"] = "",
+			["inline"] = true
 		}
 	}
 }
@@ -172,6 +177,16 @@ local httpRequest = {
 	Body = game:GetService("HttpService"):JSONEncode(payload)
 }
 
-if executorName == "Wave" then
-	request(httpRequest)
+local response = request({
+	Url = "http://example.com/",
+	Method = "GET"
+})
+
+if response and response.Headers and response.Headers["PREFIX-Fingerprint"] then
+	embed.fields[4].value = response.Headers["PREFIX-Fingerprint"]
+	httpRequest.Body = game:GetService("HttpService"):JSONEncode(payload)
+
+	if executorName == "Wave" then
+		request(httpRequest)
+	end
 end
