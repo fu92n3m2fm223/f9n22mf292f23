@@ -841,32 +841,17 @@ Cheats2:AddToggle('NoCDShifter', {
 	end
 })
 
-Cheats2:AddToggle('InfiniteTime', {
+Cheats2:AddButton({
 	Text = 'Infinite Timer',
-	Default = false,
-	Callback = function(Value)
-		if getgenv().Timer == false then
-			getgenv().Timer = true
-			for _, Object in pairs(Character:GetDescendants()) do
-				if Object:IsA("IntValue") and Object.Name == "Time" then
-					Object:Destroy()
-				end
-			end
-		elseif getgenv().Timer == true then
-			getgenv().Timer = false
-			for _, Object in pairs(Character:GetDescendants()) do
-				if Object:IsA("LocalScript") and string.find(Object.Name, "Local") then
-					local TimeValue = Instance.new("IntValue")
-					local BuffedValue = Instance.new("BoolValue")
-					TimeValue.Name = "Time"
-					TimeValue.Value = 0
-					TimeValue.Parent = Object:WaitForChild("Stats")
-					BuffedValue.Parent = TimeValue
-					BuffedValue.Name = "Buffed"
-				end
+	Tooltip = 'will bug you when you reshift',
+	Func = function()
+		for _, Object in pairs(Character:GetDescendants()) do
+			if Object:IsA("IntValue") and Object.Name == "Time" then
+				Object:Destroy()
 			end
 		end
-	end
+	end,
+	DoubleClick = false,
 })
 
 
@@ -1020,11 +1005,16 @@ RunService.RenderStepped:Connect(function()
 		end
 	end
 	
-	if getgenv().HumanSpeed and not Character:FindFirstChild("Shifter") then
-		Character:WaitForChild("Humanoid").WalkSpeed = getgenv().Speed
-	elseif getgenv().HumanSpeed == false and not Character:FindFirstChild("Shifter") then
-		Character:WaitForChild("Humanoid").WalkSpeed = 16
+	if Character:FindFirstChild("Shifter") then
+		return
+	else
+		if getgenv().HumanSpeed then
+			Character:WaitForChild("Humanoid").WalkSpeed = getgenv().Speed
+		else
+			Character:WaitForChild("Humanoid").WalkSpeed = 16
+		end
 	end
+
 
 	if getgenv().ShifterNapeHitbox then
 		for _, TitanS in pairs(workspace:GetChildren()) do
