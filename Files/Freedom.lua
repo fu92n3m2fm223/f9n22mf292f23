@@ -231,7 +231,6 @@ Cheats:AddToggle('Hood', {
 
 Cheats:AddToggle('Skills', {
 	Text = 'Unlock Skills',
-	Tooltip = 'also gives you some swing speed & hook range',
 	Default = false,
 	Callback = function(Value)
 		getgenv().Skills = Value
@@ -252,6 +251,15 @@ Cheats:AddToggle('Skills', {
 				gearUpgrades.AttackSpeed.Value = 0.2
 				gearUpgrades.HooksRange.Value = 160
 			end
+		elseif getgenv().Skills then
+			local gearSkills = Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills
+			gearSkills.Dodge.Value = false
+			gearSkills.Impulse.Value = false
+			gearSkills.HandCut.Value = false
+			gearSkills.HandCutMk2.Value = false
+			gearSkills.SuperJump.Value = false
+			gearSkills.BladeThrow.Value = false
+			gearSkills.Counter.Value = false
 		end
 
 		Player.CharacterAdded:Connect(function(character)
@@ -273,6 +281,15 @@ Cheats:AddToggle('Skills', {
 					gearUpgrades.AttackSpeed.Value = 0.2
 					gearUpgrades.HooksRange.Value = 160
 				end
+			elseif getgenv().Skills then
+				local gearSkills = Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills
+				gearSkills.Dodge.Value = false
+				gearSkills.Impulse.Value = false
+				gearSkills.HandCut.Value = false
+				gearSkills.HandCutMk2.Value = false
+				gearSkills.SuperJump.Value = false
+				gearSkills.BladeThrow.Value = false
+				gearSkills.Counter.Value = false
 			end
 		end)
 	end
