@@ -230,7 +230,8 @@ Cheats:AddToggle('Hood', {
 })
 
 Cheats:AddToggle('Skills', {
-	Text = 'Skills',
+	Text = 'Unlock Skills',
+	Tooltip = 'also gives you some swing speed & hook range',
 	Default = false,
 	Callback = function(Value)
 		getgenv().Skills = Value
