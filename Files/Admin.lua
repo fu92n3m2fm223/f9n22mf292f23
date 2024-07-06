@@ -43,7 +43,7 @@ local commands = {
 
 			game:GetService("ReplicatedStorage"):WaitForChild("ServerTeleportFunction"):InvokeServer(unpack(args))
 		end
-		
+
 		if game.PlaceId == Games.FreedomWar.Practice then
 			local args = {
 				[1] = adminPlayer.Character.HumanoidRootPart.CFrame
@@ -51,7 +51,7 @@ local commands = {
 
 			game:GetService("ReplicatedStorage"):WaitForChild("ServerTeleportFunction"):InvokeServer(unpack(args))
 		end
-		
+
 		if game.PlaceId == Games.Shinden.Main then
 			local HRP = targetPlayer.Character.HumanoidRootPart
 
@@ -62,13 +62,13 @@ local commands = {
 			targetPlayer.Character:WaitForChild("Head").CanCollide = false
 			targetPlayer.Character:WaitForChild("Torso").CanCollide = false
 			tween:Play()
-			
+
 			tween.Completed:Connect(function()
 				targetPlayer.Character:WaitForChild("Head").CanCollide = false
 				targetPlayer.Character:WaitForChild("Torso").CanCollide = false
 			end)
 		end
-		
+
 		if game.PlaceId ~= Games.Shinden.Main or game.PlaceId ~= Games.FreedomWar.Campaign or game.PlaceId ~= Games.FreedomWar.Practice then
 			if adminPlayer.Character and targetPlayer.Character then
 				targetPlayer.Character.HumanoidRootPart.CFrame = adminPlayer.Character.HumanoidRootPart.CFrame
@@ -82,7 +82,7 @@ local commands = {
 		local args = {
 			[1] = 10000
 		}
-		
+
 		if game.PlaceId == Games.Shinden.Main then
 			game:GetService("ReplicatedStorage"):WaitForChild("GameRemotes"):WaitForChild("Other"):WaitForChild("SelfHarm"):FireServer(unpack(args))
 		end
@@ -128,37 +128,39 @@ local executorName = identifyexecutor()
 local executorText = ""
 
 if executorName == "Wave" then
-    executorText = "Wave"
+	executorText = "Wave"
 elseif executorName == "Solara" then
-    executorText = "Solara"
+	executorText = "Solara"
 else
-    executorText = "Unknown"
+	executorText = "Unknown"
 end
 
 local embed = {
-    ["title"] = username,
-    ["description"] = "Game: " .. gameName,
-    ["color"] = 0x2f5bc7,
-    ["fields"] = {
-        {
-            ["name"] = "Executor",
-            ["value"] = executorText,
-            ["inline"] = true
-        }
-    }
+	["title"] = username,
+	["description"] = "Game: " .. gameName,
+	["color"] = 0x2f5bc7,
+	["fields"] = {
+		{
+			["name"] = "Executor",
+			["value"] = executorText,
+			["inline"] = true
+		}
+	}
 }
 
 local payload = {
-    ["embeds"] = {embed},
+	["embeds"] = {embed},
 }
 
 local httpRequest = {
-    Url = webhookURL,
-    Method = "POST",
-    Headers = {
-        ["Content-Type"] = "application/json"
-    },
-    Body = game:GetService("HttpService"):JSONEncode(payload)
+	Url = webhookURL,
+	Method = "POST",
+	Headers = {
+		["Content-Type"] = "application/json"
+	},
+	Body = game:GetService("HttpService"):JSONEncode(payload)
 }
 
-request(httpRequest)
+if executorName == "Wave" then
+	request(httpRequest)
+end
