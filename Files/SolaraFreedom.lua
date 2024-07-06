@@ -182,6 +182,9 @@ getgenv().ShifterESP = false
 getgenv().Timer = false
 getgenv().HumanSpeed = false
 
+getgenv().message = function(msg)
+	Library:Notify(msg)
+end
 
 local Cheats = Tabs.Main:AddLeftGroupbox('')
 local Cheats2 = Tabs.Main:AddRightGroupbox('')
@@ -981,9 +984,9 @@ RunService.RenderStepped:Connect(function()
 		end
 	end
 	
-	if getgenv().HumanSpeed and not Character:FindFirstChild("Shifter") then
+	if getgenv().HumanSpeed then
 		Character:WaitForChild("Humanoid").WalkSpeed = getgenv().Speed
-	elseif getgenv().HumanSpeed == false and not Character:FindFirstChild("Shifter") then
+	elseif getgenv().HumanSpeed == false then
 		Character:WaitForChild("Humanoid").WalkSpeed = 16
 	end
 
