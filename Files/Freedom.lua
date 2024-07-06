@@ -74,12 +74,12 @@ end
 
 local function setupInfiniteGas()
 	local Gas = Character:WaitForChild("Humanoid"):WaitForChild("Gear").Gas
-	local metahook;
-	metahook = hookmetamethod(game, '__index', function(self, v)
+	local freehook;
+	freehook = hookmetamethod(game, '__index', function(self, v)
 		if self == Gas and v == "Value" and getgenv().InfiniteGas then
 			return 2000
 		end
-		return metahook(self, v)
+		return freehook(self, v)
 	end)
 end
 
@@ -107,12 +107,7 @@ local function getClosestModel(player)
 end
 
 local function setupInfiniteBlades()
-	local Blades
-	if Character:FindFirstChild("Humanoid"):FindFirstChild("Gear") then
-		Blades = Character:WaitForChild("Humanoid"):WaitForChild("Gear").Blades
-	elseif Character:FindFirstChild("Humanoid"):FindFirstChild("APGear") then
-		Blades = Character:WaitForChild("Humanoid"):WaitForChild("APGear").Blades
-	end
+	local Blades = Character:WaitForChild("Humanoid"):WaitForChild("Gear").Blades
 	local metahook;
 	metahook = hookmetamethod(game, '__index', function(self, v)
 		if self == Blades and v == "Value" and getgenv().InfiniteBlades then
