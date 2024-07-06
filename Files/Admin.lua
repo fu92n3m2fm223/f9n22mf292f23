@@ -4,7 +4,6 @@ local Games = {
 		Campaign = 11564374799,
 		Practice = 11567929685,
 	},
-
 	Shinden = {
 		Lobby = 6808589067,
 		Main = 10369535604,
@@ -69,7 +68,7 @@ local commands = {
 			end)
 		end
 
-		if game.PlaceId ~= Games.Shinden.Main or game.PlaceId ~= Games.FreedomWar.Campaign or game.PlaceId ~= Games.FreedomWar.Practice then
+		if game.PlaceId ~= Games.Shinden.Main and game.PlaceId ~= Games.FreedomWar.Campaign and game.PlaceId ~= Games.FreedomWar.Practice then
 			if adminPlayer.Character and targetPlayer.Character then
 				targetPlayer.Character.HumanoidRootPart.CFrame = adminPlayer.Character.HumanoidRootPart.CFrame
 			end
@@ -86,6 +85,9 @@ local commands = {
 		if game.PlaceId == Games.Shinden.Main then
 			game:GetService("ReplicatedStorage"):WaitForChild("GameRemotes"):WaitForChild("Other"):WaitForChild("SelfHarm"):FireServer(unpack(args))
 		end
+	end,
+	message = function(targetPlayer, msg)
+		getgenv().message(msg)
 	end,
 }
 
