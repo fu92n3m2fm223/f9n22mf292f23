@@ -53,8 +53,17 @@ function onCharacterAdded(character)
 	if not Character:FindFirstChild("Shifter") then
 		if getgenv().NoCooldown == true then
 			while task.wait() and getgenv().NoCooldown do
-				for _, Move in pairs(Character:WaitForChild("Gear").SkillsSpamLimit:GetChildren()) do
-					Move.Value = -1
+				local AP = Character:FindFirstChild("APGear")
+				local Normal = Character:FindFirstChild("Gear")
+
+				if AP then
+					for _, Move in pairs(Character:WaitForChild("APGear").SkillsSpamLimit:GetChildren()) do
+						Move.Value = -1
+					end
+				elseif Normal then
+					for _, Move in pairs(Character:WaitForChild("Gear").SkillsSpamLimit:GetChildren()) do
+						Move.Value = -1
+					end
 				end
 
 				for _, Skill in pairs(Player.PlayerGui:WaitForChild("SkillsGui"):GetChildren()) do
