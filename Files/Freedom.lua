@@ -967,7 +967,7 @@ RunService.RenderStepped:Connect(function()
 	
 	if getgenv().HumanSpeed then
 		Character:WaitForChild("Humanoid").WalkSpeed = getgenv().Speed
-	elseif getgenv().HumanSpeed == false then
+	elseif getgenv().HumanSpeed == false and not Character:FindFirstChild("Shifter") then
 		Character:WaitForChild("Humanoid").WalkSpeed = 16
 	end
 
