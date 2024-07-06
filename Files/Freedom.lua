@@ -111,7 +111,7 @@ local function setupInfiniteBlades()
 	local metahook;
 	metahook = hookmetamethod(game, '__index', function(self, v)
 		if self == Gas and v == "Value" and getgenv().InfiniteBlades then
-			return 2000
+			return 8
 		end
 		return metahook(self, v)
 	end)
@@ -331,8 +331,17 @@ Cheats:AddToggle('NoCooldown', {
 		if getgenv().NoCooldown == false then
 			getgenv().NoCooldown = true
 			while task.wait() and getgenv().NoCooldown do
-				for _, Move in pairs(Character:WaitForChild("Gear").SkillsSpamLimit:GetChildren()) do
-					Move.Value = -1
+				local AP = Character:FindFirstChild("APGear")
+				local Normal = Character:FindFirstChild("Gear")
+				
+				if AP then
+					for _, Move in pairs(Character:WaitForChild("APGear").SkillsSpamLimit:GetChildren()) do
+						Move.Value = -1
+					end
+				elseif Normal then
+					for _, Move in pairs(Character:WaitForChild("Gear").SkillsSpamLimit:GetChildren()) do
+						Move.Value = -1
+					end
 				end
 
 				for _, Skill in pairs(Player.PlayerGui:WaitForChild("SkillsGui"):GetChildren()) do
@@ -374,6 +383,8 @@ Cheats:AddToggle('AntiHook', {
 			end
 		elseif getgenv().AntiHook == true then
 			getgenv().AntiHook = false
+			local args = {[1] = nil}
+			Character:WaitForChild("Gear").Events.MoreEvents.CastQKey:FireServer(unpack(args))
 		end
 	end
 })
