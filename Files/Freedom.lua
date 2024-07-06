@@ -630,6 +630,14 @@ Cheats2:AddButton({
 	DoubleClick = false,
 })
 
+Cheats2:AddButton({
+	Text = 'Serverhop',
+	Func = function()
+		TeleportService:Teleport(game.PlaceId, Player)
+	end,
+	DoubleClick = false,
+})
+
 --[[Cheats2:AddButton({
 	Text = 'Join Stage',
 	Tooltip = 'WIP ( DO NOT USE )',
