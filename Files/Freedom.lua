@@ -1,7 +1,3 @@
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Pixeluted/adoniscries/main/Source.lua", true))()
-
-task.wait(1)
-
 local RunService = game:GetService("RunService")
 local TeleportService = game:GetService("TeleportService")
 local TweenService = game:GetService("TweenService")
@@ -117,6 +113,27 @@ local function setupShifterStamina()
 	end)
 end
 
+local function toggleSkills(enable)
+	for _, v in pairs(Player.PlayerGui:WaitForChild("SkillsGui"):GetChildren()) do
+		v.Enabled = enable
+	end
+
+	local gearSkills = Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills
+	gearSkills.Dodge.Value = enable
+	gearSkills.Impulse.Value = enable
+	gearSkills.HandCut.Value = enable
+	gearSkills.HandCutMk2.Value = enable
+	gearSkills.SuperJump.Value = enable
+	gearSkills.BladeThrow.Value = enable
+	gearSkills.Counter.Value = enable
+
+	local gearUpgrades = Character:WaitForChild("Humanoid"):WaitForChild("Gear").Upgrades
+	if enable then
+		gearUpgrades.AttackSpeed.Value = 0.2
+		gearUpgrades.HooksRange.Value = 160
+	end
+end
+
 local function toggleTitanDetector()
 	local titanDetector = Character:FindFirstChild("TitanDetector")
 	if titanDetector then
@@ -212,40 +229,51 @@ Cheats:AddToggle('Hood', {
 	end
 })
 
-Cheats:AddToggle('Unlock Skills', {
-	Text = 'Unlock Skills',
+Cheats:AddToggle('Skills', {
+	Text = 'Skills',
 	Default = false,
 	Callback = function(Value)
-		if getgenv().Skills == false then
-			getgenv().Skills = true
-			for _, v in pairs(Player.PlayerGui:WaitForChild("SkillsGui"):GetChildren()) do
-				v.Enabled = true
-			end
-			while task.wait(1) and getgenv().Skills do
-				Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.Dodge.Value = true
-				Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.Impulse.Value = true
-				Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.HandCut.Value = true
-				Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.HandCutMk2.Value = true
-				Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.SuperJump.Value = true
-				Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.BladeThrow.Value = true
-				Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.Counter.Value = true
+		getgenv().Skills = Value
+		toggleSkills(getgenv().Skills)
 
-				Character:WaitForChild("Humanoid"):WaitForChild("Gear").Upgrades.AttackSpeed.Value = 0.2
-				Character:WaitForChild("Humanoid"):WaitForChild("Gear").Upgrades.HooksRange.Value = 160
+		if getgenv().Skills then
+			while task.wait(1) and getgenv().Skills do
+				local gearSkills = Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills
+				gearSkills.Dodge.Value = true
+				gearSkills.Impulse.Value = true
+				gearSkills.HandCut.Value = true
+				gearSkills.HandCutMk2.Value = true
+				gearSkills.SuperJump.Value = true
+				gearSkills.BladeThrow.Value = true
+				gearSkills.Counter.Value = true
+
+				local gearUpgrades = Character:WaitForChild("Humanoid"):WaitForChild("Gear").Upgrades
+				gearUpgrades.AttackSpeed.Value = 0.2
+				gearUpgrades.HooksRange.Value = 160
 			end
-		elseif getgenv().Skills == true then
-			getgenv().Skills = false
-			for _, v in pairs(Player.PlayerGui:WaitForChild("SkillsGui"):GetChildren()) do
-				v.Enabled = false
-			end
-			Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.Dodge.Value = false
-			Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.Impulse.Value = false
-			Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.HandCut.Value = false
-			Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.HandCutMk2.Value = false
-			Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.SuperJump.Value = false
-			Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.BladeThrow.Value = false
-			Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.Counter.Value = false
 		end
+
+		Player.CharacterAdded:Connect(function(character)
+			Character = character
+			toggleSkills(getgenv().Skills)
+
+			if getgenv().Skills then
+				while task.wait(1) and getgenv().Skills do
+					local gearSkills = Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills
+					gearSkills.Dodge.Value = true
+					gearSkills.Impulse.Value = true
+					gearSkills.HandCut.Value = true
+					gearSkills.HandCutMk2.Value = true
+					gearSkills.SuperJump.Value = true
+					gearSkills.BladeThrow.Value = true
+					gearSkills.Counter.Value = true
+
+					local gearUpgrades = Character:WaitForChild("Humanoid"):WaitForChild("Gear").Upgrades
+					gearUpgrades.AttackSpeed.Value = 0.2
+					gearUpgrades.HooksRange.Value = 160
+				end
+			end
+		end)
 	end
 })
 
@@ -256,7 +284,7 @@ Cheats:AddToggle('NoCooldown', {
 		if getgenv().NoCooldown == false then
 			getgenv().NoCooldown = true
 			while task.wait() and getgenv().NoCooldown do
-				for _, Move in pairs(Character:FindFirstChild("Gear").SkillsSpamLimit:GetChildren()) do
+				for _, Move in pairs(Character:WaitForChild("Gear").SkillsSpamLimit:GetChildren()) do
 					Move.Value = -1
 				end
 
