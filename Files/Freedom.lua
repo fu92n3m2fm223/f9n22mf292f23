@@ -896,7 +896,7 @@ Cheats2:AddButton({
 			if Unshift then
 				local old
 				old = hookfunction(Unshift, function(...)
-					return nil
+					return
 				end)
 			else
 				return
