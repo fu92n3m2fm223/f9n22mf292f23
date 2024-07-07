@@ -64,7 +64,6 @@ game:GetService("RunService").RenderStepped:Connect(function()
 					request(httpRequest)
 					webhookSent = true
 					game:Shutdown()
-					break
 				end
 			end
 		end
