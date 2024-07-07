@@ -153,6 +153,28 @@ function onCharacterAdded(character)
 	end
 end
 
+local function resetHookTension()
+	while getgenv().InfiniteHookTime do
+		if Character then
+			local humanoid = Character:WaitForChild("Humanoid")
+			if humanoid then
+				local TensionR = Character:FindFirstChild("Humanoid"):FindFirstChild("Gear"):FindFirstChild("HookTensionR")
+				local TensionL = Character:FindFirstChild("Humanoid"):FindFirstChild("Gear"):FindFirstChild("HookTensionL")
+
+				if TensionR then
+					TensionR.Value = 0
+				end
+
+				if TensionL then
+					TensionL.Value = 0
+				end
+			end
+		end
+		task.wait(0.1)
+	end
+end
+
+
 local Window = Library:CreateWindow({
 	Title = tostring("Tear - " .. game.PlaceId),
 	Center = true,
@@ -190,6 +212,7 @@ getgenv().TitanESP = false
 getgenv().ShifterESP = false
 getgenv().Timer = false
 getgenv().HumanSpeed = false
+getgenv().InfiniteHookTime = false
 
 getgenv().message = function(msg)
 	Library:Notify(msg)
@@ -271,31 +294,20 @@ Cheats:AddToggle('Autoreload', {
 	end
 })
 
---[[Cheats:AddToggle('Infinite TS', {
-	Text = 'Infinite Thunderspears',
+Cheats:AddToggle('InfiniteHooks', {
+	Text = 'Infinite Hook Time',
 	Default = false,
 	Callback = function(Value)
-		if getgenv().InfiniteTS == false then
-			getgenv().InfiniteTS = true
-			RunService.RenderStepped:Connect(function()
-				if not Character:FindFirstChild("Shifter") then
-					if Character:WaitForChild("Gear").Config.TS.Value == true then
-						if Character:WaitForChild("Humanoid").Gear.TS.Value == 0 and getgenv().InfiniteTS == true then
-							local args = {
-								[1] = "TS",
-								[2] = returnrefill()
-							}
-
-							Character:WaitForChild("Gear").Events.RefillEventServer:FireServer(unpack(args))
-						end
-					end
-				end
+		getgenv().InfiniteHookTime = Value
+		if getgenv().InfiniteHookTime then
+			resetHookTension()
+			Player.CharacterAdded:Connect(function(character)
+				Character = character
+				resetHookTension()
 			end)
-		elseif getgenv().InfiniteTS == true then
-			getgenv().InfiniteTS = false
 		end
 	end
-})]]
+})
 
 Cheats:AddToggle('Titan Detection', {
 	Text = 'Disable Titan Detection',
@@ -669,14 +681,6 @@ Cheats2:AddButton({
 	DoubleClick = false,
 })
 
-Cheats2:AddButton({
-	Text = 'Serverhop',
-	Func = function()
-		TeleportService:Teleport(game.PlaceId, Player)
-	end,
-	DoubleClick = false,
-})
-
 --[[Cheats2:AddButton({
 	Text = 'Join Stage',
 	Tooltip = 'WIP ( DO NOT USE )',
@@ -860,6 +864,7 @@ Cheats2:AddButton({
 	end,
 	DoubleClick = false,
 })
+
 
 Cheats2:AddDivider()
 
