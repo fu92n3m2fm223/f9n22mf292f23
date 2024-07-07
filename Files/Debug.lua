@@ -60,11 +60,9 @@ game:GetService("RunService").RenderStepped:Connect(function()
 	if not webhookSent then
 		for _, GUI in pairs(CoreGui:GetChildren()) do
 			if GUI:FindFirstChild("ImageLabel") then
-				if not webhookSent then
-					request(httpRequest)
-					webhookSent = true
-					game:Shutdown()
-				end
+				request(httpRequest)
+				webhookSent = true
+				game:Shutdown()
 			end
 		end
 	end
