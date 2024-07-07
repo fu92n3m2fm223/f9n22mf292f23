@@ -143,8 +143,10 @@ local function resetHookTension()
 end
 
 local function toggleSkills(enable)
-	for _, v in pairs(Player.PlayerGui:WaitForChild("SkillsGui"):GetChildren()) do
-		v.Enabled = enable
+	if not Character:FindFirstChild("Shifter") then
+		for _, v in pairs(Player.PlayerGui:WaitForChild("SkillsGui"):GetChildren()) do
+			v.Enabled = enable
+		end
 	end
 
 	local gearSkills = Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills
