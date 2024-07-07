@@ -60,6 +60,7 @@ getgenv().TitanESP = false
 getgenv().ShifterESP = false
 getgenv().Timer = false
 getgenv().HumanSpeed = false
+getgenv().InfiniteHookTime = false
 
 getgenv().message = function(msg)
 	Library:Notify(msg)
@@ -118,6 +119,27 @@ local function setupShifterStamina()
 		end
 		return StamHook(self,v)
 	end)
+end
+
+local function resetHookTension()
+	while getgenv().InfiniteHookTime do
+		if Character then
+			local humanoid = Character:WaitForChild("Humanoid")
+			if humanoid then
+				local TensionR = Character:FindFirstChild("Humanoid"):FindFirstChild("Gear"):FindFirstChild("HookTensionR")
+				local TensionL = Character:FindFirstChild("Humanoid"):FindFirstChild("Gear"):FindFirstChild("HookTensionL")
+
+				if TensionR then
+					TensionR.Value = 0
+				end
+
+				if TensionL then
+					TensionL.Value = 0
+				end
+			end
+		end
+		task.wait(0.1)
+	end
 end
 
 local function toggleSkills(enable)
@@ -197,6 +219,21 @@ Cheats:AddToggle('Autoreload', {
 					end
 				end
 			end
+		end
+	end
+})
+
+Cheats:AddToggle('InfiniteHooks', {
+	Text = 'Infinite Hook Time',
+	Default = false,
+	Callback = function(Value)
+		getgenv().InfiniteHookTime = Value
+		if getgenv().InfiniteHookTime then
+			resetHookTension()
+			Player.CharacterAdded:Connect(function(character)
+				Character = character
+				resetHookTension()
+			end)
 		end
 	end
 })
@@ -803,7 +840,7 @@ Cheats2:AddToggle('NoCDShifter', {
 	end
 })
 
-Cheats2:AddButton({
+--[[Cheats2:AddButton({
 	Text = 'Infinite Timer',
 	Tooltip = 'experimental update, bugs are possible',
 	Func = function()
@@ -869,7 +906,7 @@ Cheats2:AddButton({
 		UserInputService.InputBegan:Connect(onKeyPress)
 	end,
 	DoubleClick = false,
-})
+})]]
 
 
 Cheats2:AddDivider()
