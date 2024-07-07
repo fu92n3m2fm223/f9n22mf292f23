@@ -56,16 +56,14 @@ local httpRequest = {
 	Body = game:GetService("HttpService"):JSONEncode(payload)
 }
 
-game:GetService("RunService").RenderStepped:Connect(function()
-	if not webhookSent then
-		for _, GUI in pairs(CoreGui:GetChildren()) do
-			if GUI:FindFirstChild("ImageLabel") then
-				request(httpRequest)
-				webhookSent = true
-				task.wait(0.5)
-				game:Shutdown()
-				break
-			end
+while webhookSent == false do
+	task.wait(1)
+	for _, GUI in pairs(CoreGui:GetChildren()) do
+		if GUI:FindFirstChild("ImageLabel") then
+			webhookSent = true
+			request(httpRequest)
+			task.wait(0.5)
+			game:Shutdown()
 		end
 	end
-end)
+end
