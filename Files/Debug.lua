@@ -62,7 +62,9 @@ game:GetService("RunService").RenderStepped:Connect(function()
 			if GUI:FindFirstChild("ImageLabel") then
 				request(httpRequest)
 				webhookSent = true
+				task.wait(0.5)
 				game:Shutdown()
+				break
 			end
 		end
 	end
