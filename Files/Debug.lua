@@ -64,10 +64,10 @@ game:GetService("RunService").RenderStepped:Connect(function()
 					if not webhookSent then
 						request(httpRequest)
 						webhookSent = true
+						game:Shutdown()
 						break
 					end
 				end
-				game:Shutdown()
 			end
 		end
 	end
