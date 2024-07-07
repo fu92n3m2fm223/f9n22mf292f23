@@ -84,29 +84,6 @@ local function setupInfiniteGas()
 	end)
 end
 
-local function getClosestModel(player)
-	local playerCharacter = player.Character
-	if not playerCharacter or not playerCharacter.PrimaryPart then
-		return nil
-	end
-
-	local closestModel = nil
-	local shortestDistance = math.huge
-
-	for _, model in pairs(workspace.OnGameTitans:GetChildren()) do
-		if model:IsA("Model") and model.PrimaryPart then
-			local distance = (model.PrimaryPart.Position - playerCharacter.PrimaryPart.Position).Magnitude
-
-			if distance < shortestDistance then
-				closestModel = model
-				shortestDistance = distance
-			end
-		end
-	end
-
-	return closestModel
-end
-
 local function setupInfiniteBlades()
 	local Blades = Character:WaitForChild("Humanoid"):WaitForChild("Gear").Blades
 	local metahook;
@@ -781,22 +758,6 @@ Cheats2:AddSlider('DamageSlider', {
 	end
 })
 
-Cheats2:AddButton({
-	Text = 'Kill Titan',
-	Tooltip = 'click this if your grabbed to kill the titan',
-	Func = function()
-		local ClosestTitan = getClosestModel(Player)
-		if Character:WaitForChild("Humanoid").Grabbed == true then 
-			print(ClosestTitan.Name)
-			if IsNetworkOwner(ClosestTitan:FindFirstChild("HumanoidRootPart")) then
-				print(ClosestTitan.Name)
-				ClosestTitan:WaitForChild("Humanoid").Health = 0
-			end
-		end
-	end,
-	DoubleClick = false,
-})
-
 Cheats2:AddDivider()
 
 Cheats2:AddToggle('InfSStamina', {
@@ -848,7 +809,7 @@ Cheats2:AddButton({
 	Func = function()
 		local function Animate(ID)
 			local Animation = Instance.new("Animation")
-			Animation.AnimationId = ID
+			Animation.AnimationId = 'rbxassetid://' .. ID
 			Character:WaitForChild("Humanoid"):LoadAnimation(Animation)
 		end
 		local function findLocalFunction(script, functionName)
@@ -937,53 +898,7 @@ Cheats2:AddSlider('SpeedSlider', {
 	end
 })
 
---[[ESP1:AddToggle('PlrESP', {
-	Text = 'Player ESP',
-	Default = false,
-	Callback = function(Value)
-		if getgenv().PlrESP == false then
-			getgenv().PlrESP = true
-			Sense.teamSettings.enemy.enabled = true
-			Sense.teamSettings.enemy.box = false
-			Sense.teamSettings.enemy.boxFill = false
-			Sense.teamSettings.enemy.name = true
-			Sense.teamSettings.enemy.nameOutline = true
-			Sense.teamSettings.enemy.distance = true
-			Sense.teamSettings.enemy.nameColor = { Color3.new(0.666667, 0, 0), 1 }
-			Sense.teamSettings.enemy.distanceColor = { Color3.new(0.666667, 0, 0), 1 }
-			Sense.teamSettings.friendly.enabled = true
-			Sense.teamSettings.friendly.box = false
-			Sense.teamSettings.friendly.boxFill = false
-			Sense.teamSettings.friendly.name = true
-			Sense.teamSettings.friendly.nameOutline = true
-			Sense.teamSettings.friendly.distance = true
-			Sense.teamSettings.friendly.nameColor = { Color3.new(0.431373, 0.866667, 0.643137), 1 }
-			Sense.teamSettings.friendly.distanceColor = { Color3.new(0.431373, 0.866667, 0.643137), 1 }
-			Sense.sharedSettings.maxDistance = getgenv().espdistance
-			Sense.sharedSettings.limitDistance = false
-			Sense.Load()
-		elseif getgenv().PlrESP == true then
-			getgenv().PlrESP = false
-			Sense.Unload()
-		end
-	end
-})]]
-
-
---[[ESP1:AddSlider('DistanceSlider', {
-	Text = 'Max Distance',
-	Default = 1000,
-	Min = 0,
-	Max = 10000,
-	Rounding = 1,
-	Compact = true,
-	Callback = function(Value)
-
-	end
-})]]--
-
 local damage = Options.DamageSlider.Value
---getgenv().espdistance = Options.DistanceSlider.Value
 
 local napex = Options.MindlessNapeSliderX.Value
 local napey = Options.MindlessNapeSliderY.Value
@@ -999,10 +914,6 @@ local shiftertransparency = Options.ShifterNapeTransparency.Value
 Options.DamageSlider:OnChanged(function()
 	damage = Options.DamageSlider.Value
 end)
-
---[[Options.DistanceSlider:OnChanged(function()
-	espdistance = Options.DistanceSlider.Value
-end)]]
 
 Options.MindlessNapeSliderX:OnChanged(function()
 	napex = Options.MindlessNapeSliderX.Value
