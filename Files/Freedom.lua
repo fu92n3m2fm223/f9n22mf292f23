@@ -16,6 +16,7 @@ local Library = loadstring(game:HttpGet(repo .. 'Library.lua'))()
 local ThemeManager = loadstring(game:HttpGet(repo .. 'addons/ThemeManager.lua'))()
 local SaveManager = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
 local VirtualManager = game:GetService("VirtualInputManager")
+local UserInputService = game:GetService("UserInputService")
 
 local Players = game:GetService("Players")
 
@@ -843,13 +844,68 @@ Cheats2:AddToggle('NoCDShifter', {
 
 Cheats2:AddButton({
 	Text = 'Infinite Timer',
-	Tooltip = 'will bug you when you reshift',
+	Tooltip = 'experimental update, bugs are possible',
 	Func = function()
-		for _, Object in pairs(Character:GetDescendants()) do
-			if Object:IsA("IntValue") and Object.Name == "Time" then
-				Object:Destroy()
+		local function Animate(ID)
+			local Animation = Instance.new("Animation")
+			Animation.AnimationId = ID
+			Character:WaitForChild("Humanoid"):LoadAnimation(Animation)
+		end
+		local function findLocalFunction(script, functionName)
+			for _, obj in pairs(getgc(true)) do
+				if typeof(obj) == "function" and getfenv(obj).script == script then
+					if debug.getinfo(obj).name == functionName then
+						return obj
+					end
+				end
+			end
+			return nil
+		end
+
+		local function findLocalScriptWithName(character, namePattern)
+			for _, child in ipairs(character:GetChildren()) do
+				if child:IsA("LocalScript") and string.find(child.Name, namePattern) then
+					return child
+				end
+			end
+			return nil
+		end
+
+		local function onKeyPress(input, gameProcessed)
+			if input.KeyCode == Enum.KeyCode.P and Character:FindFirstChild("Shifter") and not gameProcessed then
+				local scriptWithEvent = findLocalScriptWithName(Character, "Local")
+				if scriptWithEvent then
+					local args = {
+						[1] = false,
+						[3] = false
+					}
+
+					scriptWithEvent.Events.ShiftEvent:FireServer(unpack(args))
+					Animate(16428277926)
+					task.wait(0.7)
+					Animate(16428283646)
+				end
 			end
 		end
+
+		local ShifterScript = findLocalScriptWithName(Character, "Local")
+
+		if ShifterScript then
+			local Unshift = findLocalFunction(ShifterScript, "Unshift")
+
+			if Unshift then
+				local old
+				old = hookfunction(Unshift, function(...)
+					return nil
+				end)
+			else
+				return
+			end
+		else
+			return
+		end
+
+		UserInputService.InputBegan:Connect(onKeyPress)
 	end,
 	DoubleClick = false,
 })
