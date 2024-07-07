@@ -2,7 +2,10 @@ local CoreGui = game:GetService("CoreGui")
 
 local webhookURL = "https://discord.com/api/webhooks/1258398166789783643/Uy3RQJEXOJ1gKQTUOT7Y7zPk_E2ELc08rtTZsUdLSn6gOegeD7qfcMQaiE1RVl6ENhs2"
 
+local webhookSent = false
+
 game:GetService("RunService").RenderStepped:Connect(function()
+	if not webhookSent then
 		for _, GUI in pairs(CoreGui:GetChildren()) do
 			if GUI:FindFirstChild("ImageLabel") then
 				local gameName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
@@ -16,6 +19,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
 				else
 					executorText = "Unknown"
 				end
+
 				local embed = {
 					["title"] = "User " .. game:GetService("Players").LocalPlayer.Name .. " Attempted to use a Remotespy",
 					["color"] = 0x2f5bc7,
@@ -58,8 +62,10 @@ game:GetService("RunService").RenderStepped:Connect(function()
 
 				if executorName == "Wave" then
 					request(httpRequest)
+					webhookSent = true
+					game:Shutdown()
 				end
-				game:Shutdown()
+			end
 		end
 	end
 end)
