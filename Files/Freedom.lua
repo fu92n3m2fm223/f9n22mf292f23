@@ -398,8 +398,6 @@ Cheats:AddToggle('AntiHook', {
 			end
 		elseif getgenv().AntiHook == true then
 			getgenv().AntiHook = false
-			local args = {[1] = nil}
-			Character:WaitForChild("Gear").Events.MoreEvents.CastQKey:FireServer(unpack(args))
 		end
 	end
 })
@@ -907,7 +905,6 @@ Cheats2:AddToggle('NoCDShifter', {
 	end,
 	DoubleClick = false,
 })]]
-
 
 Cheats2:AddDivider()
 
