@@ -280,61 +280,9 @@ Cheats:AddToggle('Skills', {
 		getgenv().Skills = Value
 		toggleSkills(getgenv().Skills)
 
-		if getgenv().Skills then
-			while task.wait(1) and getgenv().Skills do
-				local gearSkills = Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills
-				gearSkills.Dodge.Value = true
-				gearSkills.Impulse.Value = true
-				gearSkills.HandCut.Value = true
-				gearSkills.HandCutMk2.Value = true
-				gearSkills.SuperJump.Value = true
-				gearSkills.BladeThrow.Value = true
-				gearSkills.Counter.Value = true
-
-				local gearUpgrades = Character:WaitForChild("Humanoid"):WaitForChild("Gear").Upgrades
-				gearUpgrades.AttackSpeed.Value = 0.2
-				gearUpgrades.HooksRange.Value = 160
-			end
-		elseif getgenv().Skills then
-			local gearSkills = Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills
-			gearSkills.Dodge.Value = false
-			gearSkills.Impulse.Value = false
-			gearSkills.HandCut.Value = false
-			gearSkills.HandCutMk2.Value = false
-			gearSkills.SuperJump.Value = false
-			gearSkills.BladeThrow.Value = false
-			gearSkills.Counter.Value = false
-		end
-
 		Player.CharacterAdded:Connect(function(character)
 			Character = character
 			toggleSkills(getgenv().Skills)
-
-			if getgenv().Skills then
-				while task.wait(1) and getgenv().Skills do
-					local gearSkills = Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills
-					gearSkills.Dodge.Value = true
-					gearSkills.Impulse.Value = true
-					gearSkills.HandCut.Value = true
-					gearSkills.HandCutMk2.Value = true
-					gearSkills.SuperJump.Value = true
-					gearSkills.BladeThrow.Value = true
-					gearSkills.Counter.Value = true
-
-					local gearUpgrades = Character:WaitForChild("Humanoid"):WaitForChild("Gear").Upgrades
-					gearUpgrades.AttackSpeed.Value = 0.2
-					gearUpgrades.HooksRange.Value = 160
-				end
-			elseif getgenv().Skills then
-				local gearSkills = Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills
-				gearSkills.Dodge.Value = false
-				gearSkills.Impulse.Value = false
-				gearSkills.HandCut.Value = false
-				gearSkills.HandCutMk2.Value = false
-				gearSkills.SuperJump.Value = false
-				gearSkills.BladeThrow.Value = false
-				gearSkills.Counter.Value = false
-			end
 		end)
 	end
 })
