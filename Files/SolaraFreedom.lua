@@ -868,30 +868,6 @@ Cheats2:AddButton({
 
 Cheats2:AddDivider()
 
-Cheats2:AddToggle('Speed', {
-	Text = 'Human Speed',
-	Default = false,
-	Callback = function(Value)
-		if getgenv().HumanSpeed == false then
-			getgenv().HumanSpeed = true
-		elseif getgenv().HumanSpeed == true then
-			getgenv().HumanSpeed = false
-		end
-	end
-})
-
-Cheats2:AddSlider('SpeedSlider', {
-	Text = 'Speed',
-	Default = 16,
-	Min = 16,
-	Max = 200,
-	Rounding = 1,
-	Compact = true,
-	Callback = function(Value)
-		getgenv().Speed = Value
-	end
-})
-
 --[[ESP1:AddToggle('PlrESP', {
 	Text = 'Player ESP',
 	Default = false,
@@ -997,12 +973,6 @@ RunService.RenderStepped:Connect(function()
 				Titan.Nape.BrickColor = BrickColor.new("Institutional white")
 			end
 		end
-	end
-	
-	if getgenv().HumanSpeed then
-		Character:WaitForChild("Humanoid").WalkSpeed = getgenv().Speed
-	elseif getgenv().HumanSpeed == false then
-		Character:WaitForChild("Humanoid").WalkSpeed = 16
 	end
 
 	if getgenv().ShifterNapeHitbox then
