@@ -858,30 +858,6 @@ Cheats2:AddToggle('NoCDShifter', {
 
 Cheats2:AddDivider()
 
-Cheats2:AddToggle('Speed', {
-	Text = 'Human Speed',
-	Default = false,
-	Callback = function(Value)
-		if getgenv().HumanSpeed == false then
-			getgenv().HumanSpeed = true
-		elseif getgenv().HumanSpeed == true then
-			getgenv().HumanSpeed = false
-		end
-	end
-})
-
-Cheats2:AddSlider('SpeedSlider', {
-	Text = 'Speed',
-	Default = 16,
-	Min = 16,
-	Max = 200,
-	Rounding = 1,
-	Compact = true,
-	Callback = function(Value)
-		getgenv().Speed = Value
-	end
-})
-
 local damage = Options.DamageSlider.Value
 
 local napex = Options.MindlessNapeSliderX.Value
@@ -955,17 +931,6 @@ RunService.RenderStepped:Connect(function()
 			end
 		end
 	end
-	
-	if Character:FindFirstChild("Shifter") then
-		return
-	else
-		if getgenv().HumanSpeed then
-			Character:WaitForChild("Humanoid").WalkSpeed = getgenv().Speed
-		else
-			Character:WaitForChild("Humanoid").WalkSpeed = 16
-		end
-	end
-
 
 	if getgenv().ShifterNapeHitbox then
 		for _, TitanS in pairs(workspace:GetChildren()) do
