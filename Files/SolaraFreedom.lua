@@ -16,6 +16,7 @@ local Library = loadstring(game:HttpGet(repo .. 'Library.lua'))()
 local ThemeManager = loadstring(game:HttpGet(repo .. 'addons/ThemeManager.lua'))()
 local SaveManager = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
 local VirtualManager = game:GetService("VirtualInputManager")
+local UserInputService = game:GetService("UserInputService")
 
 local Players = game:GetService("Players")
 
@@ -213,6 +214,9 @@ getgenv().ShifterESP = false
 getgenv().Timer = false
 getgenv().HumanSpeed = false
 getgenv().InfiniteHookTime = false
+
+getgenv().healthkeybind = Enum.KeyCode.Six
+getgenv().fullkeybind = Enum.KeyCode.U
 
 getgenv().message = function(msg)
 	Library:Notify(msg)
@@ -637,17 +641,11 @@ Cheats:AddLabel('Regenerate Health'):AddKeyPicker('KeyPicker', {
 	NoUI = false,
 
 	Callback = function(Value)
-		local maxHealth = Character.Humanoid.MaxHealth
-		local currentHealth = Character.Humanoid.Health
-		local healthToAdd = maxHealth - currentHealth
-		local damage = -healthToAdd
-		local damageTable = {[1] = damage}
-
-		workspace:WaitForChild("HumanEvents").DamageEvent:FireServer(unpack(damageTable))
+		getgenv().fullkeybind = Enum.KeyCode[Value]
 	end,
 
 	ChangedCallback = function(New)
-
+		getgenv().fullkeybind = Enum.KeyCode[New]
 	end
 })
 
@@ -661,17 +659,35 @@ Cheats:AddLabel('+100 Health'):AddKeyPicker('KeyPicker', {
 	NoUI = false,
 
 	Callback = function(Value)
+		getgenv().healthkeybind = Enum.KeyCode[Value]
+	end,
+
+	ChangedCallback = function(New)
+		getgenv().healthkeybind = Enum.KeyCode[New]
+	end
+})
+
+UserInputService.InputBegan:Connect(function(Input, GPE)
+	if not GPE and Input.KeyCode == getgenv().healthkeybind then
 		local args = {
 			[1] = -100
 		}
 
 		workspace:WaitForChild("HumanEvents"):WaitForChild("DamageEvent"):FireServer(unpack(args))
-	end,
-
-	ChangedCallback = function(New)
-
 	end
-})
+end)
+
+UserInputService.InputBegan:Connect(function(Input, GPE)
+	if not GPE and Input.KeyCode == getgenv().fullkeybind then
+		local maxHealth = Character.Humanoid.MaxHealth
+		local currentHealth = Character.Humanoid.Health
+		local healthToAdd = maxHealth - currentHealth
+		local damage = -healthToAdd
+		local damageTable = {[1] = damage}
+
+		workspace:WaitForChild("HumanEvents").DamageEvent:FireServer(unpack(damageTable))
+	end
+end)
 
 Cheats2:AddButton({
 	Text = 'Rejoin Same Server',
