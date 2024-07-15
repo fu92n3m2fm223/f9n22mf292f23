@@ -62,38 +62,8 @@ getgenv().Timer = false
 getgenv().HumanSpeed = false
 getgenv().InfiniteHookTime = false
 
-getgenv().healthkeybind = Enum.KeyCode.Six
-getgenv().fullkeybind = Enum.KeyCode.U
-
 getgenv().message = function(msg)
 	Library:Notify(msg)
-end
-
-
-local function findLocalFunction(script, functionName)
-	for _, obj in pairs(getgc(true)) do
-		if typeof(obj) == "function" and getfenv(obj).script == script then
-			if debug.getinfo(obj).name == functionName then
-				return obj
-			end
-		end
-	end
-	return nil
-end
-
-local function Animate(ID)
-	local Animation = Instance.new("Animation")
-	Animation.AnimationId = 'rbxassetid://' .. ID
-	Character:WaitForChild("Humanoid"):LoadAnimation(Animation)
-end
-
-local function findLocalScriptWithName(character, namePattern)
-	for _, child in ipairs(character:GetChildren()) do
-		if child:IsA("LocalScript") and string.find(child.Name, namePattern) then
-			return child
-		end
-	end
-	return nil
 end
 
 local Cheats = Tabs.Main:AddLeftGroupbox('')
@@ -105,10 +75,14 @@ local function IsNetworkOwner(Part)
 end
 
 local function setupInfiniteGas()
-	while getgenv().InfiniteGas do
-		Character:WaitForChild("Humanoid"):WaitForChild("Gear").Gas.Value = 2000
-		task.wait(0.01)
-	end
+	local Gas = Character:WaitForChild("Humanoid"):WaitForChild("Gear").Gas
+	local freehook;
+	freehook = hookmetamethod(game, '__index', function(self, v)
+		if self == Gas and v == "Value" and getgenv().InfiniteGas then
+			return 2000
+		end
+		return freehook(self, v)
+	end)
 end
 
 local function setupInfiniteBlades()
@@ -164,7 +138,7 @@ local function resetHookTension()
 				end
 			end
 		end
-		task.wait(0.01)
+		task.wait(0.1)
 	end
 end
 
@@ -324,7 +298,7 @@ Cheats:AddToggle('NoCooldown', {
 			while task.wait() and getgenv().NoCooldown do
 				local AP = Character:FindFirstChild("APGear")
 				local Normal = Character:FindFirstChild("Gear")
-				
+
 				if AP then
 					for _, Move in pairs(Character:WaitForChild("APGear").SkillsSpamLimit:GetChildren()) do
 						Move.Value = -1
@@ -565,10 +539,16 @@ Cheats:AddButton({
 	DoubleClick = false,
 })
 
-Cheats:AddButton({
-	Text = 'Regenerate Health',
-	Tooltip = 'brings hp back to max',
-	Func = function()
+Cheats:AddLabel('Regenerate Health'):AddKeyPicker('KeyPicker', {
+	Default = 'U',
+	SyncToggleState = false,
+
+	Mode = 'Toggle',
+
+	Text = '',
+	NoUI = false,
+
+	Callback = function(Value)
 		local maxHealth = Character.Humanoid.MaxHealth
 		local currentHealth = Character.Humanoid.Health
 		local healthToAdd = maxHealth - currentHealth
@@ -577,19 +557,32 @@ Cheats:AddButton({
 
 		workspace:WaitForChild("HumanEvents").DamageEvent:FireServer(unpack(damageTable))
 	end,
-	DoubleClick = false,
+
+	ChangedCallback = function(New)
+
+	end
 })
 
-Cheats:AddButton({
-	Text = '+100 Health',
-	Func = function()
+Cheats:AddLabel('+100 Health'):AddKeyPicker('KeyPicker', {
+	Default = 'Six',
+	SyncToggleState = false,
+
+	Mode = 'Toggle',
+
+	Text = '',
+	NoUI = false,
+
+	Callback = function(Value)
 		local args = {
 			[1] = -100
 		}
 
 		workspace:WaitForChild("HumanEvents"):WaitForChild("DamageEvent"):FireServer(unpack(args))
 	end,
-	DoubleClick = false,
+
+	ChangedCallback = function(New)
+
+	end
 })
 
 Cheats2:AddButton({
@@ -799,6 +792,31 @@ Cheats2:AddToggle('NoCDShifter', {
 	Text = 'Infinite Timer',
 	Tooltip = 'experimental update, bugs are possible',
 	Func = function()
+		local function Animate(ID)
+			local Animation = Instance.new("Animation")
+			Animation.AnimationId = 'rbxassetid://' .. ID
+			Character:WaitForChild("Humanoid"):LoadAnimation(Animation)
+		end
+		local function findLocalFunction(script, functionName)
+			for _, obj in pairs(getgc(true)) do
+				if typeof(obj) == "function" and getfenv(obj).script == script then
+					if debug.getinfo(obj).name == functionName then
+						return obj
+					end
+				end
+			end
+			return nil
+		end
+
+		local function findLocalScriptWithName(character, namePattern)
+			for _, child in ipairs(character:GetChildren()) do
+				if child:IsA("LocalScript") and string.find(child.Name, namePattern) then
+					return child
+				end
+			end
+			return nil
+		end
+
 		local function onKeyPress(input, gameProcessed)
 			if input.KeyCode == Enum.KeyCode.P and Character:FindFirstChild("Shifter") and not gameProcessed then
 				local scriptWithEvent = findLocalScriptWithName(Character, "Local")
@@ -815,32 +833,26 @@ Cheats2:AddToggle('NoCDShifter', {
 				end
 			end
 		end
-		local function callback()
-			local Character = game:GetService("Players").LocalPlayer.Character
-			local ShifterScript = findLocalScriptWithName(Character, "Local")
 
-			if ShifterScript then
-				local Unshift = findLocalFunction(ShifterScript, "Unshift")
+		local ShifterScript = findLocalScriptWithName(Character, "Local")
 
-				if Unshift then
-					local old
-					old = hookfunction(Unshift, function(...)
-						print("hooked")
-						return nil
-					end)
-				else
-					return
-				end
+		if ShifterScript then
+			local Unshift = findLocalFunction(ShifterScript, "Unshift")
+
+			if Unshift then
+				local old
+				old = hookfunction(Unshift, function(...)
+					return nil
+				end)
 			else
 				return
 			end
-
-			UserInputService.InputBegan:Connect(onKeyPress)
+		else
+			return
 		end
-		
-		callback()
-	end,
 
+		UserInputService.InputBegan:Connect(onKeyPress)
+	end,
 	DoubleClick = false,
 })]]
 
