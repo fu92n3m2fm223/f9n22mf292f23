@@ -62,6 +62,8 @@ getgenv().Timer = false
 getgenv().HumanSpeed = false
 getgenv().InfiniteHookTime = false
 
+getgenv().healthkeybind = Enum.KeyCode.Six
+
 getgenv().message = function(msg)
 	Library:Notify(msg)
 end
@@ -586,6 +588,8 @@ Cheats:AddLabel('Regenerate Health'):AddKeyPicker('KeyPicker', {
 	end
 })
 
+local UserInputService = game:GetService("UserInputService")
+
 Cheats:AddLabel('+100 Health'):AddKeyPicker('KeyPicker', {
 	Default = 'Six',
 	SyncToggleState = false,
@@ -596,17 +600,23 @@ Cheats:AddLabel('+100 Health'):AddKeyPicker('KeyPicker', {
 	NoUI = false,
 
 	Callback = function(Value)
+		getgenv().healthkeybind = Enum.KeyCode[Value]
+	end,
+
+	ChangedCallback = function(New)
+		getgenv().healthkeybind = Enum.KeyCode[New]
+	end
+})
+
+UserInputService.InputBegan:Connect(function(Input, GPE)
+	if not GPE and Input.KeyCode == getgenv().healthkeybind then
 		local args = {
 			[1] = -100
 		}
 
 		workspace:WaitForChild("HumanEvents"):WaitForChild("DamageEvent"):FireServer(unpack(args))
-	end,
-
-	ChangedCallback = function(New)
-
 	end
-})
+end)
 
 Cheats2:AddButton({
 	Text = 'Rejoin Same Server',
@@ -811,7 +821,7 @@ Cheats2:AddToggle('NoCDShifter', {
 	end
 })
 
-Cheats2:AddButton({
+--[[Cheats2:AddButton({
 	Text = 'Infinite Timer',
 	Tooltip = 'experimental update, bugs are possible',
 	Func = function()
@@ -858,7 +868,7 @@ Cheats2:AddButton({
 	end,
 
 	DoubleClick = false,
-})
+})]]
 
 Cheats2:AddDivider()
 
