@@ -631,54 +631,10 @@ Cheats:AddButton({
 	DoubleClick = false,
 })
 
-Cheats:AddLabel('Regenerate Health'):AddKeyPicker('KeyPicker', {
-	Default = 'U',
-	SyncToggleState = false,
-
-	Mode = 'Toggle',
-
-	Text = '',
-	NoUI = false,
-
-	Callback = function(Value)
-		getgenv().fullkeybind = Value
-	end,
-
-	ChangedCallback = function(New)
-		getgenv().fullkeybind = New
-	end
-})
-
-Cheats:AddLabel('+100 Health'):AddKeyPicker('KeyPicker', {
-	Default = 'Six',
-	SyncToggleState = false,
-
-	Mode = 'Toggle',
-
-	Text = '',
-	NoUI = false,
-
-	Callback = function(Value)
-		getgenv().healthkeybind = Value
-	end,
-
-	ChangedCallback = function(New)
-		getgenv().healthkeybind = New
-	end
-})
-
-UserInputService.InputBegan:Connect(function(Input, GPE)
-	if not GPE and Input.KeyCode == getgenv().healthkeybind then
-		local args = {
-			[1] = -100
-		}
-
-		workspace:WaitForChild("HumanEvents"):WaitForChild("DamageEvent"):FireServer(unpack(args))
-	end
-end)
-
-UserInputService.InputBegan:Connect(function(Input, GPE)
-	if not GPE and Input.KeyCode == getgenv().fullkeybind then
+Cheats:AddButton({
+	Text = 'Regenerate Health',
+	Tooltip = 'brings hp back to max',
+	Func = function()
 		local maxHealth = Character.Humanoid.MaxHealth
 		local currentHealth = Character.Humanoid.Health
 		local healthToAdd = maxHealth - currentHealth
@@ -686,8 +642,21 @@ UserInputService.InputBegan:Connect(function(Input, GPE)
 		local damageTable = {[1] = damage}
 
 		workspace:WaitForChild("HumanEvents").DamageEvent:FireServer(unpack(damageTable))
-	end
-end)
+	end,
+	DoubleClick = false,
+})
+
+Cheats:AddButton({
+	Text = '+100 Health',
+	Func = function()
+		local args = {
+			[1] = -100
+		}
+
+		workspace:WaitForChild("HumanEvents"):WaitForChild("DamageEvent"):FireServer(unpack(args))
+	end,
+	DoubleClick = false,
+})
 
 Cheats2:AddButton({
 	Text = 'Rejoin Same Server',
