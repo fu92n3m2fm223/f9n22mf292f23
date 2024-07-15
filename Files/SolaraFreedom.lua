@@ -641,11 +641,11 @@ Cheats:AddLabel('Regenerate Health'):AddKeyPicker('KeyPicker', {
 	NoUI = false,
 
 	Callback = function(Value)
-		getgenv().fullkeybind = Enum.KeyCode[Value]
+		getgenv().fullkeybind = Value
 	end,
 
 	ChangedCallback = function(New)
-		getgenv().fullkeybind = Enum.KeyCode[New]
+		getgenv().fullkeybind = New
 	end
 })
 
@@ -659,11 +659,11 @@ Cheats:AddLabel('+100 Health'):AddKeyPicker('KeyPicker', {
 	NoUI = false,
 
 	Callback = function(Value)
-		getgenv().healthkeybind = Enum.KeyCode[Value]
+		getgenv().healthkeybind = Value
 	end,
 
 	ChangedCallback = function(New)
-		getgenv().healthkeybind = Enum.KeyCode[New]
+		getgenv().healthkeybind = New
 	end
 })
 
