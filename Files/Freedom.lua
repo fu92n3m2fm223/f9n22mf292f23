@@ -63,6 +63,7 @@ getgenv().HumanSpeed = false
 getgenv().InfiniteHookTime = false
 
 getgenv().healthkeybind = Enum.KeyCode.Six
+getgenv().fullkeybind = Enum.KeyCode.U
 
 getgenv().message = function(msg)
 	Library:Notify(msg)
@@ -574,21 +575,13 @@ Cheats:AddLabel('Regenerate Health'):AddKeyPicker('KeyPicker', {
 	NoUI = false,
 
 	Callback = function(Value)
-		local maxHealth = Character.Humanoid.MaxHealth
-		local currentHealth = Character.Humanoid.Health
-		local healthToAdd = maxHealth - currentHealth
-		local damage = -healthToAdd
-		local damageTable = {[1] = damage}
-
-		workspace:WaitForChild("HumanEvents").DamageEvent:FireServer(unpack(damageTable))
+		getgenv().fullkeybind = Enum.KeyCode[Value]
 	end,
 
 	ChangedCallback = function(New)
-
+		getgenv().fullkeybind = Enum.KeyCode[New]
 	end
 })
-
-local UserInputService = game:GetService("UserInputService")
 
 Cheats:AddLabel('+100 Health'):AddKeyPicker('KeyPicker', {
 	Default = 'Six',
@@ -615,6 +608,18 @@ UserInputService.InputBegan:Connect(function(Input, GPE)
 		}
 
 		workspace:WaitForChild("HumanEvents"):WaitForChild("DamageEvent"):FireServer(unpack(args))
+	end
+end)
+
+UserInputService.InputBegan:Connect(function(Input, GPE)
+	if not GPE and Input.KeyCode == getgenv().fullkeybind then
+		local maxHealth = Character.Humanoid.MaxHealth
+		local currentHealth = Character.Humanoid.Health
+		local healthToAdd = maxHealth - currentHealth
+		local damage = -healthToAdd
+		local damageTable = {[1] = damage}
+
+		workspace:WaitForChild("HumanEvents").DamageEvent:FireServer(unpack(damageTable))
 	end
 end)
 
