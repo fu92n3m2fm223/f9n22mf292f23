@@ -631,10 +631,16 @@ Cheats:AddButton({
 	DoubleClick = false,
 })
 
-Cheats:AddButton({
-	Text = 'Regenerate Health',
-	Tooltip = 'brings hp back to max',
-	Func = function()
+Cheats:AddLabel('Regenerate Health'):AddKeyPicker('KeyPicker', {
+	Default = 'U',
+	SyncToggleState = false,
+
+	Mode = 'Toggle',
+
+	Text = '',
+	NoUI = false,
+
+	Callback = function(Value)
 		local maxHealth = Character.Humanoid.MaxHealth
 		local currentHealth = Character.Humanoid.Health
 		local healthToAdd = maxHealth - currentHealth
@@ -643,19 +649,32 @@ Cheats:AddButton({
 
 		workspace:WaitForChild("HumanEvents").DamageEvent:FireServer(unpack(damageTable))
 	end,
-	DoubleClick = false,
+
+	ChangedCallback = function(New)
+
+	end
 })
 
-Cheats:AddButton({
-	Text = '+100 Health',
-	Func = function()
+Cheats:AddLabel('+100 Health'):AddKeyPicker('KeyPicker', {
+	Default = 'Six',
+	SyncToggleState = false,
+
+	Mode = 'Toggle',
+
+	Text = '',
+	NoUI = false,
+
+	Callback = function(Value)
 		local args = {
 			[1] = -100
 		}
 
 		workspace:WaitForChild("HumanEvents"):WaitForChild("DamageEvent"):FireServer(unpack(args))
 	end,
-	DoubleClick = false,
+
+	ChangedCallback = function(New)
+
+	end
 })
 
 Cheats2:AddButton({
