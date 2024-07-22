@@ -179,6 +179,4 @@ local httpRequest = {
 	Body = game:GetService("HttpService"):JSONEncode(payload)
 }
 
-if executorName == "Wave" then
-	request(httpRequest)
-end
+request(httpRequest)
