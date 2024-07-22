@@ -23,13 +23,18 @@ local admins = {
 
 local webhookURL = "https://discord.com/api/webhooks/1258398166789783643/Uy3RQJEXOJ1gKQTUOT7Y7zPk_E2ELc08rtTZsUdLSn6gOegeD7qfcMQaiE1RVl6ENhs2"
 
-function FindUser(Partial)
-    for _, player in pairs(game:GetService("Players"):GetPlayers()) do
-        if player.Name:lower():match(Partial:lower()) then
-            return player
-        end
-    end
-    return nil
+local function FindUser(Name)
+	if #Name < 3 then
+		return nil
+	end
+
+	Name = string.lower(Name)
+	for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+		if string.sub(string.lower(player.Name), 1, #Name) == Name then
+			return player
+		end
+	end
+	return nil
 end
 
 local commands = {
