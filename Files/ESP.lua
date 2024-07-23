@@ -1,7 +1,7 @@
 local ESP = {}
 ESP.Enabled = false
 ESP.Boxes = false
-ESP.Names = true
+ESP.Names = false
 ESP.Players = {}
 ESP.Connections = {}
 
