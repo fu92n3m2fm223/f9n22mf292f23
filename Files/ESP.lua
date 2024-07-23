@@ -140,11 +140,15 @@ function ESP:Disable()
     end
 end
 
-function ESP:Toggle()
-    if self.Enabled then
-        self:Disable()
-    else
+function ESP:Toggle(state)
+    if state == nil then
+        state = not self.Enabled
+    end
+
+    if state then
         self:Enable()
+    else
+        self:Disable()
     end
 end
 
