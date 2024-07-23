@@ -147,3 +147,5 @@ function ESP:Toggle()
         self:Enable()
     end
 end
+
+return ESP
