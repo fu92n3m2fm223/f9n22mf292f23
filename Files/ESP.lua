@@ -46,6 +46,11 @@ local function getPlayerColor(player)
 end
 
 local function updateESP()
+    if not getgenv().ESP then
+        ESP:Disable()
+        return
+    end
+
     for player, drawings in pairs(ESP.Players) do
         local character = player.Character
         if character and character:FindFirstChild("HumanoidRootPart") and not character:FindFirstChild("Shifter") then
@@ -93,7 +98,7 @@ local function updateESP()
 end
 
 function ESP:Enable()
-    if not self.Enabled then
+    if not self.Enabled and getgenv().ESP then
         self.Enabled = true
 
         for _, player in pairs(game:GetService("Players"):GetPlayers()) do
@@ -157,9 +162,9 @@ end
 
 function ESP:Toggle()
     if self.Enabled then
-        self:Enable()
-    else
         self:Disable()
+    else
+        self:Enable()
     end
 end
 
