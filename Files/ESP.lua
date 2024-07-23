@@ -53,7 +53,7 @@ local function updateESP()
 
     for player, drawings in pairs(ESP.Players) do
         local character = player.Character
-        if character and character:FindFirstChild("HumanoidRootPart") and not character:FindFirstChild("Shifter") then
+        if character and character:FindFirstChild("HumanoidRootPart") then
             -- Skip players on the "Choosing" team
             if player.Team and player.Team.Name == "Choosing" then
                 drawings.box.Visible = false
@@ -79,8 +79,12 @@ local function updateESP()
                 end
 
                 if ESP.Names then
+                    local displayName = player.Name
+                    if character:FindFirstChild("Shifter") then
+                        displayName = character.Name
+                    end
                     drawings.text.Position = Vector2.new(screenPosition.X, screenPosition.Y - size.Y / 2 - 20)
-                    drawings.text.Text = player.Name
+                    drawings.text.Text = displayName
                     drawings.text.Color = getPlayerColor(player)
                     drawings.text.Visible = true
                 else
@@ -176,7 +180,6 @@ local function checkESP()
     end
 end
 
--- Connect the checkESP function to RenderStepped to continuously check the global variable
 game:GetService("RunService").RenderStepped:Connect(checkESP)
 
 return ESP
