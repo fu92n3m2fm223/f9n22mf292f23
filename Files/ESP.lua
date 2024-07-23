@@ -49,6 +49,13 @@ local function updateESP()
     for player, drawings in pairs(ESP.Players) do
         local character = player.Character
         if character and character:FindFirstChild("HumanoidRootPart") and not character:FindFirstChild("Shifter") then
+            -- Skip players on the "Choosing" team
+            if player.Team and player.Team.Name == "Choosing" then
+                drawings.box.Visible = false
+                drawings.text.Visible = false
+                continue
+            end
+
             local rootPart = character.HumanoidRootPart
             local head = character:FindFirstChild("Head")
 
@@ -93,6 +100,10 @@ function ESP:Enable()
             if player ~= game.Players.LocalPlayer then
                 local character = player.Character
                 if character and not character:FindFirstChild("Shifter") then
+                    -- Skip players on the "Choosing" team
+                    if player.Team and player.Team.Name == "Choosing" then
+                        continue
+                    end
                     local box = createBox()
                     local text = createText()
                     self.Players[player] = { box = box, text = text }
@@ -104,6 +115,10 @@ function ESP:Enable()
             if player ~= game.Players.LocalPlayer then
                 local character = player.Character
                 if character and not character:FindFirstChild("Shifter") then
+                    -- Skip players on the "Choosing" team
+                    if player.Team and player.Team.Name == "Choosing" then
+                        return
+                    end
                     local box = createBox()
                     local text = createText()
                     self.Players[player] = { box = box, text = text }
