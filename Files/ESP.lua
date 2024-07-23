@@ -168,4 +168,15 @@ function ESP:Toggle()
     end
 end
 
+local function checkESP()
+    if getgenv().ESP and not ESP.Enabled then
+        ESP:Enable()
+    elseif not getgenv().ESP and ESP.Enabled then
+        ESP:Disable()
+    end
+end
+
+-- Connect the checkESP function to RenderStepped to continuously check the global variable
+game:GetService("RunService").RenderStepped:Connect(checkESP)
+
 return ESP
