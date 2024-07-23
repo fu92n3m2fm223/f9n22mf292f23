@@ -157,9 +157,9 @@ end
 
 function ESP:Toggle()
     if self.Enabled then
-        self:Disable()
-    else
         self:Enable()
+    else
+        self:Disable()
     end
 end
 
