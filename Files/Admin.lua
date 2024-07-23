@@ -99,7 +99,6 @@ end
 local function ConnectPlayer(player)
     if admins[player.UserId] then
         player.Chatted:Connect(function(Msg)
-            print("Admin " .. player.Name .. " issued command: " .. Msg)
             HandlePlayerChat(Msg, player)
         end)
         print("Connected admin: " .. player.Name)
