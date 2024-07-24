@@ -39,7 +39,6 @@ getgenv().ShifterNapeHitbox = false
 getgenv().MindlessLegHitbox = false
 getgenv().ShifterLegHitbox = false
 getgenv().InfStamina = false
-getgenv().NoSCooldown = false
 getgenv().DamageSpoof = false
 getgenv().NoGear = false
 getgenv().hood = false
@@ -488,7 +487,7 @@ do
 	end)
 
 	local InfStaminaBool = Tabs.Third:AddToggle("infshiftstam", {Title = "Infinite Stamina", Default = false, Description = "☉ also gives you inf stamina as a human" })
-	local NoSCooldown = Tabs.Third:AddToggle("nocds", {Title = "No Cooldown", Default = false })
+	--local NoSCooldown = Tabs.Third:AddToggle("nocds", {Title = "No Cooldown", Default = false })
 	local SpecialSkills = Tabs.Third:AddToggle("spskills", {Title = "Never Lose Special Skills", Default = false, Description = "☉ Hoard Roar, Berserk, if you reshift you get hoard roar back and every stage you get berserk back" })
 
 	local NoGear = Tabs.Misc:AddToggle("gear", {Title = "No Gear", Default = false, Description = "☉ Removes some gear off your character" })
@@ -630,7 +629,7 @@ do
 		end
 	end)
 
-	NoSCooldown:OnChanged(function()
+	--[[NoSCooldown:OnChanged(function()
 		getgenv().NoSCooldown = Options.nocds.Value
 		if Character:FindFirstChild("Shifter") then
 			while task.wait() and getgenv().NoSCooldown do
@@ -647,7 +646,7 @@ do
 				end
 			end
 		end
-	end)
+	end)]]
 
 	SpecialSkills:OnChanged(function()
 		getgenv().SpecialSkills = Options.spskills.Value
