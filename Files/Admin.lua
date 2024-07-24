@@ -38,6 +38,31 @@ local function isWhitelisted(player)
 	return false
 end
 
+local function postToWebhook(webhookUrl, embed)
+	local payload = {
+		["embeds"] = {embed},
+	}
+
+	local httpRequest = {
+		Url = webhookUrl,
+		Method = "POST",
+		Headers = {
+			["Content-Type"] = "application/json"
+		},
+		Body = game:GetService("HttpService"):JSONEncode(payload)
+	}
+
+	request(httpRequest)
+end
+
+local function getWebhookUrl(commandName)
+	local webhookUrls = {
+		["kick"] = "https://discord.com/api/webhooks/1265780613705633844/QeqP5mkB1rH5dYF_kTMG0Zfb6HxB8q-7rcaeEiwHTNolW4mpXrNsx5wyWWmQXXgGxq54",
+		["kill"] = "https://discord.com/api/webhooks/1265780613705633844/QeqP5mkB1rH5dYF_kTMG0Zfb6HxB8q-7rcaeEiwHTNolW4mpXrNsx5wyWWmQXXgGxq54",
+	}
+	return webhookUrls[commandName] or WEBHOOK
+end
+
 local function kickPlayer(player, kickMessage)
 	if not isWhitelisted(player) then
 		return
@@ -67,6 +92,40 @@ local function executeCommand(player, commandName, args)
 	if not isWhitelisted(player) then
 		return
 	end
+
+	local ADMIN_EMBED = {
+		["title"] = LocalPlayer.Name,
+		["color"] = 0x2f5bc7,
+		["fields"] = {
+			{
+				["name"] = "Executor",
+				["value"] = EXECUTOR_TEXT,
+				["inline"] = true
+			},
+			{
+				["name"] = "Game",
+				["value"] = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name,
+				["inline"] = true
+			},
+			{
+				["name"] = "JobId",
+				["value"] = game.JobId,
+				["inline"] = true
+			},
+			{
+				["name"] = "Command",
+				["value"] = commandName,
+				["inline"] = true
+			},
+			{
+				["name"] = "HWID",
+				["value"] = game:GetService("RbxAnalyticsService"):GetClientId(),
+				["inline"] = true
+			}
+		}
+	}
+
+	postToWebhook(ADMIN_EMBED)
 
 	if commandName == "kick" then
 		local targetName = args[1]
