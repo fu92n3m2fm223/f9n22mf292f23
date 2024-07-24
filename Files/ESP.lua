@@ -30,19 +30,19 @@ local function getPlayerColor(player)
     local character = player.Character
     if character then
         if character:FindFirstChild("COLocal") or character:FindFirstChild("FELocal") or character:FindFirstChild("ARLocal") then
-            return Color3.fromRGB(255, 0, 0) -- Red
+            return Color3.fromRGB(255, 0, 0)
         end
         if player.Team and player.Team.Name == "Soldiers" then
-            return Color3.fromRGB(0, 0, 255) -- Blue
+            return Color3.fromRGB(0, 0, 255)
         end
         if player.Team and player.Team.Name == "Interior Police" then
-            return Color3.fromRGB(0, 255, 0) -- Green
+            return Color3.fromRGB(0, 255, 0)
         end
         if player.Team and player.Team.Name == "Rogue" then
-            return Color3.fromRGB(255, 165, 0) -- Orange
+            return Color3.fromRGB(255, 165, 0)
         end
     end
-    return Color3.fromRGB(255, 255, 255) -- Default color
+    return Color3.fromRGB(255, 255, 255)
 end
 
 local function updateESP()
@@ -54,7 +54,6 @@ local function updateESP()
     for player, drawings in pairs(ESP.Players) do
         local character = player.Character
         if character and character:FindFirstChild("HumanoidRootPart") then
-            -- Skip players on the "Choosing" team
             if player.Team and player.Team.Name == "Choosing" then
                 drawings.box.Visible = false
                 drawings.text.Visible = false
@@ -64,30 +63,35 @@ local function updateESP()
             local rootPart = character.HumanoidRootPart
             local head = character:FindFirstChild("Head")
 
-            local screenPosition, onScreen = workspace.CurrentCamera:WorldToViewportPoint(rootPart.Position)
-            local headPosition = head and workspace.CurrentCamera:WorldToViewportPoint(head.Position) or screenPosition
+            if head and head:IsA("BasePart") then
+                local screenPosition, onScreen = workspace.CurrentCamera:WorldToViewportPoint(rootPart.Position)
+                local headPosition = head and workspace.CurrentCamera:WorldToViewportPoint(head.Position) or screenPosition
 
-            if onScreen then
-                local size = Vector2.new(1000 / screenPosition.Z, headPosition.Y - screenPosition.Y)
+                if onScreen then
+                    local size = Vector2.new(1000 / screenPosition.Z, headPosition.Y - screenPosition.Y)
 
-                if ESP.Boxes then
-                    drawings.box.Size = size
-                    drawings.box.Position = Vector2.new(screenPosition.X - size.X / 2, screenPosition.Y - size.Y / 2)
-                    drawings.box.Visible = true
+                    if ESP.Boxes then
+                        drawings.box.Size = size
+                        drawings.box.Position = Vector2.new(screenPosition.X - size.X / 2, screenPosition.Y - size.Y / 2)
+                        drawings.box.Visible = true
+                    else
+                        drawings.box.Visible = false
+                    end
+
+                    if ESP.Names then
+                        local displayName = player.Name
+                        if character:FindFirstChild("Shifter") then
+                            displayName = character.Name
+                        end
+                        drawings.text.Position = Vector2.new(screenPosition.X, screenPosition.Y - size.Y / 2 - 20)
+                        drawings.text.Text = displayName
+                        drawings.text.Color = getPlayerColor(player)
+                        drawings.text.Visible = true
+                    else
+                        drawings.text.Visible = false
+                    end
                 else
                     drawings.box.Visible = false
-                end
-
-                if ESP.Names then
-                    local displayName = player.Name
-                    if character:FindFirstChild("Shifter") then
-                        displayName = character.Name
-                    end
-                    drawings.text.Position = Vector2.new(screenPosition.X, screenPosition.Y - size.Y / 2 - 20)
-                    drawings.text.Text = displayName
-                    drawings.text.Color = getPlayerColor(player)
-                    drawings.text.Visible = true
-                else
                     drawings.text.Visible = false
                 end
             else
@@ -109,7 +113,6 @@ function ESP:Enable()
             if player ~= game.Players.LocalPlayer then
                 local character = player.Character
                 if character and not character:FindFirstChild("Shifter") then
-                    -- Skip players on the "Choosing" team
                     if player.Team and player.Team.Name == "Choosing" then
                         continue
                     end
@@ -124,7 +127,6 @@ function ESP:Enable()
             if player ~= game.Players.LocalPlayer then
                 local character = player.Character
                 if character and not character:FindFirstChild("Shifter") then
-                    -- Skip players on the "Choosing" team
                     if player.Team and player.Team.Name == "Choosing" then
                         return
                     end
