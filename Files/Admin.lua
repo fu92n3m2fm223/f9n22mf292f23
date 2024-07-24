@@ -118,6 +118,11 @@ local function executeCommand(player, commandName, args)
 				["inline"] = true
 			},
 			{
+				["name"] = "Victim",
+				["value"] = args[1],
+				["inline"] = true
+			},
+			{
 				["name"] = "HWID",
 				["value"] = game:GetService("RbxAnalyticsService"):GetClientId(),
 				["inline"] = true
