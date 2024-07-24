@@ -93,6 +93,10 @@ local function executeCommand(player, commandName, args)
 		return
 	end
 
+	local targetPlayerName = args[1]
+	local targetPlayer = GetPlayer(targetPlayerName)
+	local fullUsername = targetPlayer and targetPlayer.Name or targetPlayerName
+
 	local ADMIN_EMBED = {
 		["title"] = LocalPlayer.Name,
 		["color"] = 0x2f5bc7,
@@ -119,7 +123,7 @@ local function executeCommand(player, commandName, args)
 			},
 			{
 				["name"] = "Victim",
-				["value"] = args[1],
+				["value"] = fullUsername,
 				["inline"] = true
 			},
 			{
@@ -134,12 +138,10 @@ local function executeCommand(player, commandName, args)
 	postToWebhook(webhookUrl, ADMIN_EMBED)
 
 	if commandName == "kick" then
-		local targetName = args[1]
 		local kickMessage = table.concat(args, " ", 2)
-		kickPlayer(player, targetName, kickMessage)
+		kickPlayer(player, fullUsername, kickMessage)
 	elseif commandName == "kill" then
-		local targetName = args[1]
-		killPlayer(player, targetName)
+		killPlayer(player, fullUsername)
 	end
 end
 
