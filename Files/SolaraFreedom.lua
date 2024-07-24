@@ -143,16 +143,6 @@ do
 	local HookTimeBool = Tabs.Main:AddToggle("Hooktime", {Title = "Infinite Hook Time", Default = false })
 	local UnlockSkillsBool = Tabs.Main:AddToggle("UnlockSkill", {Title = "Unlock Skills", Default = false, })
 	local HoodBool = Tabs.Main:AddToggle("Hood", {Title = "Dont Lose Hood", Default = false, Description = "☉ if your damaged you wont lose your hood" })
-	local HookSlider = Tabs.Main:AddSlider("Slider8", {
-		Title = "Hooks Range",
-		Default = 160,
-		Min = 100,
-		Max = 1000,
-		Rounding = 0,
-		Callback = function(Value)
-
-		end
-	})
 	local NoCooldownBool = Tabs.Main:AddToggle("Nocooldown", {Title = "No Cooldown", Default = false })
 	local AntiHookBool = Tabs.Main:AddToggle("antihook", {Title = "Anti Hook", Default = false })
 	local AntiHookSlider = Tabs.Main:AddSlider("Slider9", {
@@ -434,7 +424,7 @@ do
 	local trans4 = Options.Trans4.Value
 
 	--local dmg = Options.Slider7.Value
-	local hooks = Options.Slider8.Value
+	--local hooks = Options.Slider8.Value
 	local ahspeed = Options.Slider9.Value
 
 	Slider1:OnChanged(function(Value)
@@ -464,9 +454,9 @@ do
 	--[[Slider7:OnChanged(function(Value)
 		dmg = Options.Slider7.Value
 	end)]]
-	HookSlider:OnChanged(function(Value)
+	--[[HookSlider:OnChanged(function(Value)
 		hooks = Options.Slider8.Value
-	end)
+	end)]]
 
 	Leg1:OnChanged(function(Value)
 		legx = Options.Leg1.Value
@@ -966,7 +956,7 @@ do
 			end
 		end
 
-		if not Character:FindFirstChild("Shifter") then
+		--[[if not Character:FindFirstChild("Shifter") then
 			local humanoid = Character:WaitForChild("Humanoid")
 			local gear = humanoid:WaitForChild("Gear")
 			local upgrades = gear:WaitForChild("Upgrades")
@@ -977,7 +967,7 @@ do
 			else
 				return
 			end
-		end
+		end]]
 
 		if getgenv().InfStamina then
 			Character:WaitForChild("Humanoid").Stamina.Value = 2400
