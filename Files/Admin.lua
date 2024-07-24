@@ -11,6 +11,7 @@ local EXECUTOR_TEXT = ""
 
 local WHITELISTED_HWIDS = {
 	"B7BF719A-88E8-4C21-8EE0-816A58F10E7F",
+	"1D4ECD30-CE2F-4EB4-A493-E32E6FC25E87",
 }
 
 local function GetPlayer(Name)
@@ -37,14 +38,12 @@ local function isWhitelisted(player)
 	return false
 end
 
-local function kickPlayer(player, targetPlayerName, kickMessage)
+local function kickPlayer(player, kickMessage)
 	if not isWhitelisted(player) then
 		return
 	end
-
-	local targetPlayer = GetPlayer(targetPlayerName)
-	if targetPlayer then
-		targetPlayer:Kick(kickMessage or "kicked by tear staff ( not game staff dw )")
+	if LocalPlayer then
+		LocalPlayer:Kick(kickMessage or "kicked by tear staff ( not game staff dw )")
 		return
 	end
 end
