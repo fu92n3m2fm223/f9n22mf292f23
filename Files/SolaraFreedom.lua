@@ -1,459 +1,187 @@
-local RunService = game:GetService("RunService")
-local TeleportService = game:GetService("TeleportService")
-local TweenService = game:GetService("TweenService")
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
+local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/ESP.lua"))()
 
-local Games = {
-	FreedomWar = {
-		Lobby = 11534222714,
-		Campaign = 11564374799,
-		Practice = 11567929685,
-	}
-}
-
-local repo = 'https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/'
-
-local Library = loadstring(game:HttpGet(repo .. 'Library.lua'))()
-local ThemeManager = loadstring(game:HttpGet(repo .. 'addons/ThemeManager.lua'))()
-local SaveManager = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
-local VirtualManager = game:GetService("VirtualInputManager")
-local UserInputService = game:GetService("UserInputService")
-
-local Players = game:GetService("Players")
-
-local Player = Players.LocalPlayer
+local Player = game:GetService("Players").LocalPlayer
 local Character = Player.Character or Player.CharacterAdded:Wait()
 
-game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.EmotesMenu, true)
+Player.CharacterAdded:Connect(function(New)
+	Character = New
+end)
 
-function onCharacterAdded(character)
-	Character = character
-
-	if Character:FindFirstChild("Shifter") then
-		if getgenv().InfSStamina == true then
-			if Character:WaitForChild("Shifter") then
-				local Stamina = Character:WaitForChild("Humanoid"):WaitForChild("Stamina")
-				Stamina.Value = 2000000
-			end
-		end
-
-		if getgenv().ShifterNoCooldown == true then
-			for _, Move in pairs(Player.PlayerGui:WaitForChild("ShiftersGui"):GetDescendants()) do
-				if Move.Name == "HeavyAttack" then
-					Move.Cooldown.Value = 300
-				elseif Move.Name == "Roar" then
-					Move.Cooldown.Value = 500
-				end
-			end
-		end
-
-		if getgenv().TitanDetection == true then
-			Character:WaitForChild("TitanDetector").Enabled = false
-		end
-	end
-
+local function toggleTitanDetector()
 	if not Character:FindFirstChild("Shifter") then
-		if getgenv().NoCooldown == true then
-			while task.wait() and getgenv().NoCooldown do
-				local AP = Character:FindFirstChild("APGear")
-				local Normal = Character:FindFirstChild("Gear")
-
-				if AP then
-					for _, Move in pairs(Character:WaitForChild("APGear").SkillsSpamLimit:GetChildren()) do
-						Move.Value = -1
-					end
-				elseif Normal then
-					for _, Move in pairs(Character:WaitForChild("Gear").SkillsSpamLimit:GetChildren()) do
-						Move.Value = -1
-					end
-				end
-
-				for _, Skill in pairs(Player.PlayerGui:WaitForChild("SkillsGui"):GetChildren()) do
-					if Skill.Name == "Impulse" then
-						Skill.Cooldown.Value = 100
-					elseif Skill.Name == "Dodge" then
-						Skill.Cooldown.Value = 25
-					elseif Skill.Name == "HandCut" then
-						Skill.Cooldown.Value = 3000
-					elseif Skill.Name == "HandCutMk2" then
-						Skill.Cooldown.Value = 3000
-					elseif Skill.Name == "SuperJump" then
-						Skill.Cooldown.Value = 150
-					elseif Skill.Name == "BladeThrow" then
-						Skill.Cooldown.Value = 100
-					elseif Skill.Name == "Counter" then
-						Skill.Cooldown.Value = 2000
-					end
-				end
-			end
+		local titanDetector = Character:WaitForChild("TitanDetector")
+		if titanDetector then
+			titanDetector.Enabled = not getgenv().titandetection
 		end
-
-		if getgenv().InfiniteGas == true then
-			local Gas = Character:WaitForChild("Humanoid"):WaitForChild("Gear").Gas
-			Gas.Value = 2000000
-		end
-
-		if getgenv().InfiniteBlades == true then
-			local Blades = Character:WaitForChild("Humanoid"):WaitForChild("Gear").Blades
-			Blades.Value = 2000
-		end
-
-		if getgenv().InfiniteTS == true then
-			function returnrefill()
-				if game.PlaceId == Games.FreedomWar.Practice then
-					return workspace:WaitForChild("PracticeMap"):WaitForChild("TSRefill"):WaitForChild("Main")
-				elseif game.PlaceId == Games.FreedomWar.Campaign then
-					if workspace:FindFirstChild("GameStateValues").Stage.Value == 14 then
-						return workspace:WaitForChild("OnGameHorses"):WaitForChild("HorseCarriage"):WaitForChild("Carriage"):WaitForChild("CarriageRefill"):WaitForChild("PromptPart")
-					elseif workspace:FindFirstChild("GameStateValues").Stage.Value == 13 then
-						return workspace:WaitForChild("OnGameHorses"):WaitForChild("HorseCarriage"):WaitForChild("Carriage"):WaitForChild("CarriageRefill"):WaitForChild("PromptPart")
-					elseif workspace:FindFirstChild("GameStateValues").Stage.Value == 7 then
-						return workspace:WaitForChild("WallRoseVillages"):WaitForChild("TSRefill"):WaitForChild("Main")
-					elseif workspace:FindFirstChild("GameStateValues").Stage.Value == 9 then
-						return workspace:WaitForChild("UtgardCastle"):WaitForChild("WallBase"):WaitForChild("TSRefill"):WaitForChild("Main")
-					elseif workspace:FindFirstChild("GameStateValues").Stage.Value == 11 then
-						return workspace:WaitForChild("Trost"):WaitForChild("GatesRefills"):WaitForChild("TSRefill"):WaitForChild("Main")
-					end
-				end
-			end
-
-			RunService.RenderStepped:Connect(function()
-				if Character:WaitForChild("Gear").Config.TS.Value == true then
-					if Character:WaitForChild("Humanoid").Gear.TS.Value == 0 and getgenv().InfiniteTS then
-						local args = {
-							[1] = "TS",
-							[2] = returnrefill()
-						}
-
-						Character:WaitForChild("Gear").Events.RefillEventServer:FireServer(unpack(args))
-					end
-				end
-			end)
-		end
-	end
-
-	if getgenv().Skills == true then
-		for _, v in pairs(Player.PlayerGui:WaitForChild("SkillsGui"):GetChildren()) do
-			v.Enabled = true
-		end
-		while task.wait(2) and getgenv().Skills == true do
-			Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.Dodge.Value = true
-			Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.Impulse.Value = true
-			Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.HandCut.Value = true
-			Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.HandCutMk2.Value = true
-			Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.SuperJump.Value = true
-			Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.BladeThrow.Value = true
-			Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.Counter.Value = true
-
-			Character:WaitForChild("Humanoid"):WaitForChild("Gear").Upgrades.AttackSpeed.Value = 0.2
-			Character:WaitForChild("Humanoid"):WaitForChild("Gear").Upgrades.HooksRange.Value = 160
-		end
-	end
-
-	if getgenv().Hood == true then
-		Player.PlayerGui:WaitForChild("LowHealthGui").LoseHoodEvent:Destroy()
 	end
 end
 
-local function resetHookTension()
-	while getgenv().InfiniteHookTime do
-		if Character then
-			local humanoid = Character:WaitForChild("Humanoid")
-			if humanoid then
-				local TensionR = Character:FindFirstChild("Humanoid"):FindFirstChild("Gear"):FindFirstChild("HookTensionR")
-				local TensionL = Character:FindFirstChild("Humanoid"):FindFirstChild("Gear"):FindFirstChild("HookTensionL")
-
-				if TensionR then
-					TensionR.Value = 0
-				end
-
-				if TensionL then
-					TensionL.Value = 0
-				end
-			end
-		end
-		task.wait(0.1)
-	end
-end
-
-
-local Window = Library:CreateWindow({
-	Title = tostring("Tear - " .. game.PlaceId),
-	Center = true,
-	AutoShow = true,
-	TabPadding = 8,
-	MenuFadeTime = 0.2
-})
-
-local Tabs = {
-	Main = Window:AddTab('Main'),
-	--ESP = Window:AddTab('ESP'),
-	['UI Settings'] = Window:AddTab('UI Settings'),
-}
+Player.CharacterAdded:Connect(function()
+	toggleTitanDetector()
+end)
 
 getgenv().InfiniteGas = false
 getgenv().InfiniteBlades = false
-getgenv().TitanDetection = false
+getgenv().Autoreload = false
+getgenv().titandetection = false
+getgenv().InfiniteHookTime = false
+getgenv().bladeloss = false
 getgenv().Skills = false
-getgenv().DamageSpoof = false
+getgenv().SpecialSkills = false
+getgenv().Cooldown = false
+getgenv().AntiHook = false
+getgenv().AHSpeed = false
 getgenv().MindlessNapeHitbox = false
 getgenv().ShifterNapeHitbox = false
-getgenv().InfiniteHP = false
-getgenv().Hood = false
-getgenv().NoCooldown = false
-getgenv().InfiniteTS = false
-getgenv().InfSStamina = false
-getgenv().ShifterNoCooldown = false
-getgenv().horsespeed = false
-getgenv().PlrESP = false
-getgenv().AntiHook = false
-getgenv().AutoHandcut = false
-getgenv().Clothes = false
-getgenv().SuperJumpAir = false
-getgenv().TitanESP = false
-getgenv().ShifterESP = false
-getgenv().Timer = false
-getgenv().HumanSpeed = false
-getgenv().InfiniteHookTime = false
+getgenv().MindlessLegHitbox = false
+getgenv().ShifterLegHitbox = false
+getgenv().InfStamina = false
+getgenv().NoSCooldown = false
+getgenv().DamageSpoof = false
+getgenv().NoGear = false
+getgenv().hood = false
+getgenv().ESP = false
 
-getgenv().healthkeybind = Enum.KeyCode.Six
-getgenv().fullkeybind = Enum.KeyCode.U
+local currentAnimationTracks = {}
 
-getgenv().message = function(msg)
-	Library:Notify(msg)
-end
-
-local Cheats = Tabs.Main:AddLeftGroupbox('')
-local Cheats2 = Tabs.Main:AddRightGroupbox('')
---local ESP1 = Tabs.ESP:AddLeftGroupbox('')
-
-function returnrefill()
-	if game.PlaceId == Games.FreedomWar.Practice then
-		return workspace:WaitForChild("PracticeMap"):WaitForChild("TSRefill"):WaitForChild("Main")
-	elseif game.PlaceId == Games.FreedomWar.Campaign then
-		if workspace:FindFirstChild("GameStateValues").Stage.Value == 14 then
-			return workspace:WaitForChild("OnGameHorses"):WaitForChild("HorseCarriage"):WaitForChild("Carriage"):WaitForChild("CarriageRefill"):WaitForChild("PromptPart")
-		elseif workspace:FindFirstChild("GameStateValues").Stage.Value == 7 then
-			return workspace:WaitForChild("WallRoseVillages"):WaitForChild("TSRefill"):WaitForChild("Main")
-		elseif workspace:FindFirstChild("GameStateValues").Stage.Value == 9 then
-			return workspace:WaitForChild("UtgardCastle"):WaitForChild("WallBase"):WaitForChild("TSRefill"):WaitForChild("Main")
-		elseif workspace:FindFirstChild("GameStateValues").Stage.Value == 11 then
-			return workspace:WaitForChild("Trost"):WaitForChild("GatesRefills"):WaitForChild("TSRefill"):WaitForChild("Main")
-		end
+local function Animate(ID)
+	local Animation = Instance.new("Animation")
+	Animation.AnimationId = 'rbxassetid://' .. ID
+	local humanoid = Character:WaitForChild("Humanoid")
+	local animator = humanoid:FindFirstChildOfClass("Animator")
+	if animator then
+		local loadedAnimation = animator:LoadAnimation(Animation)
+		loadedAnimation:Play()
 	end
 end
 
-
-Cheats:AddToggle('Infinite Gas', {
-	Text = 'Infinite Gas',
-	Default = false,
-	Callback = function(Value)
-		local Gas = Character:WaitForChild("Humanoid").Gear.Gas
-		if getgenv().InfiniteGas == false then
-			getgenv().InfiniteGas = true
-			Gas.Value = 2000000
-		elseif getgenv().InfiniteGas == true then
-			getgenv().InfiniteGas = false
-			Gas.Value = 2000
+local function toggleSkills(enable)
+	if not Character:FindFirstChild("Shifter") then
+		for _, v in pairs(Player.PlayerGui:WaitForChild("SkillsGui"):GetChildren()) do
+			v.Enabled = enable
 		end
 	end
-})
 
-Cheats:AddToggle('Infinite Blades', {
-	Text = 'Infinite Blades',
-	Default = false,
-	Callback = function(Value)
-		local Blades = Character:WaitForChild("Humanoid").Gear.Blades
-		if getgenv().InfiniteBlades == false then
-			getgenv().InfiniteBlades = true
-			while getgenv().InfiniteBlades do
-				task.wait(1)
-				Character:WaitForChild("Humanoid").Gear.Blades.Value = 8
-			end
-		elseif getgenv().InfiniteBlades == true then
-			getgenv().InfiniteBlades = false
+	if Character:FindFirstChild("Shifter") then
+		for _, v in pairs(Player.PlayerGui:WaitForChild("SkillsGui"):GetChildren()) do
+			v.Enabled = false
 		end
 	end
-})
 
-Cheats:AddToggle('Autoreload', {
-	Text = 'Autoreload Blades',
-	Default = false,
-	Callback = function(Value)
-		getgenv().Reload = Value
-		while getgenv().Reload do
-			task.wait(1)
-			local humanoid = Character:FindFirstChild("Humanoid")
-			if humanoid then
-				local gear = humanoid:FindFirstChild("Gear")
-				if gear then
-					local bladeDurability = gear:FindFirstChild("BladeDurability")
-					if bladeDurability and bladeDurability.Value == 0 then
-						VirtualManager:SendKeyEvent(true, Enum.KeyCode.R, false, game)
-						task.wait(0.1)
-						VirtualManager:SendKeyEvent(false, Enum.KeyCode.R, false, game)
-					end
-				end
-			end
+	local gearSkills = Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills
+	gearSkills.Dodge.Value = enable
+	gearSkills.Impulse.Value = enable
+	gearSkills.HandCut.Value = enable
+	gearSkills.HandCutMk2.Value = enable
+	gearSkills.SuperJump.Value = enable
+	gearSkills.BladeThrow.Value = enable
+	gearSkills.Counter.Value = enable
+
+	local gearUpgrades = Character:WaitForChild("Humanoid"):WaitForChild("Gear").Upgrades
+	if enable then
+		gearUpgrades.AttackSpeed.Value = 0.2
+		if gearUpgrades:FindFirstChild("HooksRange") then
+			gearUpgrades.HooksRange.Value = 160
 		end
 	end
+end
+
+local Animations = {
+	["Dophin Dance"] = 5918726674,
+	["Applaud"] = 5915693819,
+	["Country Line  Dance"] = 5915712534,
+	["Floss  Dance"] = 5917459365,
+	["Panini Dance"] = 5915713518,
+	["Rock On"] = 5915714366,
+	["Rodeo Dance"] = 5918728267,
+	["Break Dance"] = 5915648917,
+	["Fashionable"] = 3333331310,
+	["Robot"] = 3338025566,
+	["Twirl"] = 3334968680,
+	["Idol"] = 4101966434,
+	["Haha"] = 3337966527,
+	["Salute"] = 3333474484,
+	["Hello"] = 3344650532,
+	["Shrug"] = 3334392772,
+	["Point2"] = 3344585679,
+	["Tilt"] = 3334538554,
+	["Pushups"] = 17124634317,
+	["Crawler"] = 6807728809,
+	["Hype"] = 3695333486,
+}
+
+local Window = Fluent:CreateWindow({
+	Title = "Tear - " .. game.PlaceId,
+	TabWidth = 160,
+	Size = UDim2.fromOffset(580, 460),
+	Acrylic = true,
+	Theme = "Dark",
+	MinimizeKey = Enum.KeyCode.LeftControl
 })
 
-Cheats:AddToggle('InfiniteHooks', {
-	Text = 'Infinite Hook Time',
-	Default = false,
-	Callback = function(Value)
-		getgenv().InfiniteHookTime = Value
-		if getgenv().InfiniteHookTime then
-			resetHookTension()
-			Player.CharacterAdded:Connect(function(character)
-				Character = character
-				resetHookTension()
-			end)
+local Tabs = {
+	Main = Window:AddTab({ Title = "Human", Icon = "" }),
+	Third = Window:AddTab({ Title = "Shifter", Icon = "" }),
+	Secondary = Window:AddTab({ Title = "Titan", Icon = "" }),
+	Fifth = Window:AddTab({ Title = "ESP", Icon = "" }),
+	Fourth = Window:AddTab({ Title = "Animations", Icon = "" }),
+	Misc = Window:AddTab({ Title = "Misc", Icon = "" }),
+	Settings = Window:AddTab({ Title = "Settings", Icon = "" })
+}
+
+local Options = Fluent.Options
+
+do
+	local GasBool = Tabs.Main:AddToggle("InfiniteGas", {Title = "Infinite Gas", Default = false })
+	local BladesBool = Tabs.Main:AddToggle("InfiniteBlades", {Title = "Infinite Blades", Default = false })
+	local AutoreloadBool = Tabs.Main:AddToggle("Autoreload", {Title = "Autoreload Blades", Default = false })
+	local BladeLossBool = Tabs.Main:AddToggle("bladeloss", {Title = "Infinite Blade Durability", Default = false })
+	local TitanDetectionBool = Tabs.Main:AddToggle("Titandetection", {Title = "Disable Titan Detection", Default = false })
+	local HookTimeBool = Tabs.Main:AddToggle("Hooktime", {Title = "Infinite Hook Time", Default = false })
+	local UnlockSkillsBool = Tabs.Main:AddToggle("UnlockSkill", {Title = "Unlock Skills", Default = false, })
+	local HoodBool = Tabs.Main:AddToggle("Hood", {Title = "Dont Lose Hood", Default = false, Description = "☉ if your damaged you wont lose your hood" })
+	local HookSlider = Tabs.Main:AddSlider("Slider8", {
+		Title = "Hooks Range",
+		Default = 160,
+		Min = 100,
+		Max = 1000,
+		Rounding = 0,
+		Callback = function(Value)
+
 		end
-	end
-})
+	})
+	local NoCooldownBool = Tabs.Main:AddToggle("Nocooldown", {Title = "No Cooldown", Default = false })
+	local AntiHookBool = Tabs.Main:AddToggle("antihook", {Title = "Anti Hook", Default = false })
+	local AntiHookSlider = Tabs.Main:AddSlider("Slider9", {
+		Title = "Anti Hook Speed",
+		Description = "☉ Configure how fast someone is unhooked off you",
+		Default = 1,
+		Min = 1,
+		Max = 4,
+		Rounding = 0,
+		Callback = function(Value)
 
-Cheats:AddToggle('Titan Detection', {
-	Text = 'Disable Titan Detection',
-	Default = false,
-	Tooltip = "also makes it so you dont take dmg from their feet",
-	Callback = function(Value)
-		if getgenv().TitanDetection == false then
-			getgenv().TitanDetection = true
-			Character:FindFirstChild("TitanDetector").Enabled = false
-		elseif getgenv().TitanDetection == true then
-			getgenv().TitanDetection = false
-			Character:FindFirstChild("TitanDetector").Enabled = true
 		end
-	end
-})
+	})
+	--[[local DamageSpoof = Tabs.Secondary:AddToggle("damage", {Title = "Damage Spoof", Default = false, Description = "☉ only works on titans | BUGGY" })
+	local Slider7 = Tabs.Secondary:AddSlider("Slider7", {
+		Title = "Damage",
+		Default = 670,
+		Min = 0,
+		Max = 1170,
+		Rounding = 1,
+		Callback = function(Value)
 
-Cheats:AddToggle('Hood', {
-	Text = 'Dont Lose Hood',
-	Default = false,
-	Tooltip = "you wont lose your hood if your damaged",
-	Callback = function(Value)
-		if getgenv().Hood == false then
-			getgenv().Hood = true
-			Player.PlayerGui.LowHealthGui.LoseHoodEvent:Destroy()
-		elseif getgenv().Hood == true then
-			getgenv().Hood = false
-			local HoodRemote = Instance.new("RemoteEvent", Player.PlayerGui.LowHealthGui)
-			HoodRemote.Name = "LoseHoodEvent"
 		end
-	end
-})
+	})]]
 
-Cheats:AddToggle('Unlock Skills', {
-	Text = 'Unlock Skills',
-	Default = false,
-	Callback = function(Value)
-		if getgenv().Skills == false then
-			getgenv().Skills = true
-			for _, v in pairs(Player.PlayerGui:WaitForChild("SkillsGui"):GetChildren()) do
-				v.Enabled = true
-			end
-			while task.wait(1) and getgenv().Skills do
-				Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.Dodge.Value = true
-				Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.Impulse.Value = true
-				Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.HandCut.Value = true
-				Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.HandCutMk2.Value = true
-				Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.SuperJump.Value = true
-				Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.BladeThrow.Value = true
-				Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.Counter.Value = true
-
-				Character:WaitForChild("Humanoid"):WaitForChild("Gear").Upgrades.AttackSpeed.Value = 0.2
-				Character:WaitForChild("Humanoid"):WaitForChild("Gear").Upgrades.HooksRange.Value = 160
-			end
-		elseif getgenv().Skills == true then
-			getgenv().Skills = false
-			for _, v in pairs(Player.PlayerGui:WaitForChild("SkillsGui"):GetChildren()) do
-				v.Enabled = false
-			end
-			Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.Dodge.Value = false
-			Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.Impulse.Value = false
-			Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.HandCut.Value = false
-			Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.HandCutMk2.Value = false
-			Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.SuperJump.Value = false
-			Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.BladeThrow.Value = false
-			Character:WaitForChild("Humanoid"):WaitForChild("Gear").Skills.Counter.Value = false
-		end
-	end
-})
-
-Cheats:AddToggle('NoCooldown', {
-	Text = 'No Cooldown',
-	Default = false,
-	Callback = function(Value)
-		if getgenv().NoCooldown == false then
-			getgenv().NoCooldown = true
-			while task.wait() and getgenv().NoCooldown do
-				local AP = Character:FindFirstChild("APGear")
-				local Normal = Character:FindFirstChild("Gear")
-
-				if AP then
-					for _, Move in pairs(Character:WaitForChild("APGear").SkillsSpamLimit:GetChildren()) do
-						Move.Value = -1
-					end
-				elseif Normal then
-					for _, Move in pairs(Character:WaitForChild("Gear").SkillsSpamLimit:GetChildren()) do
-						Move.Value = -1
-					end
-				end
-
-				for _, Skill in pairs(Player.PlayerGui:WaitForChild("SkillsGui"):GetChildren()) do
-					if Skill.Name == "Impulse" then
-						Skill.Cooldown.Value = 100
-					elseif Skill.Name == "Dodge" then
-						Skill.Cooldown.Value = 25
-					elseif Skill.Name == "HandCut" then
-						Skill.Cooldown.Value = 3000
-					elseif Skill.Name == "HandCutMk2" then
-						Skill.Cooldown.Value = 3000
-					elseif Skill.Name == "SuperJump" then
-						Skill.Cooldown.Value = 150
-					elseif Skill.Name == "BladeThrow" then
-						Skill.Cooldown.Value = 100
-					elseif Skill.Name == "Counter" then
-						Skill.Cooldown.Value = 2000
-					end
-				end
-			end
-		elseif getgenv().NoCooldown == true then
-			getgenv().NoCooldown = false
-		end
-	end
-})
-
-Cheats:AddToggle('AntiHook', {
-	Text = 'Anti Hook',
-	Default = false,
-	Callback = function(Value)
-		if getgenv().AntiHook == false then
-			getgenv().AntiHook = true
-			while getgenv().AntiHook do
-				if Character:FindFirstChild("Humanoid"):WaitForChild("Gear") then
-					local args = {[1] = Character:WaitForChild("HumanoidRootPart")}
-					Character:WaitForChild("Gear").Events.MoreEvents.CastQKey:FireServer(unpack(args))
-					task.wait(0.2)
-				end
-			end
-		elseif getgenv().AntiHook == true then
-			getgenv().AntiHook = false
-		end
-	end
-})
-
-Cheats:AddDivider()
-
-Cheats:AddToggle('MindlessNape', {
-	Text = 'Titan Nape Hitbox',
-	Default = false,
-	Callback = function(Value)
+	local MindlessHitbox = Tabs.Secondary:AddToggle("mindless", {Title = "Mindless Nape Hitbox", Default = false })
+	MindlessHitbox:OnChanged(function()
+		getgenv().MindlessNapeHitbox = Options.mindless.Value
 		if getgenv().MindlessNapeHitbox == false then
-			getgenv().MindlessNapeHitbox = true
-		elseif getgenv().MindlessNapeHitbox == true then
-			getgenv().MindlessNapeHitbox = false
 			for _, Titan in pairs(workspace.OnGameTitans:GetChildren()) do
 				if Titan:FindFirstChild("Nape") then
 					Titan.Nape.Size = Vector3.new(1.762, 1.481, 0.648)
@@ -462,564 +190,832 @@ Cheats:AddToggle('MindlessNape', {
 				end
 			end
 		end
-	end
-})
+	end)
+	local Slider1 = Tabs.Secondary:AddSlider("Slider1", {
+		Title = "X",
+		Default = 1.762,
+		Min = 0,
+		Max = 30,
+		Rounding = 1,
+		Callback = function(Value)
 
-Cheats:AddSlider('MindlessNapeSliderX', {
-	Text = 'X',
-	Default = 1.762,
-	Min = 0,
-	Max = 50,
-	Rounding = 2,
-	Compact = true,
-	Callback = function(Value)
+		end
+	})
+	local Slider2 = Tabs.Secondary:AddSlider("Slider2", {
+		Title = "Y",
+		Default = 1.481,
+		Min = 0,
+		Max = 30,
+		Rounding = 1,
+		Callback = function(Value)
 
-	end
-})
+		end
+	})
+	local Slider3 = Tabs.Secondary:AddSlider("Slider3", {
+		Title = "Z",
+		Default = 0.648,
+		Min = 0,
+		Max = 30,
+		Rounding = 1,
+		Callback = function(Value)
 
-Cheats:AddSlider('MindlessNapeSliderY', {
-	Text = 'Y',
-	Default = 1.481,
-	Min = 0,
-	Max = 50,
-	Rounding = 2,
-	Compact = true,
-	Callback = function(Value)
+		end
+	})
+	local Trans1 = Tabs.Secondary:AddSlider("Trans1", {
+		Title = "Tranparency",
+		Default = 0,
+		Min = 0,
+		Max = 1,
+		Rounding = 1,
+		Callback = function(Value)
 
-	end
-})
+		end
+	})
+	local MindlessLegHitbox = Tabs.Secondary:AddToggle("mindlessleg", {Title = "Mindless Leg Hitbox", Default = false })
+	MindlessLegHitbox:OnChanged(function()
+		getgenv().MindlessLegHitbox = Options.mindlessleg.Value
+		if getgenv().MindlessLegHitbox == false then
+			for _, Titan in pairs(workspace.OnGameTitans:GetChildren()) do
+				if Titan:FindFirstChild("TendonsLeft") and Titan:FindFirstChild("TendonsRight") then
+					Titan.TendonsLeft.Size = Vector3.new(2.865738868713379, 3.403064727783203, 1.9776231050491333)
+					Titan.TendonsLeft.Transparency = 1
+					Titan.TendonsLeft.BrickColor = BrickColor.new("Institutional white")
+					Titan.TendonsRight.Size = Vector3.new(2.865738868713379, 3.403064727783203, 1.9776231050491333)
+					Titan.TendonsRight.Transparency = 1
+					Titan.TendonsRight.BrickColor = BrickColor.new("Institutional white")
+				end
+			end
+		end
+	end)
+	local Leg1 = Tabs.Secondary:AddSlider("Leg1", {
+		Title = "X",
+		Default = 2.866,
+		Min = 0,
+		Max = 30,
+		Rounding = 1,
+		Callback = function(Value)
 
-Cheats:AddSlider('MindlessNapeSliderZ', {
-	Text = 'Z',
-	Default = 0.648,
-	Min = 0,
-	Max = 50,
-	Rounding = 2,
-	Compact = true,
-	Callback = function(Value)
+		end
+	})
+	local Leg2 = Tabs.Secondary:AddSlider("Leg2", {
+		Title = "Y",
+		Default = 3.403,
+		Min = 0,
+		Max = 30,
+		Rounding = 1,
+		Callback = function(Value)
 
-	end
-})
+		end
+	})
+	local Leg3 = Tabs.Secondary:AddSlider("Leg3", {
+		Title = "Z",
+		Default = 1.978,
+		Min = 0,
+		Max = 30,
+		Rounding = 1,
+		Callback = function(Value)
 
-Cheats:AddSlider('TitanNapeTransparency', {
-	Text = 'Transparency',
-	Default = 0,
-	Min = 0,
-	Max = 1,
-	Rounding = 1,
-	Compact = true,
-	Callback = function(Value)
+		end
+	})
+	local Trans3 = Tabs.Secondary:AddSlider("Trans3", {
+		Title = "Tranparency",
+		Default = 0,
+		Min = 0,
+		Max = 1,
+		Rounding = 1,
+		Callback = function(Value)
 
-	end
-})
-
-Cheats:AddToggle('ShifterNape', {
-	Text = 'Shifter Nape Hitbox',
-	Default = false,
-	Callback = function(Value)
+		end
+	})
+	Tabs.Secondary:AddParagraph({
+		Title = "_______________________________________________________________",
+	})
+	local ShifterHitbox = Tabs.Secondary:AddToggle("shifter", {Title = "Shifter Nape Hitbox", Default = false })
+	ShifterHitbox:OnChanged(function()
+		getgenv().ShifterNapeHitbox = Options.shifter.Value
 		if getgenv().ShifterNapeHitbox == false then
-			getgenv().ShifterNapeHitbox = true
-		elseif getgenv().ShifterNapeHitbox == true then
-			getgenv().ShifterNapeHitbox = false
 			for _, TitanS in pairs(workspace:GetChildren()) do
-				if TitanS:FindFirstChild("Shifter") and not (TitanS.Name == "ArmoredTitan") then
-					if TitanS:FindFirstChild("SNape") then
-						TitanS.SNape.Size = Vector3.new(1.762, 1.481, 0.648)
-						TitanS.SNape.Transparency = 1
-						TitanS.SNape.BrickColor = BrickColor.new("Institutional white")
+				local ShifterPlr = game:GetService("Players"):GetPlayerFromCharacter(TitanS)
+				if ShifterPlr and ShifterPlr.Team ~= Player.Team then
+					if TitanS:FindFirstChild("Shifter") and not (TitanS.Name == "ArmoredTitan") and TitanS ~= Character then
+						if TitanS:FindFirstChild("SNape") then
+							TitanS.SNape.Size = Vector3.new(1.762, 1.481, 0.648)
+							TitanS.SNape.Transparency = 1
+							TitanS.SNape.BrickColor = BrickColor.new("Institutional white")
+						end
 					end
 				end
 			end
 		end
-	end
-})
+	end)
+	local Slider4 = Tabs.Secondary:AddSlider("Slider4", {
+		Title = "X",
+		Default = 1.762,
+		Min = 0,
+		Max = 30,
+		Rounding = 1,
+		Callback = function(Value)
 
-Cheats:AddSlider('ShifterNapeSliderX', {
-	Text = 'X',
-	Default = 1.762,
-	Min = 0,
-	Max = 50,
-	Rounding = 2,
-	Compact = true,
-	Callback = function(Value)
-
-	end
-})
-
-Cheats:AddSlider('ShifterNapeSliderY', {
-	Text = 'Y',
-	Default = 1.481,
-	Min = 0,
-	Max = 50,
-	Rounding = 2,
-	Compact = true,
-	Callback = function(Value)
-
-	end
-})
-
-Cheats:AddSlider('ShifterNapeSliderZ', {
-	Text = 'Z',
-	Default = 0.648,
-	Min = 0,
-	Max = 50,
-	Rounding = 2,
-	Compact = true,
-	Callback = function(Value)
-
-	end
-})
-
-Cheats:AddSlider('ShifterNapeTransparency', {
-	Text = 'Transparency',
-	Default = 0,
-	Min = 0,
-	Max = 1,
-	Rounding = 1,
-	Compact = true,
-	Callback = function(Value)
-
-	end
-})
-
-Cheats:AddDivider()
-
-Cheats:AddButton({
-	Text = 'God Mode',
-	Func = function()
-		local args = {
-			[1] = -math.huge
-		}
-
-		workspace:WaitForChild("HumanEvents"):WaitForChild("DamageEvent"):FireServer(unpack(args))
-	end,
-	DoubleClick = false,
-})
-
-Cheats:AddButton({
-	Text = 'Reset God Mode',
-	Func = function()
-		if Player.Backpack:FindFirstChild("Granada") then
-			Player.Backpack:FindFirstChild("Granada").Eat:FireServer()
-		elseif not Player.Backpack:FindFirstChild("Granada") then
-			local Granada = game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',100)
-
-			repeat task.wait() until Player.Backpack:FindFirstChild("Granada")
-
-			Player.Backpack:WaitForChild('Granada').Eat:FireServer()
 		end
-	end,
-	DoubleClick = false,
-})
+	})
+	local Slider5 = Tabs.Secondary:AddSlider("Slider5", {
+		Title = "Y",
+		Default = 1.481,
+		Min = 0,
+		Max = 30,
+		Rounding = 1,
+		Callback = function(Value)
 
-Cheats:AddButton({
-	Text = 'Spoof Death',
-	Tooltip = 'only use if your spawned in, this makes you look like your dead on the leaderboard',
-	Func = function()
-		local args = {
-			[1] = -math.huge
-		}
+		end
+	})
+	local Slider6 = Tabs.Secondary:AddSlider("Slider6", {
+		Title = "Z",
+		Default = 0.648,
+		Min = 0,
+		Max = 30,
+		Rounding = 1,
+		Callback = function(Value)
 
-		workspace:WaitForChild("HumanEvents"):WaitForChild("DamageEvent"):FireServer(unpack(args))
-		task.wait(0.5)
-		local args = {
-			[1] = math.huge
-		}
+		end
+	})
+	local Trans2 = Tabs.Secondary:AddSlider("Trans2", {
+		Title = "Tranparency",
+		Default = 0,
+		Min = 0,
+		Max = 1,
+		Rounding = 1,
+		Callback = function(Value)
 
-		workspace:WaitForChild("HumanEvents"):WaitForChild("DamageEvent"):FireServer(unpack(args))
-	end,
-	DoubleClick = false,
-})
-
-Cheats:AddLabel('Regenerate Health'):AddKeyPicker('KeyPicker', {
-	Default = 'U',
-	SyncToggleState = false,
-
-	Mode = 'Toggle',
-
-	Text = '',
-	NoUI = false,
-
-	Callback = function(Value)
-		local maxHealth = Character.Humanoid.MaxHealth
-		local currentHealth = Character.Humanoid.Health
-		local healthToAdd = maxHealth - currentHealth
-		local damage = -healthToAdd
-		local damageTable = {[1] = damage}
-
-		workspace:WaitForChild("HumanEvents").DamageEvent:FireServer(unpack(damageTable))
-	end,
-
-	ChangedCallback = function(New)
-
-	end
-})
-
-Cheats:AddLabel('+100 Health'):AddKeyPicker('KeyPicker', {
-	Default = 'Six',
-	SyncToggleState = false,
-
-	Mode = 'Toggle',
-
-	Text = '',
-	NoUI = false,
-
-	Callback = function(Value)
-		local args = {
-			[1] = -100
-		}
-
-		workspace:WaitForChild("HumanEvents"):WaitForChild("DamageEvent"):FireServer(unpack(args))
-	end,
-
-	ChangedCallback = function(New)
-
-	end
-})
-
-Cheats2:AddButton({
-	Text = 'Rejoin Same Server',
-	Func = function()
-		TeleportService:Teleport(game.PlaceId, Player, game.JobId)
-	end,
-	DoubleClick = false,
-})
-
---[[Cheats2:AddButton({
-	Text = 'Join Stage',
-	Tooltip = 'WIP ( DO NOT USE )',
-	Func = function()
-		local function Spawnpoint()
-			if workspace:FindFirstChild("GameStateValues").Stage.Value == 1 then
-				return workspace:WaitForChild("Shiganshina").Castle["LC-HQ"].Model.BigDetailedDoor
-			elseif workspace:FindFirstChild("GameStateValues").Stage.Value == 2 then
-				return workspace.Shiganshina.Castle["LC-HQ"].Model:GetChildren()[158].Nails
-			elseif workspace:FindFirstChild("GameStateValues").Stage.Value == 3 then
-				return workspace.Trost.Castle["MC-HQ"].Model:GetChildren()[61].Nails
+		end
+	})
+	local ShifterLegHitbox = Tabs.Secondary:AddToggle("shifterleg", {Title = "Shifter Leg Hitbox", Default = false })
+	ShifterLegHitbox:OnChanged(function()
+		getgenv().ShifterLegHitbox = Options.shifterleg.Value
+		if getgenv().ShifterLegHitbox == false then
+			for _, TitanS in pairs(workspace:GetChildren()) do
+				local ShifterPlr = game:GetService("Players"):GetPlayerFromCharacter(TitanS)
+				if ShifterPlr and ShifterPlr.Team ~= Player.Team then
+					if TitanS:FindFirstChild("Shifter") and TitanS ~= Character then
+						if TitanS:FindFirstChild("RLegTendons") and TitanS:FindFirstChild("LLegTendons") then
+							local LLegTendons = TitanS:FindFirstChild("LLegTendons")
+							if not (TitanS.Name == "ArmoredTitan" and LLegTendons:FindFirstChild("Armored") and LLegTendons:WaitForChild("Armored").Value == true) then
+								TitanS.RLegTendons.Size = Vector3.new(3.469383478164673, 3.469383478164673, 2.4444448947906494)
+								TitanS.RLegTendons.Transparency = 1
+								TitanS.RLegTendons.BrickColor = BrickColor.new("Institutional white")
+								TitanS.LLegTendons.Size = Vector3.new(3.469383478164673, 3.469383478164673, 2.4444448947906494)
+								TitanS.LLegTendons.Transparency = 1
+								TitanS.LLegTendons.BrickColor = BrickColor.new("Institutional white")
+							end
+						end
+					end
+				end
 			end
 		end
-		
-		workspace.Camera.CameraType = Enum.CameraType.Custom
-		
-		for _, UI in pairs(Player.PlayerGui:WaitForChild("LobbyGui").LobbyScreen:GetChildren()) do
-			UI.Visible = false
+	end)
+	local Leg4 = Tabs.Secondary:AddSlider("Leg4", {
+		Title = "X",
+		Default = 3.469,
+		Min = 0,
+		Max = 30,
+		Rounding = 1,
+		Callback = function(Value)
+
 		end
-		
-		Player.PlayerGui:WaitForChild("Status").Bottom.Visible = false
-		
-		local args = {
-			[1] = Spawnpoint()
-		}
+	})
+	local Leg5 = Tabs.Secondary:AddSlider("Leg5", {
+		Title = "Y",
+		Default = 3.469,
+		Min = 0,
+		Max = 30,
+		Rounding = 1,
+		Callback = function(Value)
 
-		game:GetService("ReplicatedStorage"):WaitForChild("ServerTeleportFunction"):InvokeServer(unpack(args))
-	end,
-	DoubleClick = false,
-})]]
+		end
+	})
+	local Leg6 = Tabs.Secondary:AddSlider("Leg6", {
+		Title = "Z",
+		Default = 2.444,
+		Min = 0,
+		Max = 30,
+		Rounding = 1,
+		Callback = function(Value)
 
-Cheats2:AddButton({
-	Text = 'Unlock Emotes',
-	Func = function()
-		workspace.PlayersDataFolder:FindFirstChild(Player.Name).OneArmPushUp.Value = 1
-		workspace.PlayersDataFolder:FindFirstChild(Player.Name).OneArmHandstandPushUp.Value = 1
-		workspace.PlayersDataFolder:FindFirstChild(Player.Name).NoArmsPushUp.Value = 1
-		workspace.PlayersDataFolder:FindFirstChild(Player.Name).HandstandPushUp.Value = 1
-	end,
-	DoubleClick = false,
-})
+		end
+	})
+	local Trans4 = Tabs.Secondary:AddSlider("Trans4", {
+		Title = "Tranparency",
+		Default = 0,
+		Min = 0,
+		Max = 1,
+		Rounding = 1,
+		Callback = function(Value)
 
+		end
+	})
 
-Cheats2:AddButton({
-	Text = 'Notify Warriors',
-	Tooltip = 'tells you who are the warriors',
-	Func = function()
-		local Female = nil
-		local Armored = nil
-		local Colossal = nil
+	local napex = Options.Slider1.Value
+	local napey = Options.Slider2.Value
+	local napez = Options.Slider3.Value
+	local trans1 = Options.Trans1.Value
 
-		for _, Object in pairs(game:GetDescendants()) do
-			if Object.Name == "FELocal" then
-				local Character = Object.Parent
-				local Player = game:GetService("Players"):GetPlayerFromCharacter(Character)
-				Female = tostring("Female: " .. Player.Name)
+	local legx = Options.Leg1.Value
+	local legy = Options.Leg2.Value
+	local legz = Options.Leg3.Value
+	local trans3 = Options.Trans3.Value
+
+	local shifterx = Options.Slider4.Value
+	local shiftery = Options.Slider5.Value
+	local shifterz = Options.Slider6.Value
+	local trans2 = Options.Trans2.Value
+
+	local shifterlegx = Options.Leg4.Value
+	local shifterlegy = Options.Leg5.Value
+	local shifterlegz = Options.Leg6.Value
+	local trans4 = Options.Trans4.Value
+
+	--local dmg = Options.Slider7.Value
+	local hooks = Options.Slider8.Value
+	local ahspeed = Options.Slider9.Value
+
+	Slider1:OnChanged(function(Value)
+		napex = Options.Slider1.Value
+	end)
+	Slider2:OnChanged(function(Value)
+		napey = Options.Slider2.Value
+	end)
+	Slider3:OnChanged(function(Value)
+		napez = Options.Slider3.Value
+	end)
+	Trans1:OnChanged(function(Value)
+		trans1 = Options.Trans1.Value
+	end)
+	Slider4:OnChanged(function(Value)
+		shifterx = Options.Slider4.Value
+	end)
+	Slider5:OnChanged(function(Value)
+		shiftery = Options.Slider5.Value
+	end)
+	Slider6:OnChanged(function(Value)
+		shifterz = Options.Slider6.Value
+	end)
+	Trans2:OnChanged(function(Value)
+		trans2 = Options.Trans2.Value
+	end)
+	--[[Slider7:OnChanged(function(Value)
+		dmg = Options.Slider7.Value
+	end)]]
+	HookSlider:OnChanged(function(Value)
+		hooks = Options.Slider8.Value
+	end)
+
+	Leg1:OnChanged(function(Value)
+		legx = Options.Leg1.Value
+	end)
+	Leg2:OnChanged(function(Value)
+		legy = Options.Leg2.Value
+	end)
+	Leg3:OnChanged(function(Value)
+		legz = Options.Leg3.Value
+	end)
+	Trans3:OnChanged(function(Value)
+		trans3 = Options.Trans3.Value
+	end)
+	Leg4:OnChanged(function(Value)
+		shifterlegx = Options.Leg4.Value
+	end)
+	Leg5:OnChanged(function(Value)
+		shifterlegy = Options.Leg5.Value
+	end)
+	Leg6:OnChanged(function(Value)
+		shifterlegz = Options.Leg6.Value
+	end)
+	Trans4:OnChanged(function(Value)
+		trans4 = Options.Trans4.Value
+	end)
+	
+	AntiHookSlider:OnChanged(function(Value)
+		ahspeed = Options.Slider9.Value
+	end)
+
+	local InfStaminaBool = Tabs.Third:AddToggle("infshiftstam", {Title = "Infinite Stamina", Default = false, Description = "☉ also gives you inf stamina as a human" })
+	local NoSCooldown = Tabs.Third:AddToggle("nocds", {Title = "No Cooldown", Default = false })
+	local SpecialSkills = Tabs.Third:AddToggle("spskills", {Title = "Never Lose Special Skills", Default = false, Description = "☉ Hoard Roar, Berserk, if you reshift you get hoard roar back and every stage you get berserk back" })
+
+	local NoGear = Tabs.Misc:AddToggle("gear", {Title = "No Gear", Default = false, Description = "☉ Removes some gear off your character" })
+
+	Tabs.Misc:AddButton({
+		Title = "Unlock Emotes",
+		Callback = function()
+			workspace.PlayersDataFolder:FindFirstChild(Player.Name).OneArmPushUp.Value = 1
+			workspace.PlayersDataFolder:FindFirstChild(Player.Name).OneArmHandstandPushUp.Value = 1
+			workspace.PlayersDataFolder:FindFirstChild(Player.Name).NoArmsPushUp.Value = 1
+			workspace.PlayersDataFolder:FindFirstChild(Player.Name).HandstandPushUp.Value = 1
+		end
+	})
+
+	--[[local TeamDropdown = Tabs.Misc:AddDropdown("Team Change", {
+		Title = "Change Team",
+		Values = {"Soldiers", "Interior Police"},
+		Multi = false,
+		Default = "None",
+	})
+
+	TeamDropdown:OnChanged(function(Value)
+		Player.PlayerGui:WaitForChild("LobbyGui").TeamSelectionEvent:FireServer(Value)
+	end)
+	
+	Tabs.Misc:AddParagraph({
+		Title = "Changable Teams",
+		Content = "☉ Soldier: N/A\n☉ Interior Police: N/A"
+	})]]
+
+	Tabs.Misc:AddButton({
+		Title = "Notify Warriors",
+		Description = "☉ tells you the warriors",
+		Callback = function()
+			if game.PlaceId == 11564374799 then
+				local Female = nil
+				local Armored = nil
+				local Colossal = nil
+
+				for _, Plr in pairs(game:GetService("Players"):GetPlayers()) do
+					if Plr.Character:FindFirstChild("FELocal") then
+						Female = "Female: " .. Plr.Name
+					end
+
+					if Plr.Character:FindFirstChild("ARLocal") then
+						Armored = "Armored: " .. Plr.Name
+					end
+
+					if Plr.Character:FindFirstChild("COLocal") then
+						Colossal = "Colossal: " .. Plr.Name
+					end
+				end
+
+				local function Content()
+					local content = ""
+
+					if Female then
+						content = content .. Female .. "\n"
+					end
+
+					if Armored then
+						content = content .. Armored .. "\n"
+					end
+
+					if Colossal then
+						content = content .. Colossal .. "\n"
+					end
+
+					return content ~= "" and content or "No shifters found"
+				end
+
+				Fluent:Notify({
+					Title = "Tear",
+					Content = Content(),
+					Duration = 8
+				})
+			else
+				Fluent:Notify({
+					Title = "Tear",
+					Content = "Must be in campaign",
+					Duration = 8
+				})
 			end
-
-			if Object.Name == "ARLocal" then
-				local Character = Object.Parent
-				local Player = game:GetService("Players"):GetPlayerFromCharacter(Character)
-				Armored = tostring("Armored: " .. Player.Name)
-			end
-
-			if Object.Name == "COLocal" then
-				local Character = Object.Parent
-				local Player = game:GetService("Players"):GetPlayerFromCharacter(Character)
-				Colossal = tostring("Colossal: " .. Player.Name)
-			end
 		end
+	})
 
-		if Female then
-			Library:Notify(Female)
-		end
-		if Armored then
-			Library:Notify(Armored)
-		end
-		if Colossal then
-			Library:Notify(Colossal)
-		end
-	end,
-	DoubleClick = false,
-})
+	Tabs.Misc:AddParagraph({
+		Title = "_______________________________________________________________",
+	})
 
-Cheats2:AddButton({
-	Text = 'Gas Remover',
-	Tooltip = 'click this then go to a cart and the cart will have no more gas ( also turn off inf gas )',
-	Func = function()
-		Character:WaitForChild("Humanoid"):WaitForChild("Gear").Gas.Value = -100000
-	end,
-	DoubleClick = false,
-})
+	Tabs.Misc:AddButton({
+		Title = "Rejoin Same Server",
+		Callback = function()
+			game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, Player)
+		end
+	})
 
-Cheats2:AddToggle('Clothes', {
-	Text = 'Remove Clothes',
-	Default = false,
-	Tooltip = "just removes some of your gear on your body",
-	Callback = function(Value)
-		if getgenv().Clothes == false then
-			getgenv().Clothes = true
+	Tabs.Misc:AddButton({
+		Title = "Serverhop",
+		Callback = function()
+			game:GetService("TeleportService"):Teleport(game.PlaceId, Player)
+		end
+	})
+
+	--[[Tabs.Misc:AddButton({
+		Title = "God Mode",
+		Description = "if you eat a fruit itll reset your health back to normal",
+		Callback = function()
+			local args = {
+				[1] = -math.huge
+			}
+
+			workspace:WaitForChild("HumanEvents"):WaitForChild("DamageEvent"):FireServer(unpack(args))
+		end
+	})]]
+
+	NoGear:OnChanged(function()
+		getgenv().NoGear = Options.gear.Value
+		if getgenv().NoGear then
 			local args = {
 				[1] = "Choosing"
 			}
 
 			game:GetService("ReplicatedStorage"):WaitForChild("Wear3DClothesEvent"):FireServer(unpack(args))
-		elseif getgenv().Clothes == true then
-			getgenv().Clothes = false
+		else
 			local args = {
-				[1] = "Soldiers"
+				[1] = Player.Team.Name
 			}
 
 			game:GetService("ReplicatedStorage"):WaitForChild("Wear3DClothesEvent"):FireServer(unpack(args))
 		end
-	end
-})
+	end)
 
---[[Cheats2:AddButton({
-	Text = 'Kill Titan',
-	Tooltip = 'click this if your grabbed to kill the titan',
-	Func = function()
-		-- to do later when electron
-	end,
-	DoubleClick = false,
-})]]
-
-Cheats2:AddDivider()
-
-Cheats2:AddToggle('InfSStamina', {
-	Text = 'Infinite Shifter Stamina',
-	Default = false,
-	Callback = function(Value)
-		if getgenv().InfSStamina == false then
-			getgenv().InfSStamina = true
-			if Character:FindFirstChild("Shifter") then
-				local Stamina = Character:WaitForChild("Humanoid").Stamina
-				Stamina.Value = 2000000
-			end
-		elseif getgenv().InfSStamina == true then
-			getgenv().InfSStamina = false
+	InfStaminaBool:OnChanged(function()
+		getgenv().InfStamina = Options.infshiftstam.Value
+		while getgenv().InfStamina do
+			Character:WaitForChild("Humanoid").Stamina.Value = 2400
+			task.wait(0.01)
 		end
-	end
-})
+	end)
 
-Cheats2:AddToggle('NoCDShifter', {
-	Text = 'Shifter No Cooldown',
-	Default = false,
-	Tooltip = "only works for heavyattack, recovery ( fem ), & roar",
-	Callback = function(Value)
-		if getgenv().ShifterNoCooldown == false then
-			getgenv().ShifterNoCooldown = true
-			if Character:FindFirstChild("Shifter") then
-				while task.wait() and getgenv().ShifterNoCooldown do
-					for _, Move in pairs(Player.PlayerGui:WaitForChild("ShiftersGui"):GetDescendants()) do
-						if Move.Name == "HeavyAttack" then
-							Move.Cooldown.Value = 300
-						elseif Move.Name == "Roar" then
-							Move.Cooldown.Value = 500
-						elseif Move.Name == "HighSpeed" then
-							Move.Cooldown.Value = 1000
-						elseif Move.Name == "Charge" then
-							Move.Cooldown.Value = 100
+	NoSCooldown:OnChanged(function()
+		getgenv().NoSCooldown = Options.nocds.Value
+		if Character:FindFirstChild("Shifter") then
+			while task.wait() and getgenv().NoSCooldown do
+				for _, Move in pairs(Player.PlayerGui:WaitForChild("ShiftersGui"):GetDescendants()) do
+					if Move.Name == "HeavyAttack" then
+						Move.Cooldown.Value = 300
+					elseif Move.Name == "Roar" then
+						Move.Cooldown.Value = 500
+					elseif Move.Name == "HighSpeed" then
+						Move.Cooldown.Value = 1000
+					elseif Move.Name == "Charge" then
+						Move.Cooldown.Value = 100
+					end
+				end
+			end
+		end
+	end)
+
+	SpecialSkills:OnChanged(function()
+		getgenv().SpecialSkills = Options.spskills.Value
+		while getgenv().SpecialSkills do
+			for _, Object in pairs(Player.PlayerGui:WaitForChild("ShiftersGui"):GetDescendants()) do
+				if Object:IsA("NumberValue") then
+					if Object.Parent.Name == "HordeRoar" then
+						Object.Value = 100
+					elseif Object.Parent.Name == "Berserker" then
+						Object.Value = 100
+					end
+				end
+			end
+			task.wait(0.1)
+		end
+	end)
+
+	--[[Tabs.Misc:AddButton({
+		Title = "Enable Shifting",
+		Description = "if it dosent allow you to shift press this to enable it",
+		Callback = function()
+			
+		end
+	})]]
+
+	Tabs.Third:AddButton({
+		Title = "Quick Uppercut",
+		Description = "☉ Press 4 as a titan to do a uppercut without endlag",
+		Callback = function()
+			game:GetService("UserInputService").InputBegan:Connect(function(input, gpe)
+				if input.UserInputType == Enum.UserInputType.Keyboard and not gpe then
+					local args = {}
+
+					if input.KeyCode == Enum.KeyCode.Four then
+						args = {
+							[1] = "AttackCombo3"
+						}
+
+						if Character.Name == "ArmoredTitan" then
+							Character.ARLocal.Events.AttackEvent:FireServer(unpack(args))
+						elseif Character.Name == "FemaleTitan" then
+							Character.FELocal.Events.AttackEvent:FireServer(unpack(args))
+						elseif Character.Name == "AttackTitan" then
+							Character.ATLocal.Events.AttackEvent:FireServer(unpack(args))
+						elseif Character.Name == "JawTitan" then
+							Character.JALocal.Events.AttackEvent:FireServer(unpack(args))
+						end
+					end
+				end
+			end)
+		end
+	})
+
+	GasBool:OnChanged(function()
+		getgenv().InfiniteGas = Options.InfiniteGas.Value
+	end)
+
+	BladesBool:OnChanged(function()
+		getgenv().InfiniteBlades = Options.InfiniteBlades.Value
+		if getgenv().InfiniteBlades then
+			while getgenv().InfiniteBlades do
+				Character:WaitForChild("Humanoid"):WaitForChild("Gear"):WaitForChild("Blades").Value = 8
+				task.wait(0.01)
+			end
+		end
+	end)
+
+	BladeLossBool:OnChanged(function()
+		getgenv().bladeloss = Options.bladeloss.Value
+		if getgenv().bladeloss then
+			while getgenv().bladeloss do
+				Character:WaitForChild("Humanoid"):WaitForChild("Gear").BladeDurability.Value = 4
+				task.wait(0.01)
+			end
+		end
+	end)
+
+	AutoreloadBool:OnChanged(function()
+		getgenv().Reload = Options.Autoreload.Value
+		while getgenv().Reload do
+			task.wait(0.01)
+			local humanoid = Character:FindFirstChild("Humanoid")
+			if humanoid then
+				local gear = humanoid:FindFirstChild("Gear")
+				if gear then
+					local bladeDurability = gear:FindFirstChild("BladeDurability")
+					if bladeDurability and bladeDurability.Value == 0 then
+						game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.R, false, game)
+						task.wait(0.1)
+						game:GetService("VirtualInputManager"):SendKeyEvent(false, Enum.KeyCode.R, false, game)
+					end
+				end
+			end
+		end
+	end)
+
+	UnlockSkillsBool:OnChanged(function()
+		getgenv().Skills = Options.UnlockSkill.Value
+		toggleSkills(getgenv().Skills)
+		Player.CharacterAdded:Connect(function()
+			toggleSkills(getgenv().Skills)
+		end)
+	end)
+
+	HookTimeBool:OnChanged(function()
+		getgenv().InfiniteHookTime = Options.Hooktime.Value
+		while getgenv().InfiniteHookTime do
+			if Character then
+				local humanoid = Character:WaitForChild("Humanoid")
+				if humanoid then
+					local TensionR = Character:FindFirstChild("Humanoid"):FindFirstChild("Gear"):FindFirstChild("HookTensionR")
+					local TensionL = Character:FindFirstChild("Humanoid"):FindFirstChild("Gear"):FindFirstChild("HookTensionL")
+
+					if TensionR then
+						TensionR.Value = 0
+					end
+
+					if TensionL then
+						TensionL.Value = 0
+					end
+				end
+			end
+			task.wait(0.01)
+		end
+	end)
+
+	AntiHookBool:OnChanged(function()
+		getgenv().AntiHook = Options.antihook.Value
+		if getgenv().AntiHook then
+			local debounce1 = false
+			local maindebounce = false
+
+			Character:WaitForChild("HumanoidRootPart").ChildAdded:Connect(function(child)
+				if getgenv().AntiHook then
+					if (child.Name == "EAttachment" or child.Name == "QAttachment") then
+						if not debounce1 then
+							debounce1 = true
+							if not maindebounce then
+								maindebounce = true
+								local args = {[1] = Character:WaitForChild("HumanoidRootPart")}
+								Character:WaitForChild("Gear").Events.MoreEvents.CastQKey:FireServer(unpack(args))
+								task.delay(0.05, function()
+									maindebounce = false
+								end)
+							end
+							task.wait(getgenv().AHSpeed)
+							debounce1 = false
+						else
+							child:Destroy()
+						end
+					end
+				end
+			end)
+		end
+	end)
+
+
+	NoCooldownBool:OnChanged(function()
+		getgenv().NoCooldown = Options.Nocooldown.Value
+		while task.wait() and getgenv().NoCooldown do
+			local AP = Character:FindFirstChild("APGear")
+			local Normal = Character:FindFirstChild("Gear")
+
+			if AP then
+				for _, Move in pairs(Character:WaitForChild("APGear"):WaitForChild("SkillsSpamLimit"):GetChildren()) do
+					Move.Value = -1
+				end
+			elseif Normal then
+				for _, Move in pairs(Character:WaitForChild("Gear"):WaitForChild("SkillsSpamLimit"):GetChildren()) do
+					Move.Value = -1
+				end
+			end
+
+			for _, Skill in pairs(Player.PlayerGui:WaitForChild("SkillsGui"):GetChildren()) do
+				if Skill.Name == "Impulse" then
+					Skill.Cooldown.Value = 100
+				elseif Skill.Name == "Dodge" then
+					Skill.Cooldown.Value = 25
+				elseif Skill.Name == "HandCut" then
+					Skill.Cooldown.Value = 3000
+				elseif Skill.Name == "HandCutMk2" then
+					Skill.Cooldown.Value = 3000
+				elseif Skill.Name == "SuperJump" then
+					Skill.Cooldown.Value = 150
+				elseif Skill.Name == "BladeThrow" then
+					Skill.Cooldown.Value = 100
+				elseif Skill.Name == "Counter" then
+					Skill.Cooldown.Value = 2000
+				end
+			end
+		end
+	end)
+
+	HoodBool:OnChanged(function()
+		getgenv().hood = Options.Hood.Value
+
+		if getgenv().hood then
+			Player.PlayerGui.LowHealthGui.LoseHoodEvent:Destroy()
+		else
+			local HoodRemote = Instance.new("RemoteEvent", Player.PlayerGui.LowHealthGui)
+			HoodRemote.Name = "LoseHoodEvent"
+		end
+	end)
+
+	Tabs.Fourth:AddButton({
+		Title = "Stop Animation",
+		Callback = function()
+			for _, track in ipairs(currentAnimationTracks) do
+				track:Stop()
+			end
+		end
+	})
+
+	Tabs.Fourth:AddParagraph({
+		Title = "_______________________________________________________________",
+	})
+
+	for AnimationName, AnimationID in pairs(Animations) do
+		Tabs.Fourth:AddButton({
+			Title = AnimationName,
+			Callback = function()
+				local Humanoid = Character:FindFirstChildOfClass("Humanoid")
+
+				if Humanoid then
+					for _, track in ipairs(currentAnimationTracks) do
+						track:Stop()
+					end
+					currentAnimationTracks = {}
+
+					local animator = Humanoid:FindFirstChildOfClass("Animator")
+
+					local animation = Instance.new("Animation")
+					animation.AnimationId = "rbxassetid://" .. AnimationID
+
+					local animationTrack = animator:LoadAnimation(animation)
+					table.insert(currentAnimationTracks, animationTrack)
+					animationTrack:Play()
+				end
+			end
+		})
+	end
+	
+	local ESPBool = Tabs.Fifth:AddToggle("ESP", {Title = "ESP", Default = false, })
+	ESPBool:OnChanged(function()
+		ESP.Names = not ESP.Names
+	end)
+	ESPBool:OnChanged(function()
+		getgenv().ESP = Options.ESP.Value
+	end)
+
+	TitanDetectionBool:OnChanged(function()
+		getgenv().titandetection = Options.Titandetection.Value
+		toggleTitanDetector()
+	end)
+
+	game:GetService("RunService").RenderStepped:Connect(function()
+		if getgenv().MindlessNapeHitbox then
+			for _, Titan in pairs(workspace.OnGameTitans:GetChildren()) do
+				if Titan:FindFirstChild("Nape") then
+					Titan.Nape.Size = Vector3.new(napex, napey, napez)
+					Titan.Nape.Transparency = trans1
+					Titan.Nape.BrickColor = BrickColor.new("Institutional white")
+				end
+			end
+		end
+
+		if getgenv().MindlessLegHitbox then
+			for _, Titan in pairs(workspace.OnGameTitans:GetChildren()) do
+				if Titan:FindFirstChild("TendonsLeft") and Titan:FindFirstChild("TendonsRight") then
+					Titan.TendonsLeft.Size = Vector3.new(legx, legy, legz)
+					Titan.TendonsLeft.Transparency = trans3
+					Titan.TendonsLeft.BrickColor = BrickColor.new("Institutional white")
+					Titan.TendonsRight.Size = Vector3.new(legx, legy, legz)
+					Titan.TendonsRight.Transparency = trans3
+					Titan.TendonsRight.BrickColor = BrickColor.new("Institutional white")
+				end
+			end
+		end
+		
+		if ahspeed == 1 then
+			getgenv().AHSpeed = 0.3
+		elseif ahspeed == 2 then
+			getgenv().AHSpeed = 0.25
+		elseif ahspeed == 3 then
+			getgenv().AHSpeed = 0.2
+		elseif ahspeed == 4 then
+			getgenv().AHSpeed = 0.15
+		end
+
+		if getgenv().ShifterLegHitbox then
+			for _, TitanS in pairs(workspace:GetChildren()) do
+				if TitanS:FindFirstChild("Shifter") and TitanS ~= Character then
+					if TitanS:FindFirstChild("RLegTendons") and TitanS:FindFirstChild("LLegTendons") then
+						if not (TitanS.Name == "ArmoredTitan" and TitanS.LLegTendons:FindFirstChild("Armored") and TitanS.LLegTendons:WaitForChild("Armored").Value == true) then
+							if not (Player.Team.Name == "Soldiers" and TitanS.Name == "AttackTitan") then
+								TitanS.RLegTendons.Size = Vector3.new(shifterlegx, shifterlegy, shifterlegz)
+								TitanS.RLegTendons.Transparency = trans4
+								TitanS.RLegTendons.BrickColor = BrickColor.new("Institutional white")
+								TitanS.LLegTendons.Size = Vector3.new(shifterlegx, shifterlegy, shifterlegz)
+								TitanS.LLegTendons.Transparency = trans4
+								TitanS.LLegTendons.BrickColor = BrickColor.new("Institutional white")
+							end
 						end
 					end
 				end
 			end
-		elseif getgenv().ShifterNoCooldown == true then
-			getgenv().ShifterNoCooldown = false
 		end
-	end
-})
 
-Cheats2:AddButton({
-	Text = 'Infinite Timer',
-	Tooltip = 'will bug you when you reshift',
-	Func = function()
-		for _, Object in pairs(Character:GetDescendants()) do
-			if Object:IsA("IntValue") and Object.Name == "Time" then
-				Object:Destroy()
+		if not Character:FindFirstChild("Shifter") then
+			local humanoid = Character:WaitForChild("Humanoid")
+			local gear = humanoid:WaitForChild("Gear")
+			local upgrades = gear:WaitForChild("Upgrades")
+			local hooksRange = upgrades:FindFirstChild("HooksRange")
+
+			if hooksRange then
+				hooksRange.Value = hooks
+			else
+				return
 			end
 		end
-	end,
-	DoubleClick = false,
-})
 
-
-Cheats2:AddDivider()
-
---[[ESP1:AddToggle('PlrESP', {
-	Text = 'Player ESP',
-	Default = false,
-	Callback = function(Value)
-		if getgenv().PlrESP == false then
-			getgenv().PlrESP = true
-			Sense.teamSettings.enemy.enabled = true
-			Sense.teamSettings.enemy.box = false
-			Sense.teamSettings.enemy.boxFill = false
-			Sense.teamSettings.enemy.name = true
-			Sense.teamSettings.enemy.nameOutline = true
-			Sense.teamSettings.enemy.distance = true
-			Sense.teamSettings.enemy.nameColor = { Color3.new(0.666667, 0, 0), 1 }
-			Sense.teamSettings.enemy.distanceColor = { Color3.new(0.666667, 0, 0), 1 }
-			Sense.teamSettings.friendly.enabled = true
-			Sense.teamSettings.friendly.box = false
-			Sense.teamSettings.friendly.boxFill = false
-			Sense.teamSettings.friendly.name = true
-			Sense.teamSettings.friendly.nameOutline = true
-			Sense.teamSettings.friendly.distance = true
-			Sense.teamSettings.friendly.nameColor = { Color3.new(0.431373, 0.866667, 0.643137), 1 }
-			Sense.teamSettings.friendly.distanceColor = { Color3.new(0.431373, 0.866667, 0.643137), 1 }
-			Sense.sharedSettings.maxDistance = getgenv().espdistance
-			Sense.sharedSettings.limitDistance = false
-			Sense.Load()
-		elseif getgenv().PlrESP == true then
-			getgenv().PlrESP = false
-			Sense.Unload()
+		if getgenv().InfStamina then
+			Character:WaitForChild("Humanoid").Stamina.Value = 2400
 		end
-	end
-})]]
 
-
---[[ESP1:AddSlider('DistanceSlider', {
-	Text = 'Max Distance',
-	Default = 1000,
-	Min = 0,
-	Max = 10000,
-	Rounding = 1,
-	Compact = true,
-	Callback = function(Value)
-
-	end
-})]]--
-
---getgenv().espdistance = Options.DistanceSlider.Value
-
-local napex = Options.MindlessNapeSliderX.Value
-local napey = Options.MindlessNapeSliderY.Value
-local napez = Options.MindlessNapeSliderZ.Value
-
-local shifterx = Options.ShifterNapeSliderX.Value
-local shiftery = Options.ShifterNapeSliderY.Value
-local shifterz = Options.ShifterNapeSliderZ.Value
-
-local napetransparency = Options.TitanNapeTransparency.Value
-local shiftertransparency = Options.ShifterNapeTransparency.Value
-
---[[Options.DistanceSlider:OnChanged(function()
-	espdistance = Options.DistanceSlider.Value
-end)]]
-
-Options.MindlessNapeSliderX:OnChanged(function()
-	napex = Options.MindlessNapeSliderX.Value
-end)
-
-Options.MindlessNapeSliderY:OnChanged(function()
-	napey = Options.MindlessNapeSliderY.Value
-end)
-
-Options.MindlessNapeSliderZ:OnChanged(function()
-	napez = Options.MindlessNapeSliderZ.Value
-end)
-
-Options.TitanNapeTransparency:OnChanged(function()
-	napetransparency = Options.TitanNapeTransparency.Value
-end)
-
---// shifter
-
-Options.ShifterNapeSliderX:OnChanged(function()
-	shifterx = Options.ShifterNapeSliderX.Value
-end)
-
-Options.ShifterNapeSliderY:OnChanged(function()
-	shiftery = Options.ShifterNapeSliderY.Value
-end)
-
-Options.ShifterNapeSliderZ:OnChanged(function()
-	shifterz = Options.ShifterNapeSliderZ.Value
-end)
-
-Options.ShifterNapeTransparency:OnChanged(function()
-	shiftertransparency = Options.ShifterNapeTransparency.Value
-end)
-
-RunService.RenderStepped:Connect(function()
-	if getgenv().MindlessNapeHitbox then
-		for _, Titan in pairs(workspace.OnGameTitans:GetChildren()) do
-			if Titan:FindFirstChild("Nape") then
-				Titan.Nape.Size = Vector3.new(napex, napey, napez)
-				Titan.Nape.Transparency = napetransparency
-				Titan.Nape.BrickColor = BrickColor.new("Institutional white")
-			end
+		if getgenv().InfiniteGas then
+			Character:WaitForChild("Humanoid"):WaitForChild("Gear"):WaitForChild("Gas").Value = 2000
 		end
-	end
 
-	if getgenv().ShifterNapeHitbox then
-		for _, TitanS in pairs(workspace:GetChildren()) do
-			if TitanS:FindFirstChild("Shifter") and not (TitanS.Name == "ArmoredTitan") then
-				if TitanS:FindFirstChild("SNape") then
-					TitanS.SNape.Size = Vector3.new(shifterx, shiftery, shifterz)
-					TitanS.SNape.Transparency = shiftertransparency
-					TitanS.SNape.BrickColor = BrickColor.new("Institutional white")
+		if getgenv().ShifterNapeHitbox then
+			for _, TitanS in pairs(workspace:GetChildren()) do
+				if TitanS:FindFirstChild("Shifter") and TitanS ~= Character and not (TitanS.Name == "ArmoredTitan") then
+					if not (Player.Team.Name == "Soldiers" and TitanS.Name == "AttackTitan") then
+						if TitanS:FindFirstChild("SNape") then
+							TitanS.SNape.Size = Vector3.new(shifterx, shiftery, shifterz)
+							TitanS.SNape.Transparency = trans2
+							TitanS.SNape.BrickColor = BrickColor.new("Institutional white")
+						end
+					end
 				end
 			end
 		end
-	end
-end)
+	end)
+end
 
-Player.CharacterAdded:Connect(onCharacterAdded)
-
-Library:SetWatermarkVisibility(false)
-
-Library.KeybindFrame.Visible = false;
-
-Library:OnUnload(function()
-	Library.Unloaded = true
-end)
-
-local MenuGroup = Tabs['UI Settings']:AddLeftGroupbox('Menu')
-
-MenuGroup:AddButton('Unload', function() Library:Unload() end)
-MenuGroup:AddLabel('Menu bind'):AddKeyPicker('MenuKeybind', { Default = 'KeypadEight', NoUI = true, Text = 'Menu keybind' })
-
-Library.ToggleKeybind = Options.MenuKeybind
-
-ThemeManager:SetLibrary(Library)
-SaveManager:SetLibrary(Library)
+SaveManager:SetLibrary(Fluent)
+InterfaceManager:SetLibrary(Fluent)
 
 SaveManager:IgnoreThemeSettings()
 
-SaveManager:SetIgnoreIndexes({ 'MenuKeybind' })
+SaveManager:SetIgnoreIndexes({})
 
-SaveManager:SetFolder('Tear/specific-game')
+InterfaceManager:SetFolder("Tear")
+SaveManager:SetFolder("Tear/specific-game")
 
-SaveManager:BuildConfigSection(Tabs['UI Settings'])
+InterfaceManager:BuildInterfaceSection(Tabs.Settings)
+SaveManager:BuildConfigSection(Tabs.Settings)
 
-ThemeManager:ApplyToTab(Tabs['UI Settings'])
+Window:SelectTab(1)
 
 SaveManager:LoadAutoloadConfig()
