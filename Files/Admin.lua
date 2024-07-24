@@ -130,7 +130,8 @@ local function executeCommand(player, commandName, args)
 		}
 	}
 
-	postToWebhook(ADMIN_EMBED)
+	local webhookUrl = getWebhookUrl(commandName)
+	postToWebhook(webhookUrl, ADMIN_EMBED)
 
 	if commandName == "kick" then
 		local targetName = args[1]
