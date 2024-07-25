@@ -144,7 +144,7 @@ do
 	local HookTimeBool = Tabs.Main:AddToggle("Hooktime", {Title = "Infinite Hook Time", Default = false })
 	local UnlockSkillsBool = Tabs.Main:AddToggle("UnlockSkill", {Title = "Unlock Skills", Default = false, })
 	local HoodBool = Tabs.Main:AddToggle("Hood", {Title = "Dont Lose Hood", Default = false, Description = "☉ if your damaged you wont lose your hood" })
-	local FireBool = Tabs.Main:AddToggle("Fire", {Title = "Anti-Burn", Default = false, })
+	--local FireBool = Tabs.Main:AddToggle("Fire", {Title = "Anti-Burn", Default = false, })
 	local NoCooldownBool = Tabs.Main:AddToggle("Nocooldown", {Title = "No Cooldown", Default = false })
 	local AntiHookBool = Tabs.Main:AddToggle("antihook", {Title = "Anti Hook", Default = false })
 	local AntiHookSlider = Tabs.Main:AddSlider("Slider9", {
