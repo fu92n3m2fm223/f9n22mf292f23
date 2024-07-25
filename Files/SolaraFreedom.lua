@@ -790,7 +790,11 @@ do
 							if not maindebounce then
 								maindebounce = true
 								local args = {[1] = Character:WaitForChild("HumanoidRootPart")}
-								Character:WaitForChild("Gear").Events.MoreEvents.CastQKey:FireServer(unpack(args))
+								if Character:FindFirstChild("APGear") then
+									Character:WaitForChild("APGear").Events.MoreEvents.CastQKey:FireServer(unpack(args))
+								else
+									Character:WaitForChild("Gear").Events.MoreEvents.CastQKey:FireServer(unpack(args))
+								end
 								task.delay(0.05, function()
 									maindebounce = false
 								end)
