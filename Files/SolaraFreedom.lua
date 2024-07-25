@@ -144,6 +144,7 @@ do
 	local HookTimeBool = Tabs.Main:AddToggle("Hooktime", {Title = "Infinite Hook Time", Default = false })
 	local UnlockSkillsBool = Tabs.Main:AddToggle("UnlockSkill", {Title = "Unlock Skills", Default = false, })
 	local HoodBool = Tabs.Main:AddToggle("Hood", {Title = "Dont Lose Hood", Default = false, Description = "☉ if your damaged you wont lose your hood" })
+	local FireBool = Tabs.Main:AddToggle("Fire", {Title = "Anti-Burn", Default = false, })
 	local NoCooldownBool = Tabs.Main:AddToggle("Nocooldown", {Title = "No Cooldown", Default = false })
 	local AntiHookBool = Tabs.Main:AddToggle("antihook", {Title = "Anti Hook", Default = false })
 	local AntiHookSlider = Tabs.Main:AddSlider("Slider9", {
@@ -427,7 +428,6 @@ do
 	--local dmg = Options.Slider7.Value
 	--local hooks = Options.Slider8.Value
 	local ahspeed = Options.Slider9.Value
-	local anspeed = Options.Slider10.Value
 
 	Slider1:OnChanged(function(Value)
 		napex = Options.Slider1.Value
@@ -484,7 +484,7 @@ do
 	Trans4:OnChanged(function(Value)
 		trans4 = Options.Trans4.Value
 	end)
-	
+
 	AntiHookSlider:OnChanged(function(Value)
 		ahspeed = Options.Slider9.Value
 	end)
@@ -862,7 +862,7 @@ do
 			end
 		end
 	})
-	
+
 	local AnimSpeedSlider = Tabs.Fourth:AddSlider("Slider10", {
 		Title = "Animation Speed",
 		Description = "☉ changes the speed of your animation",
@@ -876,6 +876,8 @@ do
 			end
 		end
 	})
+
+	local anspeed = Options.Slider10.Value
 
 	AnimSpeedSlider:OnChanged(function(Value)
 		for _, track in ipairs(currentAnimationTracks) do
@@ -909,12 +911,12 @@ do
 					table.insert(currentAnimationTracks, animationTrack)
 					animationTrack:Play()
 
-					animationTrack:AdjustSpeed(AnimSpeedSlider:GetValue())
+					animationTrack:AdjustSpeed(anspeed)
 				end
 			end
 		})
 	end
-	
+
 	local ESPBool = Tabs.Fifth:AddToggle("ESP", {Title = "ESP", Default = false, })
 	ESPBool:OnChanged(function()
 		ESP.Names = not ESP.Names
@@ -951,7 +953,7 @@ do
 				end
 			end
 		end
-		
+
 		if ahspeed == 1 then
 			getgenv().AHSpeed = 0.3
 		elseif ahspeed == 2 then
