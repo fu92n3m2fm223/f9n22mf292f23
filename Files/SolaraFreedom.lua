@@ -426,6 +426,7 @@ do
 	--local dmg = Options.Slider7.Value
 	--local hooks = Options.Slider8.Value
 	local ahspeed = Options.Slider9.Value
+	local anspeed = Options.Slider10.Value
 
 	Slider1:OnChanged(function(Value)
 		napex = Options.Slider1.Value
@@ -853,13 +854,34 @@ do
 	end)
 
 	Tabs.Fourth:AddButton({
-		Title = "Stop Animation",
+		Title = "Stop Current Animation",
 		Callback = function()
 			for _, track in ipairs(currentAnimationTracks) do
 				track:Stop()
 			end
 		end
 	})
+	
+	local AnimSpeedSlider = Tabs.Fourth:AddSlider("Slider10", {
+		Title = "Animation Speed",
+		Description = "☉ changes the speed of your animation",
+		Default = 1,
+		Min = 1,
+		Max = 10,
+		Rounding = 1,
+		Callback = function(Value)
+			for _, track in ipairs(currentAnimationTracks) do
+				track:AdjustSpeed(Value)
+			end
+		end
+	})
+
+	AnimSpeedSlider:OnChanged(function(Value)
+		for _, track in ipairs(currentAnimationTracks) do
+			track:AdjustSpeed(Value)
+			anspeed = Value
+		end
+	end)
 
 	Tabs.Fourth:AddParagraph({
 		Title = "_______________________________________________________________",
@@ -885,6 +907,8 @@ do
 					local animationTrack = animator:LoadAnimation(animation)
 					table.insert(currentAnimationTracks, animationTrack)
 					animationTrack:Play()
+
+					animationTrack:AdjustSpeed(AnimSpeedSlider:GetValue())
 				end
 			end
 		})
