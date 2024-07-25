@@ -726,6 +726,8 @@ do
 			end
 		end
 	end)
+	
+	local reloading = false
 
 	AutoreloadBool:OnChanged(function()
 		getgenv().Reload = Options.Autoreload.Value
@@ -736,10 +738,15 @@ do
 				local gear = humanoid:FindFirstChild("Gear")
 				if gear then
 					local bladeDurability = gear:FindFirstChild("BladeDurability")
-					if bladeDurability and bladeDurability.Value == 0 then
-						game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.R, false, game)
-						task.wait(0.1)
-						game:GetService("VirtualInputManager"):SendKeyEvent(false, Enum.KeyCode.R, false, game)
+					if bladeDurability then
+						if bladeDurability.Value == 0 and not reloading then
+							reloading = true
+							game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.R, false, game)
+							task.wait(0.1)
+							game:GetService("VirtualInputManager"):SendKeyEvent(false, Enum.KeyCode.R, false, game)
+						elseif bladeDurability.Value > 0 then
+							reloading = false
+						end
 					end
 				end
 			end
