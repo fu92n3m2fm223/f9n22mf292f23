@@ -1188,10 +1188,12 @@ do
 				if Victim ~= localPlayer and Victim.Character and not Victim.Character:FindFirstChild("Shifter") then
 					local Hitbox = Victim.Character:WaitForChild("HumanoidRootPart"):FindFirstChild("BulletsHitbox")
 					if Hitbox then
-						Hitbox.Size = Vector3.new(humanhitbox, humanhitbox, humanhitbox)
-						Hitbox.Transparency = humantrans
-						Hitbox.BrickColor = BrickColor.new("Institutional white")
-						Hitbox.Shape = Enum.PartType.Ball
+						if Victim.Team.Name ~= localPlayer.Team.Name then
+							Hitbox.Size = Vector3.new(humanhitbox, humanhitbox, humanhitbox)
+							Hitbox.Transparency = humantrans
+							Hitbox.BrickColor = BrickColor.new("Institutional white")
+							Hitbox.Shape = Enum.PartType.Ball
+						end
 					end
 				end
 			end
