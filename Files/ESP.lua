@@ -72,6 +72,7 @@ local function updateESP()
 
                     local showSoldierESP = getgenv().soldieresp and player.Team and player.Team.Name == "Soldiers"
                     local showWarriorESP = getgenv().warrioreesp and (character:FindFirstChild("COLocal") or character:FindFirstChild("FELocal") or character:FindFirstChild("ARLocal"))
+                    local showInteriorESP = getgenv().interior and player.Team and player.Team.Name == "Interior Police"
                     
                     -- Check for TrueTeam
                     if character:FindFirstChild("ShifterHolder") and character.ShifterHolder:FindFirstChild("TrueTeam") then
@@ -81,7 +82,7 @@ local function updateESP()
                         end
                     end
 
-                    if (showSoldierESP or showWarriorESP) then
+                    if (showSoldierESP or showWarriorESP or showInteriorESP) then
                         if ESP.Boxes then
                             drawings.box.Size = size
                             drawings.box.Position = Vector2.new(screenPosition.X - size.X / 2, screenPosition.Y - size.Y / 2)
