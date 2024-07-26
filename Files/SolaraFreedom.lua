@@ -437,7 +437,7 @@ do
 	})
 	local HumanTrans = Tabs.Secondary:AddSlider("Size2", {
 		Title = "Transparency",
-		Default = 1,
+		Default = 0,
 		Min = 0,
 		Max = 1,
 		Rounding = 1,
