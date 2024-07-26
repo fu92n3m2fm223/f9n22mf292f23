@@ -1056,7 +1056,7 @@ do
 			for _, TitanS in pairs(workspace:GetChildren()) do
 				if TitanS:FindFirstChild("Shifter") and TitanS ~= Character then
 					local ShifterPlr = game:GetService("Players"):GetPlayerFromCharacter(TitanS)
-					local Team = ShifterPlr:WaitForChild("ShifterHolder").TrueTeam.Value
+					local Team = TitanS:WaitForChild("ShifterHolder").TrueTeam.Value
 					if TitanS:FindFirstChild("RLegTendons") and TitanS:FindFirstChild("LLegTendons") then
 						if not (TitanS.Name == "ArmoredTitan" and TitanS.LLegTendons:FindFirstChild("Armored") and TitanS.LLegTendons:WaitForChild("Armored").Value == true) then
 							if Player.Team.Name ~= Team then
@@ -1098,7 +1098,7 @@ do
 			for _, TitanS in pairs(workspace:GetChildren()) do
 				if TitanS:FindFirstChild("Shifter") and TitanS ~= Character and not (TitanS.Name == "ArmoredTitan") then
 					local ShifterPlr = game:GetService("Players"):GetPlayerFromCharacter(TitanS)
-					local Team = ShifterPlr:WaitForChild("ShifterHolder").TrueTeam.Value
+					local Team = TitanS:WaitForChild("ShifterHolder").TrueTeam.Value
 					if Player.Team.Name ~= Team then
 						if TitanS:FindFirstChild("SNape") then
 							TitanS.SNape.Size = Vector3.new(shifterx, shiftery, shifterz)
