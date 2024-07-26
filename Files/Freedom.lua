@@ -46,6 +46,7 @@ getgenv().MindlessNapeHitbox = false
 getgenv().ShifterNapeHitbox = false
 getgenv().MindlessLegHitbox = false
 getgenv().ShifterLegHitbox = false
+getgenv().HumanHitbox = false
 getgenv().InfStamina = false
 getgenv().NoSCooldown = false
 getgenv().DamageSpoof = false
@@ -444,6 +445,43 @@ do
 
 		end
 	})
+	local HumanHitbox = Tabs.Secondary:AddToggle("Human", {Title = "Human Hitbox", Default = false })
+	HumanHitbox:OnChanged(function()
+		getgenv().HumanHitbox = Options.Human.Value
+		if getgenv().HumanHitbox == false then
+			for _, Victim in pairs(game:GetService("Players"):GetPlayers()) do
+				if Victim.Character and not Victim.Character:FindFirstChild("Shifter") then
+					local Hitbox = Victim.Character:WaitForChild("HumanoidRootPart"):WaitForChild("BulletsHitbox")
+					if Hitbox then
+						Hitbox.Size = Vector3.new(3, 3, 2)
+						Hitbox.Transparency = 1
+						Hitbox.BrickColor = BrickColor.new("Institutional white")
+						Hitbox.Shape = Enum.PartType.Block
+					end
+				end
+			end
+		end
+	end)
+	local HumanSize = Tabs.Secondary:AddSlider("Size", {
+		Title = "Size",
+		Default = 3,
+		Min = 3,
+		Max = 10,
+		Rounding = 1,
+		Callback = function(Value)
+
+		end
+	})
+	local HumanTrans = Tabs.Secondary:AddSlider("Size2", {
+		Title = "Transparency",
+		Default = 1,
+		Min = 0,
+		Max = 1,
+		Rounding = 1,
+		Callback = function(Value)
+
+		end
+	})
 
 	local napex = Options.Slider1.Value
 	local napey = Options.Slider2.Value
@@ -464,6 +502,9 @@ do
 	local shifterlegy = Options.Leg5.Value
 	local shifterlegz = Options.Leg6.Value
 	local trans4 = Options.Trans4.Value
+	
+	local humanhitbox = Options.Size.Value
+	local humantrans = Options.Size2.Value
 
 	--local dmg = Options.Slider7.Value
 	local hooks = Options.Slider8.Value
@@ -523,6 +564,13 @@ do
 	end)
 	Trans4:OnChanged(function(Value)
 		trans4 = Options.Trans4.Value
+	end)
+	
+	HumanSize:OnChanged(function(Value)
+		humanhitbox = Options.Size.Value
+	end)
+	HumanTrans:OnChanged(function(Value)
+		humantrans = Options.Size2.Value
 	end)
 	
 	AntiHookSlider:OnChanged(function(Value)
@@ -1130,6 +1178,21 @@ do
 
 		if getgenv().InfiniteGas then
 			Character:WaitForChild("Humanoid"):WaitForChild("Gear"):WaitForChild("Gas").Value = 2000
+		end
+		
+		if getgenv().HumanHitbox then
+			local localPlayer = game:GetService("Players").LocalPlayer
+			for _, Victim in pairs(game:GetService("Players"):GetPlayers()) do
+				if Victim ~= localPlayer and Victim.Character and not Victim.Character:FindFirstChild("Shifter") then
+					local Hitbox = Victim.Character:WaitForChild("HumanoidRootPart"):FindFirstChild("BulletsHitbox")
+					if Hitbox then
+						Hitbox.Size = Vector3.new(humanhitbox, humanhitbox, humanhitbox)
+						Hitbox.Transparency = humantrans
+						Hitbox.BrickColor = BrickColor.new("Institutional white")
+						Hitbox.Shape = Enum.PartType.Ball
+					end
+				end
+			end
 		end
 
 		if getgenv().ShifterNapeHitbox then
