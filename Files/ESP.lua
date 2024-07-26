@@ -71,7 +71,7 @@ local function updateESP()
                     local size = Vector2.new(1000 / screenPosition.Z, headPosition.Y - screenPosition.Y)
 
                     local showSoldierESP = getgenv().soldieresp and player.Team and player.Team.Name == "Soldiers"
-                    local showWarriorESP = getgenv().warrioreesp and (character:FindFirstChild("COLocal") or character:FindFirstChild("FELocal") or character:FindFirstChild("ARLocal"))
+                    local showWarriorESP = getgenv().warrioreesp and not getgenv().soldieresp and (character:FindFirstChild("COLocal") or character:FindFirstChild("FELocal") or character:FindFirstChild("ARLocal"))
 
                     if showSoldierESP or showWarriorESP then
                         if ESP.Boxes then
