@@ -28,7 +28,6 @@ getgenv().InfiniteBlades = false
 getgenv().Autoreload = false
 getgenv().titandetection = false
 getgenv().InfiniteHookTime = false
-getgenv().bladeloss = false
 getgenv().Skills = false
 getgenv().SpecialSkills = false
 getgenv().Cooldown = false
@@ -145,7 +144,6 @@ do
 	local GasBool = Tabs.Main:AddToggle("InfiniteGas", {Title = "Infinite Gas", Default = false })
 	local BladesBool = Tabs.Main:AddToggle("InfiniteBlades", {Title = "Infinite Blades", Default = false })
 	local AutoreloadBool = Tabs.Main:AddToggle("Autoreload", {Title = "Autoreload Blades", Default = false })
-	local BladeLossBool = Tabs.Main:AddToggle("bladeloss", {Title = "Infinite Blade Durability", Default = false })
 	local TitanDetectionBool = Tabs.Main:AddToggle("Titandetection", {Title = "Disable Titan Detection", Default = false })
 	local HookTimeBool = Tabs.Main:AddToggle("Hooktime", {Title = "Infinite Hook Time", Default = false })
 	local UnlockSkillsBool = Tabs.Main:AddToggle("UnlockSkill", {Title = "Unlock Skills", Default = false, })
@@ -153,13 +151,10 @@ do
 	local FireBool = Tabs.Main:AddToggle("Fire", {Title = "Anti-Burn", Default = false, })
 	local NoCooldownBool = Tabs.Main:AddToggle("Nocooldown", {Title = "No Cooldown", Default = false })
 	local AntiHookBool = Tabs.Main:AddToggle("antihook", {Title = "Anti Hook", Default = false, })
-	local HookPlayerBool = Tabs.Main:AddToggle("antihook2", {Title = "Legit Anti Hook", Default = false, Description = "☉ when you hook a player itll unhook them, disables inf hook timer & regular antihook" })
+	local HookPlayerBool = Tabs.Main:AddToggle("antihook2", {Title = "Legit Anti Hook", Default = false, Description = "☉ when you hook a player itll unhook them" })
 	local AntiHookSlider = Tabs.Main:AddSlider("Slider9", {
 		Title = "Anti Hook Speed",
-		Description = [[
-		☉ Configure how fast someone is unhooked off you
-		☉ 1 = Slowest, move up for AntiHook to be faster
-		]],
+		Description = "☉ Configure how fast someone is unhooked off you 1 = Slowest, move up for AntiHook to be faster",
 		Default = 1,
 		Min = 1,
 		Max = 4,
@@ -773,16 +768,6 @@ do
 			end
 		end
 	end)
-
-	BladeLossBool:OnChanged(function()
-		getgenv().bladeloss = Options.bladeloss.Value
-		if getgenv().bladeloss then
-			while getgenv().bladeloss do
-				Character:WaitForChild("Humanoid"):WaitForChild("Gear").BladeDurability.Value = 4
-				task.wait(0.01)
-			end
-		end
-	end)
 	
 	local reloading = false
 
@@ -827,11 +812,11 @@ do
 					local TensionR = Character:FindFirstChild("Humanoid"):FindFirstChild("Gear"):FindFirstChild("HookTensionR")
 					local TensionL = Character:FindFirstChild("Humanoid"):FindFirstChild("Gear"):FindFirstChild("HookTensionL")
 
-					if TensionR.Value > 145 then
+					if TensionR.Value >= 100 then
 						TensionR.Value = 0
 					end
 
-					if TensionL.Value > 145 then
+					if TensionL.Value >= 100 then
 						TensionL.Value = 0
 					end
 				end
@@ -843,6 +828,15 @@ do
 	AntiHookBool:OnChanged(function()
 		getgenv().AntiHook = Options.antihook.Value
 		if getgenv().AntiHook then
+			if getgenv().PlayerHook then
+				Options.antihook:SetValue(false)
+				Fluent:Notify({
+					Title = "Tear",
+					Content = "Turn off Legit Anti Hook",
+					Duration = 8
+				})
+				return
+			end
 			local debounce1 = false
 			local maindebounce = false
 
@@ -874,16 +868,27 @@ do
 		end
 	end)
 	
+	local debounce = false
+
 	HookPlayerBool:OnChanged(function()
 		getgenv().PlayerHook = Options.antihook2.Value
 		while getgenv().PlayerHook do
+			if getgenv().AntiHook then
+				Options.antihook2:SetValue(false)
+				Fluent:Notify({
+					Title = "Tear",
+					Content = "Turn off Anti Hook",
+					Duration = 8
+				})
+				return
+			end
+			task.wait(0.1)
 			local HookL = Character:WaitForChild("Humanoid").Gear:FindFirstChild("HookTensionL").Value
 			local HookR = Character:WaitForChild("Humanoid").Gear:FindFirstChild("HookTensionR").Value
 			local args = {[1] = Character:WaitForChild("HumanoidRootPart")}
 			local todoai = nil
 
 			if HookL ~= HookR then
-
 				if HookL < HookR then
 					todoai = Character:WaitForChild("Gear").Events.MoreEvents.CastQKey
 				elseif HookL > HookR then
