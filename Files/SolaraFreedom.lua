@@ -32,6 +32,7 @@ getgenv().bladeloss = false
 getgenv().Skills = false
 getgenv().SpecialSkills = false
 getgenv().Cooldown = false
+getgenv().HookPlayer = false
 getgenv().AntiHook = false
 getgenv().AHSpeed = false
 getgenv().MindlessNapeHitbox = false
@@ -151,10 +152,14 @@ do
 	local HoodBool = Tabs.Main:AddToggle("Hood", {Title = "Dont Lose Hood", Default = false, Description = "☉ if your damaged you wont lose your hood" })
 	local FireBool = Tabs.Main:AddToggle("Fire", {Title = "Anti-Burn", Default = false, })
 	local NoCooldownBool = Tabs.Main:AddToggle("Nocooldown", {Title = "No Cooldown", Default = false })
-	local AntiHookBool = Tabs.Main:AddToggle("antihook", {Title = "Anti Hook", Default = false })
+	local AntiHookBool = Tabs.Main:AddToggle("antihook", {Title = "Anti Hook", Default = false, })
+	local HookPlayerBool = Tabs.Main:AddToggle("antihook2", {Title = "Legit Anti Hook", Default = false, Description = "☉ when you hook a player itll unhook them, disables inf hook timer & regular antihook" })
 	local AntiHookSlider = Tabs.Main:AddSlider("Slider9", {
 		Title = "Anti Hook Speed",
-		Description = "☉ Configure how fast someone is unhooked off you",
+		Description = [[
+		☉ Configure how fast someone is unhooked off you
+		☉ 1 = Slowest, move up for AntiHook to be faster
+		]],
 		Default = 1,
 		Min = 1,
 		Max = 4,
@@ -822,11 +827,11 @@ do
 					local TensionR = Character:FindFirstChild("Humanoid"):FindFirstChild("Gear"):FindFirstChild("HookTensionR")
 					local TensionL = Character:FindFirstChild("Humanoid"):FindFirstChild("Gear"):FindFirstChild("HookTensionL")
 
-					if TensionR then
+					if TensionR.Value > 145 then
 						TensionR.Value = 0
 					end
 
-					if TensionL then
+					if TensionL.Value > 145 then
 						TensionL.Value = 0
 					end
 				end
@@ -866,6 +871,28 @@ do
 					end
 				end
 			end)
+		end
+	end)
+	
+	HookPlayerBool:OnChanged(function()
+		getgenv().PlayerHook = Options.antihook2.Value
+		while getgenv().PlayerHook do
+			local HookL = Character:WaitForChild("Humanoid").Gear:FindFirstChild("HookTensionL").Value
+			local HookR = Character:WaitForChild("Humanoid").Gear:FindFirstChild("HookTensionR").Value
+			local args = {[1] = Character:WaitForChild("HumanoidRootPart")}
+			local todoai = nil
+
+			if HookL ~= HookR then
+
+				if HookL < HookR then
+					todoai = Character:WaitForChild("Gear").Events.MoreEvents.CastQKey
+				elseif HookL > HookR then
+					todoai = Character:WaitForChild("Gear").Events.MoreEvents.CastEKey
+				end
+
+				todoai:FireServer(unpack(args))
+			end
+			task.wait(getgenv().AHSpeed)
 		end
 	end)
 
@@ -1058,13 +1085,13 @@ do
 		end
 
 		if ahspeed == 1 then
-			getgenv().AHSpeed = 0.3
+			getgenv().AHSpeed = 0.5
 		elseif ahspeed == 2 then
-			getgenv().AHSpeed = 0.25
+			getgenv().AHSpeed = 0.37
 		elseif ahspeed == 3 then
-			getgenv().AHSpeed = 0.2
+			getgenv().AHSpeed = 0.25
 		elseif ahspeed == 4 then
-			getgenv().AHSpeed = 0.15
+			getgenv().AHSpeed = 0.1
 		end
 
 		if getgenv().ShifterLegHitbox then
