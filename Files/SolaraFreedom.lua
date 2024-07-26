@@ -1031,7 +1031,7 @@ do
 				if Victim ~= localPlayer and Victim.Character and not Victim.Character:FindFirstChild("Shifter") then
 					local Hitbox = Victim.Character:WaitForChild("HumanoidRootPart"):FindFirstChild("BulletsHitbox")
 					if Hitbox then
-						if Victim.Team.Name ~= localPlayer.Team.Name then
+						if Victim.Team.Name ~= localPlayer.Team.Name or localPlayer.Team.Name == "Rogue" or Victim.Team.Name == "Rogue" then
 							Hitbox.Size = Vector3.new(humanhitbox, humanhitbox, humanhitbox)
 							Hitbox.Transparency = humantrans
 							Hitbox.BrickColor = BrickColor.new("Institutional white")
