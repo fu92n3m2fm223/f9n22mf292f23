@@ -81,7 +81,7 @@ local function updateESP()
                         end
                     end
 
-                    if showSoldierESP or showWarriorESP then
+                    if (showSoldierESP or showWarriorESP) then
                         if ESP.Boxes then
                             drawings.box.Size = size
                             drawings.box.Position = Vector2.new(screenPosition.X - size.X / 2, screenPosition.Y - size.Y / 2)
