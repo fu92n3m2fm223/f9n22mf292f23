@@ -1094,18 +1094,6 @@ do
 		toggleTitanDetector()
 	end)
 
-	local DamageHook;
-	DamageHook = hookmetamethod(game, '__namecall', function(self, ...)
-		local args = {...}
-		local call_type = getnamecallmethod();
-		if call_type == 'FireServer' and tostring(self) == 'HitEvent' and getgenv().DamageSpoof then 
-			args[2] = dmg
-			return DamageHook(self, unpack(args))
-		else
-			return DamageHook(self, ...)
-		end
-	end)
-
 	game:GetService("RunService").RenderStepped:Connect(function()
 		if getgenv().MindlessNapeHitbox then
 			for _, Titan in pairs(workspace.OnGameTitans:GetChildren()) do
