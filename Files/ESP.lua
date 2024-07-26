@@ -72,6 +72,14 @@ local function updateESP()
 
                     local showSoldierESP = getgenv().soldieresp and player.Team and player.Team.Name == "Soldiers"
                     local showWarriorESP = getgenv().warrioreesp and not getgenv().soldieresp and (character:FindFirstChild("COLocal") or character:FindFirstChild("FELocal") or character:FindFirstChild("ARLocal"))
+                    
+                    -- Check for TrueTeam
+                    if character:FindFirstChild("ShifterHolder") and character.ShifterHolder:FindFirstChild("TrueTeam") then
+                        local trueTeam = character.ShifterHolder.TrueTeam
+                        if trueTeam.Value == "Warriors" then
+                            showSoldierESP = false
+                        end
+                    end
 
                     if showSoldierESP or showWarriorESP then
                         if ESP.Boxes then
