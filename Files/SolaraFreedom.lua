@@ -45,6 +45,8 @@ getgenv().hood = false
 getgenv().fire = false
 getgenv().ESP = false
 getgenv().HumanHitbox = false
+getgenv().soldieresp = false
+getgenv().warrioreesp = false
 
 local currentAnimationTracks = {}
 
@@ -989,8 +991,16 @@ do
 	end
 
 	local ESPBool = Tabs.Fifth:AddToggle("ESP", {Title = "ESP", Default = false, })
+	local SoldierBool = Tabs.Fifth:AddToggle("SoldierESP", {Title = "Soldiers", Default = false, })
+	local WarriorBool = Tabs.Fifth:AddToggle("WarriorESP", {Title = "Warriors", Default = false, })
 	ESPBool:OnChanged(function()
 		ESP.Names = not ESP.Names
+	end)
+	SoldierBool:OnChanged(function()
+		getgenv().soldieresp = Options.SoldierESP.Value
+	end)
+	WarriorBool:OnChanged(function()
+		getgenv().warrioreesp = Options.WarriorESP.Value
 	end)
 	ESPBool:OnChanged(function()
 		getgenv().ESP = Options.ESP.Value
