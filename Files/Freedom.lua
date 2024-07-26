@@ -1143,9 +1143,11 @@ do
 		if getgenv().ShifterLegHitbox then
 			for _, TitanS in pairs(workspace:GetChildren()) do
 				if TitanS:FindFirstChild("Shifter") and TitanS ~= Character then
+					local ShifterPlr = game:GetService("Players"):GetPlayerFromCharacter(TitanS)
+					local Team = ShifterPlr:WaitForChild("ShifterHolder").TrueTeam.Value
 					if TitanS:FindFirstChild("RLegTendons") and TitanS:FindFirstChild("LLegTendons") then
 						if not (TitanS.Name == "ArmoredTitan" and TitanS.LLegTendons:FindFirstChild("Armored") and TitanS.LLegTendons:WaitForChild("Armored").Value == true) then
-							if not (Player.Team.Name == "Soldiers" and TitanS.Name == "AttackTitan") then
+							if Player.Team.Name ~= Team then
 								TitanS.RLegTendons.Size = Vector3.new(shifterlegx, shifterlegy, shifterlegz)
 								TitanS.RLegTendons.Transparency = trans4
 								TitanS.RLegTendons.BrickColor = BrickColor.new("Institutional white")
@@ -1198,7 +1200,9 @@ do
 		if getgenv().ShifterNapeHitbox then
 			for _, TitanS in pairs(workspace:GetChildren()) do
 				if TitanS:FindFirstChild("Shifter") and TitanS ~= Character and not (TitanS.Name == "ArmoredTitan") then
-					if not (Player.Team.Name == "Soldiers" and TitanS.Name == "AttackTitan") then
+					local ShifterPlr = game:GetService("Players"):GetPlayerFromCharacter(TitanS)
+					local Team = ShifterPlr:WaitForChild("ShifterHolder").TrueTeam.Value
+					if Player.Team.Name ~= Team then
 						if TitanS:FindFirstChild("SNape") then
 							TitanS.SNape.Size = Vector3.new(shifterx, shiftery, shifterz)
 							TitanS.SNape.Transparency = trans2
