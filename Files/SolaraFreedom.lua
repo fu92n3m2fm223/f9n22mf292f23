@@ -427,7 +427,7 @@ do
 		Title = "Size",
 		Default = 3,
 		Min = 3,
-		Max = 7,
+		Max = 10,
 		Rounding = 1,
 		Callback = function(Value)
 
