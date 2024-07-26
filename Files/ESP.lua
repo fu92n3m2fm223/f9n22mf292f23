@@ -70,24 +70,32 @@ local function updateESP()
                 if onScreen then
                     local size = Vector2.new(1000 / screenPosition.Z, headPosition.Y - screenPosition.Y)
 
-                    if ESP.Boxes then
-                        drawings.box.Size = size
-                        drawings.box.Position = Vector2.new(screenPosition.X - size.X / 2, screenPosition.Y - size.Y / 2)
-                        drawings.box.Visible = true
+                    local showSoldierESP = getgenv().soldieresp and player.Team and player.Team.Name == "Soldiers"
+                    local showWarriorESP = getgenv().warrioreesp and (character:FindFirstChild("COLocal") or character:FindFirstChild("FELocal") or character:FindFirstChild("ARLocal"))
+
+                    if showSoldierESP or showWarriorESP then
+                        if ESP.Boxes then
+                            drawings.box.Size = size
+                            drawings.box.Position = Vector2.new(screenPosition.X - size.X / 2, screenPosition.Y - size.Y / 2)
+                            drawings.box.Visible = true
+                        else
+                            drawings.box.Visible = false
+                        end
+
+                        if ESP.Names then
+                            local displayName = player.Name
+                            if character:FindFirstChild("Shifter") then
+                                displayName = character.Name
+                            end
+                            drawings.text.Position = Vector2.new(screenPosition.X, screenPosition.Y - size.Y / 2 - 20)
+                            drawings.text.Text = displayName
+                            drawings.text.Color = getPlayerColor(player)
+                            drawings.text.Visible = true
+                        else
+                            drawings.text.Visible = false
+                        end
                     else
                         drawings.box.Visible = false
-                    end
-
-                    if ESP.Names then
-                        local displayName = player.Name
-                        if character:FindFirstChild("Shifter") then
-                            displayName = character.Name
-                        end
-                        drawings.text.Position = Vector2.new(screenPosition.X, screenPosition.Y - size.Y / 2 - 20)
-                        drawings.text.Text = displayName
-                        drawings.text.Color = getPlayerColor(player)
-                        drawings.text.Visible = true
-                    else
                         drawings.text.Visible = false
                     end
                 else
