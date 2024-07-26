@@ -156,7 +156,7 @@ local Window = Fluent:CreateWindow({
 local Tabs = {
 	Main = Window:AddTab({ Title = "Human", Icon = "" }),
 	Third = Window:AddTab({ Title = "Shifter", Icon = "" }),
-	Secondary = Window:AddTab({ Title = "Titan", Icon = "" }),
+	Secondary = Window:AddTab({ Title = "Hitboxes", Icon = "" }),
 	Fifth = Window:AddTab({ Title = "ESP", Icon = "" }),
 	Fourth = Window:AddTab({ Title = "Animations", Icon = "" }),
 	Misc = Window:AddTab({ Title = "Misc", Icon = "" }),
