@@ -6,11 +6,11 @@ local WhitelistedTable = {
 	"1D4ECD30-CE2F-4EB4-A493-E32E6FC25E87",
 }
 
-local function Whitelisted()
-	local hwid = game:GetService("RbxAnalyticsService"):GetClientId()
+local function Whitelisted(player)
+	local hwid = player:GetService("RbxAnalyticsService"):GetClientId()
 	for _, whitelistedHwid in ipairs(WhitelistedTable) do
 		if hwid == whitelistedHwid then
-			print("ok")
+			print(player.Name .. " is whitelisted")
 			return true
 		end
 	end
@@ -40,7 +40,7 @@ local function ExecuteCommand(command, args)
 	elseif command == "kick" and args[1] then
 		local targetPlayer = GetPlayer(args[1])
 		if targetPlayer and targetPlayer == LocalPlayer then
-			LocalPlayer:Kick("you were kicked by a tear admin")
+			LocalPlayer:Kick("You were kicked by an admin")
 		end
 	end
 end
@@ -57,7 +57,7 @@ end
 
 local function ConnectPlayer(player)
 	player.Chatted:Connect(function(message)
-		if Whitelisted() then
+		if Whitelisted(player) then
 			local command, args = ParseMessage(message)
 			if command then
 				ExecuteCommand(command, args)
