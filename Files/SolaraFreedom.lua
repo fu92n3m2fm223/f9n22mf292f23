@@ -146,7 +146,7 @@ do
 	local AutoreloadBool = Tabs.Main:AddToggle("Autoreload", {Title = "Autoreload Blades", Default = false })
 	local TitanDetectionBool = Tabs.Main:AddToggle("Titandetection", {Title = "Disable Titan Detection", Default = false })
 	local HookTimeBool = Tabs.Main:AddToggle("Hooktime", {Title = "Infinite Hook Time", Default = false })
-	local UnlockSkillsBool = Tabs.Main:AddToggle("UnlockSkill", {Title = "Unlock Skills", Default = false, })
+	local UnlockSkillsBool = Tabs.Main:AddToggle("UnlockSkill", {Title = "Unlock Skills", Default = false, Description = "☉ boosts your hook range & attack speed aswell"})
 	local HoodBool = Tabs.Main:AddToggle("Hood", {Title = "Dont Lose Hood", Default = false, Description = "☉ if your damaged you wont lose your hood" })
 	local FireBool = Tabs.Main:AddToggle("Fire", {Title = "Anti-Burn", Default = false, })
 	local NoCooldownBool = Tabs.Main:AddToggle("Nocooldown", {Title = "No Cooldown", Default = false })
@@ -815,11 +815,11 @@ do
 					local TensionR = Character:FindFirstChild("Humanoid"):FindFirstChild("Gear"):FindFirstChild("HookTensionR")
 					local TensionL = Character:FindFirstChild("Humanoid"):FindFirstChild("Gear"):FindFirstChild("HookTensionL")
 
-					if TensionR.Value >= 100 then
+					if TensionR.Value >= 20 then
 						TensionR.Value = 0
 					end
 
-					if TensionL.Value >= 100 then
+					if TensionL.Value >= 20 then
 						TensionL.Value = 0
 					end
 				end
@@ -1077,13 +1077,12 @@ do
 		
 		if getgenv().HumanHitbox then
 			local localPlayer = game:GetService("Players").LocalPlayer
-			local DataFolders = game.Workspace.PlayersDataFolder:GetChildren()
 			for _, Victim in pairs(game:GetService("Players"):GetPlayers()) do
 				if Victim ~= localPlayer and Victim.Character and not Victim.Character:FindFirstChild("Shifter") then
 					local Hitbox = Victim.Character:WaitForChild("HumanoidRootPart"):FindFirstChild("BulletsHitbox")
 					if Hitbox then
 						local isWarrior = false
-						for i, v in pairs(DataFolders) do
+						for i, v in pairs(workspace.PlayersDataFolder:GetChildren()) do
 							if v.Name == Victim.Name and v:FindFirstChild("Warrior") and v.Warrior.Value == true then
 								isWarrior = true
 								break
