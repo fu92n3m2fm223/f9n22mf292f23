@@ -829,15 +829,6 @@ do
 	AntiHookBool:OnChanged(function()
 		getgenv().AntiHook = Options.antihook.Value
 		if getgenv().AntiHook then
-			if getgenv().PlayerHook then
-				Options.antihook:SetValue(false)
-				Fluent:Notify({
-					Title = "Tear",
-					Content = "Turn off Legit Anti Hook",
-					Duration = 8
-				})
-				return
-			end
 			local debounce1 = false
 			local maindebounce = false
 
