@@ -409,6 +409,9 @@ do
 
 		end
 	})
+	Tabs.Secondary:AddParagraph({
+		Title = "_______________________________________________________________",
+	})
 	local HumanHitbox = Tabs.Secondary:AddToggle("Human", {Title = "Human Hitbox", Default = false })
 	HumanHitbox:OnChanged(function()
 		getgenv().HumanHitbox = Options.Human.Value
