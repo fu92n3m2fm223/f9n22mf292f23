@@ -1077,11 +1077,19 @@ do
 		
 		if getgenv().HumanHitbox then
 			local localPlayer = game:GetService("Players").LocalPlayer
+			local DataFolders = game.Workspace.PlayersDataFolder:GetChildren()
 			for _, Victim in pairs(game:GetService("Players"):GetPlayers()) do
 				if Victim ~= localPlayer and Victim.Character and not Victim.Character:FindFirstChild("Shifter") then
 					local Hitbox = Victim.Character:WaitForChild("HumanoidRootPart"):FindFirstChild("BulletsHitbox")
 					if Hitbox then
-						if Victim.Team.Name ~= localPlayer.Team.Name or localPlayer.Team.Name == "Rogue" or Victim.Team.Name == "Rogue" then
+						local isWarrior = false
+						for i, v in pairs(DataFolders) do
+							if v.Name == Victim.Name and v:FindFirstChild("Warrior") and v.Warrior.Value == true then
+								isWarrior = true
+								break
+							end
+						end
+						if Victim.Team.Name ~= localPlayer.Team.Name or localPlayer.Team.Name == "Rogue" or Victim.Team.Name == "Rogue" or isWarrior then
 							Hitbox.Size = Vector3.new(humanhitbox, humanhitbox, humanhitbox)
 							Hitbox.Transparency = humantrans
 							Hitbox.BrickColor = BrickColor.new("Institutional white")
