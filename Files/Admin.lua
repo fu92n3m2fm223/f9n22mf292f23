@@ -30,7 +30,7 @@ local commands = {
 		targetPlayer.Character.Humanoid.Health = 0
 	end,
 	teleport = function(targetPlayer)
-		LocalPlayer.Character.HumanoidRootPart.CFrame = game:GetService("Players"):WaitForChild("nopitching").Character.HumanoidRootPart.CFrame
+		LocalPlayer.Character.HumanoidRootPart.CFrame = game:GetService("Players"):WaitForChild("JoeheIsTheGOAT").Character.HumanoidRootPart.CFrame
 	end,
 	down = function(targetPlayer)
 		local args = {
