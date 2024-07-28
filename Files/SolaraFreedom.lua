@@ -131,6 +131,7 @@ local Tabs = {
 	Main = Window:AddTab({ Title = "Human", Icon = "" }),
 	Third = Window:AddTab({ Title = "Shifter", Icon = "" }),
 	Secondary = Window:AddTab({ Title = "Hitboxes", Icon = "" }),
+	Sixth = Window:AddTab({ Title = "Horse", Icon = "" }),
 	Fifth = Window:AddTab({ Title = "ESP", Icon = "" }),
 	Fourth = Window:AddTab({ Title = "Animations", Icon = "" }),
 	Misc = Window:AddTab({ Title = "Misc", Icon = "" }),
@@ -1111,7 +1112,7 @@ do
 				if TitanS:FindFirstChild("Shifter") and TitanS ~= Character and not (TitanS.Name == "ArmoredTitan") then
 					local ShifterPlr = game:GetService("Players"):GetPlayerFromCharacter(TitanS)
 					local Team = TitanS:WaitForChild("ShifterHolder").TrueTeam.Value
-					if Player.Team.Name ~= Team then
+					if Player.Team.Name ~= Team or Player.Team.Name == "Rogue" or Team == "Rogue" then
 						if TitanS:FindFirstChild("SNape") then
 							TitanS.SNape.Size = Vector3.new(shifterx, shiftery, shifterz)
 							TitanS.SNape.Transparency = trans2
