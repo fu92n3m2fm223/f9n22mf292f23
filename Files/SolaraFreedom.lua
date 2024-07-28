@@ -47,6 +47,9 @@ getgenv().HumanHitbox = false
 getgenv().soldieresp = false
 getgenv().warrioreesp = false
 getgenv().interior = false
+getgenv().horsegod = false
+getgenv().horsegod = false
+getgenv().horsestam = false
 
 local currentAnimationTracks = {}
 
@@ -1006,6 +1009,35 @@ do
 		getgenv().titandetection = Options.Titandetection.Value
 		toggleTitanDetector()
 	end)
+	
+	local HorseGod = Tabs.Sixth:AddToggle("HorseGod", {Title = "Horse God Mode", Default = false, })
+	
+	HorseGod:OnChanged(function()
+		getgenv().horsegod = Options.HorseGod.Value
+	end)
+	
+	local HorseStamina = Tabs.Sixth:AddToggle("HorseStamina", {Title = "Infinite Horse Stamina", Default = false, })
+
+	HorseStamina:OnChanged(function()
+		getgenv().horsestam = Options.HorseStamina.Value
+	end)
+	
+	local HorseSpeed = Tabs.Sixth:AddSlider("HorseSpeedSlider", {
+		Title = "Horse Speed",
+		Default = 30,
+		Min = 30,
+		Max = 100,
+		Rounding = 1,
+		Callback = function(Value)
+			
+		end
+	})
+
+	local HorseSpeedVal = Options.HorseSpeedSlider.Value
+
+	HorseSpeed:OnChanged(function(Value)
+		HorseSpeedVal = Options.HorseSpeedSlider.Value
+	end)
 
 	game:GetService("RunService").RenderStepped:Connect(function()
 		if getgenv().MindlessNapeHitbox then
@@ -1063,6 +1095,42 @@ do
 			getgenv().AHSpeed = 0.25
 		elseif ahspeed == 4 then
 			getgenv().AHSpeed = 0.1
+		end
+		
+		for i, horse in pairs(workspace:WaitForChild("OnGameHorses"):GetChildren()) do
+			local horseHumanoid = horse:FindFirstChild("Humanoid")
+			local carriage = horse:FindFirstChild("Carriage")
+
+			if carriage then
+				horseHumanoid = carriage.Humanoid
+			end
+
+			if horseHumanoid then
+				if horseHumanoid.Health > 0 then
+					local horseOwner = horseHumanoid.Owner.Value
+
+					if horseOwner == Player.Name and horseHumanoid.Mounted.Value == true then
+						local config = horseHumanoid.Parent.Configuration
+
+						local god = horseHumanoid.God
+						local Stam = config.Stamina
+						local speed = config.CurrentSpeed
+						local maxspeed = config.MaxSpeed
+
+						if god and getgenv().horsegod then
+							god.Value = Options.HorseGod.Value
+						end
+
+						if Stam and getgenv().horsestam then
+							Stam.Value = 4000
+						end
+
+						if speed and maxspeed then
+							maxspeed.Value = HorseSpeedVal
+						end
+					end
+				end
+			end
 		end
 
 		if getgenv().ShifterLegHitbox then
