@@ -29,7 +29,6 @@ getgenv().Autoreload = false
 getgenv().titandetection = false
 getgenv().InfiniteHookTime = false
 getgenv().Skills = false
-getgenv().SpecialSkills = false
 getgenv().Cooldown = false
 getgenv().AntiHook = false
 getgenv().AHSpeed = false
@@ -574,7 +573,6 @@ do
 
 	local InfStaminaBool = Tabs.Third:AddToggle("infshiftstam", {Title = "Infinite Stamina", Default = false, Description = "☉ also gives you inf stamina as a human" })
 	--local NoSCooldown = Tabs.Third:AddToggle("nocds", {Title = "No Cooldown", Default = false })
-	local SpecialSkills = Tabs.Third:AddToggle("spskills", {Title = "Never Lose Special Skills", Default = false, Description = "☉ Hoard Roar, Berserk, if you reshift you get hoard roar back and every stage you get berserk back" })
 
 	local NoGear = Tabs.Misc:AddToggle("gear", {Title = "No Gear", Default = false, Description = "☉ Removes some gear off your character" })
 
@@ -733,22 +731,6 @@ do
 			end
 		end
 	end)]]
-
-	SpecialSkills:OnChanged(function()
-		getgenv().SpecialSkills = Options.spskills.Value
-		while getgenv().SpecialSkills do
-			for _, Object in pairs(Player.PlayerGui:WaitForChild("ShiftersGui"):GetDescendants()) do
-				if Object:IsA("NumberValue") then
-					if Object.Parent.Name == "HordeRoar" then
-						Object.Value = 100
-					elseif Object.Parent.Name == "Berserker" then
-						Object.Value = 100
-					end
-				end
-			end
-			task.wait(0.1)
-		end
-	end)
 
 	--[[Tabs.Misc:AddButton({
 		Title = "Enable Shifting",
