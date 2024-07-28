@@ -176,13 +176,13 @@ do
 	})
 
 	local PlayerSpeed = Tabs.Main:AddSlider("PlayerSpeed", {
-		Title = "Human Speed",
+		Title = "Speed",
 		Default = 16,
 		Min = 16,
 		Max = 200,
 		Rounding = 1,
 		Callback = function(Value)
-			if Character:FindFirstChild("ShifterHolder") then
+			if Character:FindFirstChild("Shifter") then
 				return
 			else
 				Character:WaitForChild("Humanoid").WalkSpeed = Value
@@ -573,6 +573,58 @@ do
 
 	local InfStaminaBool = Tabs.Third:AddToggle("infshiftstam", {Title = "Infinite Stamina", Default = false, Description = "☉ also gives you inf stamina as a human" })
 	--local NoSCooldown = Tabs.Third:AddToggle("nocds", {Title = "No Cooldown", Default = false })
+	Tabs.Third:AddButton({
+		Title = "Quick Uppercut",
+		Description = "☉ Press 4 as a titan to do a uppercut without endlag",
+		Callback = function()
+			game:GetService("UserInputService").InputBegan:Connect(function(input, gpe)
+				if input.UserInputType == Enum.UserInputType.Keyboard and not gpe then
+					local args = {}
+
+					if input.KeyCode == Enum.KeyCode.Four then
+						args = {
+							[1] = "AttackCombo3"
+						}
+
+						if Character.Name == "ArmoredTitan" then
+							Character.ARLocal.Events.AttackEvent:FireServer(unpack(args))
+						elseif Character.Name == "FemaleTitan" then
+							Character.FELocal.Events.AttackEvent:FireServer(unpack(args))
+						elseif Character.Name == "AttackTitan" then
+							Character.ATLocal.Events.AttackEvent:FireServer(unpack(args))
+						elseif Character.Name == "JawTitan" then
+							Character.JALocal.Events.AttackEvent:FireServer(unpack(args))
+						end
+					end
+				end
+			end)
+		end
+	})
+	
+	local ShifterSpeed = Tabs.Third:AddSlider("ShifterSpeed", {
+		Title = "Speed",
+		Default = 16,
+		Min = 16,
+		Max = 200,
+		Rounding = 1,
+		Callback = function(Value)
+			if not Character:FindFirstChild("ShifterHolder") then
+				return
+			else
+				for _, child in pairs(Character:GetChildren()) do
+					if string.find(child.Name, "Local") then
+						local stats = child:FindFirstChild("Stats")
+						if stats then
+							local runningSpeed = stats:FindFirstChild("RunningSpeed")
+							if runningSpeed then
+								runningSpeed.Value = Value
+							end
+						end
+					end
+				end
+			end
+		end
+	})
 
 	local NoGear = Tabs.Misc:AddToggle("gear", {Title = "No Gear", Default = false, Description = "☉ Removes some gear off your character" })
 
@@ -739,34 +791,6 @@ do
 			
 		end
 	})]]
-
-	Tabs.Third:AddButton({
-		Title = "Quick Uppercut",
-		Description = "☉ Press 4 as a titan to do a uppercut without endlag",
-		Callback = function()
-			game:GetService("UserInputService").InputBegan:Connect(function(input, gpe)
-				if input.UserInputType == Enum.UserInputType.Keyboard and not gpe then
-					local args = {}
-
-					if input.KeyCode == Enum.KeyCode.Four then
-						args = {
-							[1] = "AttackCombo3"
-						}
-
-						if Character.Name == "ArmoredTitan" then
-							Character.ARLocal.Events.AttackEvent:FireServer(unpack(args))
-						elseif Character.Name == "FemaleTitan" then
-							Character.FELocal.Events.AttackEvent:FireServer(unpack(args))
-						elseif Character.Name == "AttackTitan" then
-							Character.ATLocal.Events.AttackEvent:FireServer(unpack(args))
-						elseif Character.Name == "JawTitan" then
-							Character.JALocal.Events.AttackEvent:FireServer(unpack(args))
-						end
-					end
-				end
-			end)
-		end
-	})
 
 	GasBool:OnChanged(function()
 		getgenv().InfiniteGas = Options.InfiniteGas.Value
