@@ -177,7 +177,7 @@ do
 	})
 
 	local PlayerSpeed = Tabs.Main:AddSlider("PlayerSpeed", {
-		Title = "Speed",
+		Title = "Human Speed",
 		Default = 16,
 		Min = 16,
 		Max = 200,
