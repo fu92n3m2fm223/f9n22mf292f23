@@ -51,6 +51,16 @@ getgenv().horsegod = false
 getgenv().horsegod = false
 getgenv().horsestam = false
 
+Player.CharacterAdded:Connect(function()
+	if getgenv().NoGear then
+		local args = {
+			[1] = "Choosing"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("Wear3DClothesEvent"):FireServer(unpack(args))
+	end
+end)
+
 local currentAnimationTracks = {}
 
 local function Animate(ID)
@@ -680,6 +690,13 @@ do
 			game:GetService("ReplicatedStorage"):WaitForChild("Wear3DClothesEvent"):FireServer(unpack(args))
 		end
 	end)
+	
+	local TeamDropdown = Tabs.Misc:AddDropdown("Team Change", {
+		Title = "Change Team",
+		Values = {"Soldiers", "Interior Police"},
+		Multi = false,
+		Default = "None",
+	})
 
 	InfStaminaBool:OnChanged(function()
 		getgenv().InfStamina = Options.infshiftstam.Value
