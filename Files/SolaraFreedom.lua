@@ -846,8 +846,18 @@ do
 			if Character then
 				local humanoid = Character:WaitForChild("Humanoid")
 				if humanoid then
-					local TensionR = Character:FindFirstChild("Humanoid"):FindFirstChild("Gear"):FindFirstChild("HookTensionR")
-					local TensionL = Character:FindFirstChild("Humanoid"):FindFirstChild("Gear"):FindFirstChild("HookTensionL")
+					local Gear = Character:FindFirstChild("Humanoid"):FindFirstChild("Gear")
+					local APGear = Character:FindFirstChild("Humanoid"):FindFirstChild("APGear")
+
+					local TensionR, TensionL
+
+					if Gear then
+						TensionR = Gear:FindFirstChild("HookTensionR")
+						TensionL = Gear:FindFirstChild("HookTensionL")
+					elseif APGear then
+						TensionR = APGear:FindFirstChild("HookTensionR")
+						TensionL = APGear:FindFirstChild("HookTensionL")
+					end
 
 					if TensionR then
 						TensionR.Value = 0
