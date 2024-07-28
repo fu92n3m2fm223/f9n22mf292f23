@@ -2,7 +2,6 @@ local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
 local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/ESP.lua"))()
-local FlyUi = loadstring(game:HttpGet("https://raw.githubusercontent.com/elyctstudios/Scripts/main/Scripts/Tools/flyui.lua"))()
 
 local Player = game:GetService("Players").LocalPlayer
 local Character = Player.Character or Player.CharacterAdded:Wait()
@@ -174,6 +173,21 @@ do
 		Rounding = 0,
 		Callback = function(Value)
 
+		end
+	})
+
+	local PlayerSpeed = Tabs.Main:AddSlider("PlayerSpeed", {
+		Title = "Speed",
+		Default = 16,
+		Min = 16,
+		Max = 200,
+		Rounding = 1,
+		Callback = function(Value)
+			if Character:FindFirstChild("ShifterHolder") then
+				return
+			else
+				Character:WaitForChild("Humanoid").WalkSpeed = Value
+			end
 		end
 	})
 	--[[local DamageSpoof = Tabs.Secondary:AddToggle("damage", {Title = "Damage Spoof", Default = false, Description = "☉ only works on titans | BUGGY" })
@@ -691,17 +705,6 @@ do
 			game:GetService("ReplicatedStorage"):WaitForChild("Wear3DClothesEvent"):FireServer(unpack(args))
 		end
 	end)
-	
-	--[[local PlayerSpeed = Tabs.Misc:AddSlider("PlayerSpeed", {
-		Title = "Speed",
-		Default = 16,
-		Min = 16,
-		Max = 200,
-		Rounding = 1,
-		Callback = function(Value)
-			Character:WaitForChild("Humanoid").WalkSpeed = Value
-		end
-	})]]
 
 	InfStaminaBool:OnChanged(function()
 		getgenv().InfStamina = Options.infshiftstam.Value
