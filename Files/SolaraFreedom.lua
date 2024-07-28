@@ -51,6 +51,8 @@ getgenv().horsegod = false
 getgenv().horsegod = false
 getgenv().horsestam = false
 
+local Options = Fluent.Options
+
 Player.CharacterAdded:Connect(function()
 	if getgenv().NoGear then
 		local args = {
@@ -151,8 +153,6 @@ local Tabs = {
 	Settings = Window:AddTab({ Title = "Settings", Icon = "" })
 }
 
-local Options = Fluent.Options
-
 do
 	local GasBool = Tabs.Main:AddToggle("InfiniteGas", {Title = "Infinite Gas", Default = false })
 	local BladesBool = Tabs.Main:AddToggle("InfiniteBlades", {Title = "Infinite Blades", Default = false })
@@ -190,6 +190,7 @@ do
 			end
 		end
 	})
+	
 	--[[local DamageSpoof = Tabs.Secondary:AddToggle("damage", {Title = "Damage Spoof", Default = false, Description = "☉ only works on titans | BUGGY" })
 	local Slider7 = Tabs.Secondary:AddSlider("Slider7", {
 		Title = "Damage",
