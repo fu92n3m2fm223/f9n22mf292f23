@@ -868,30 +868,40 @@ do
 			local debounce1 = false
 			local maindebounce = false
 
-			Character:WaitForChild("HumanoidRootPart").ChildAdded:Connect(function(child)
-				if getgenv().AntiHook then
-					if (child.Name == "EAttachment" or child.Name == "QAttachment") then
-						if not debounce1 then
-							debounce1 = true
-							if not maindebounce then
-								maindebounce = true
-								local args = {[1] = Character:WaitForChild("HumanoidRootPart")}
-								if Character:FindFirstChild("APGear") then
-									Character:WaitForChild("APGear").Events.MoreEvents.CastQKey:FireServer(unpack(args))
-								else
-									Character:WaitForChild("Gear").Events.MoreEvents.CastQKey:FireServer(unpack(args))
+			local function setupCharacter(character)
+				character:WaitForChild("HumanoidRootPart").ChildAdded:Connect(function(child)
+					if getgenv().AntiHook then
+						if (child.Name == "EAttachment" or child.Name == "QAttachment") then
+							if not debounce1 then
+								debounce1 = true
+								if not maindebounce then
+									maindebounce = true
+									local args = {[1] = character:WaitForChild("HumanoidRootPart")}
+									if character:FindFirstChild("APGear") then
+										character:WaitForChild("APGear").Events.MoreEvents.CastQKey:FireServer(unpack(args))
+									else
+										character:WaitForChild("Gear").Events.MoreEvents.CastQKey:FireServer(unpack(args))
+									end
+									task.delay(0.05, function()
+										maindebounce = false
+									end)
 								end
-								task.delay(0.05, function()
-									maindebounce = false
-								end)
+								task.wait(getgenv().AHSpeed)
+								debounce1 = false
+							else
+								child:Destroy()
 							end
-							task.wait(getgenv().AHSpeed)
-							debounce1 = false
-						else
-							child:Destroy()
 						end
 					end
-				end
+				end)
+			end
+
+			if Character then
+				setupCharacter(Character)
+			end
+
+			Player.CharacterAdded:Connect(function(character)
+				setupCharacter(character)
 			end)
 		end
 	end)
