@@ -52,6 +52,7 @@ getgenv().horsestam = false
 
 local Options = Fluent.Options
 
+
 Player.CharacterAdded:Connect(function()
 	if getgenv().NoGear then
 		local args = {
@@ -59,6 +60,10 @@ Player.CharacterAdded:Connect(function()
 		}
 
 		game:GetService("ReplicatedStorage"):WaitForChild("Wear3DClothesEvent"):FireServer(unpack(args))
+	end
+
+	if getgenv().fire then
+		Character:WaitForChild("Humanoid").Burning:Destroy()
 	end
 end)
 
@@ -1154,7 +1159,9 @@ do
 			local carriage = horse:FindFirstChild("Carriage")
 
 			if carriage then
-				horseHumanoid = carriage.Humanoid
+				pcall(function()
+					horseHumanoid = carriage.Humanoid
+				end)
 			end
 
 			if horseHumanoid then
