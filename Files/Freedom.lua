@@ -232,7 +232,11 @@ do
 		Max = 200,
 		Rounding = 1,
 		Callback = function(Value)
-			Character:WaitForChild("Humanoid").WalkSpeed = Value
+			if Character:FindFirstChild("Shifter") then
+				return
+			else
+				Character:WaitForChild("Humanoid").WalkSpeed = Value
+			end
 		end
 	})
 	--[[local DamageSpoof = Tabs.Secondary:AddToggle("damage", {Title = "Damage Spoof", Default = false, Description = "☉ only works on titans | BUGGY" })
@@ -868,6 +872,31 @@ do
 			end
 
 			callback()
+		end
+	})
+	
+	local ShifterSpeed = Tabs.Third:AddSlider("ShifterSpeed", {
+		Title = "Speed",
+		Default = 16,
+		Min = 16,
+		Max = 200,
+		Rounding = 1,
+		Callback = function(Value)
+			if not Character:FindFirstChild("ShifterHolder") then
+				return
+			else
+				for _, child in pairs(Character:GetChildren()) do
+					if string.find(child.Name, "Local") then
+						local stats = child:FindFirstChild("Stats")
+						if stats then
+							local runningSpeed = stats:FindFirstChild("RunningSpeed")
+							if runningSpeed then
+								runningSpeed.Value = Value
+							end
+						end
+					end
+				end
+			end
 		end
 	})
 
