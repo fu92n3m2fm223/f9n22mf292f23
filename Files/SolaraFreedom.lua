@@ -642,6 +642,23 @@ do
 			workspace.PlayersDataFolder:FindFirstChild(Player.Name).HandstandPushUp.Value = 1
 		end
 	})
+	
+
+	local TeamDropdown = Tabs.Misc:AddDropdown("Team Change", {
+		Title = "Change Team",
+		Values = {"Soldiers", "Interior Police"},
+		Multi = false,
+		Default = "None",
+	})
+
+	TeamDropdown:OnChanged(function(Value)
+		Player.PlayerGui:WaitForChild("LobbyGui").TeamSelectionEvent:FireServer(Value)
+	end)
+
+	Tabs.Misc:AddParagraph({
+		Title = "Changable Teams",
+		Content = "☉ dont use interior police unless its Stage 11 or Stage 12, if you switch to soldiers as a warrior itll make you a soldier shifter"
+	})
 
 	--[[local TeamDropdown = Tabs.Misc:AddDropdown("Team Change", {
 		Title = "Change Team",
