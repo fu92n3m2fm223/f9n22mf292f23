@@ -68,6 +68,10 @@ Player.CharacterAdded:Connect(function()
 
 		game:GetService("ReplicatedStorage"):WaitForChild("Wear3DClothesEvent"):FireServer(unpack(args))
 	end
+	
+	if getgenv().fire then
+		Character:WaitForChild("Humanoid").Burning:Destroy()
+	end
 end)
 
 local function findLocalFunction(scriptName, functionName)
@@ -171,6 +175,7 @@ local Tabs = {
 	Main = Window:AddTab({ Title = "Human", Icon = "" }),
 	Third = Window:AddTab({ Title = "Shifter", Icon = "" }),
 	Secondary = Window:AddTab({ Title = "Hitboxes", Icon = "" }),
+	Sixth = Window:AddTab({ Title = "Horse", Icon = "" }),
 	Fifth = Window:AddTab({ Title = "ESP", Icon = "" }),
 	Fourth = Window:AddTab({ Title = "Animations", Icon = "" }),
 	Misc = Window:AddTab({ Title = "Misc", Icon = "" }),
@@ -629,7 +634,7 @@ do
 	
 	Tabs.Misc:AddParagraph({
 		Title = "Changable Teams",
-		Content = "☉ dont use interior police unless its Stage 11 or Stage 2, if you switch to soldiers as a warrior itll make you a soldier shifter"
+		Content = "☉ dont use interior police unless its Stage 11 or Stage 12, if you switch to soldiers as a warrior itll make you a soldier shifter"
 	})
 
 	Tabs.Misc:AddButton({
