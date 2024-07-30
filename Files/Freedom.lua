@@ -36,9 +36,7 @@ getgenv().InfiniteBlades = false
 getgenv().Autoreload = false
 getgenv().titandetection = false
 getgenv().InfiniteHookTime = false
-getgenv().bladeloss = false
 getgenv().Skills = false
-getgenv().SpecialSkills = false
 getgenv().Cooldown = false
 getgenv().AntiHook = false
 getgenv().AHSpeed = false
@@ -46,19 +44,31 @@ getgenv().MindlessNapeHitbox = false
 getgenv().ShifterNapeHitbox = false
 getgenv().MindlessLegHitbox = false
 getgenv().ShifterLegHitbox = false
-getgenv().HumanHitbox = false
 getgenv().InfStamina = false
-getgenv().NoSCooldown = false
 getgenv().DamageSpoof = false
 getgenv().NoGear = false
 getgenv().hood = false
 getgenv().fire = false
 getgenv().ESP = false
+getgenv().HumanHitbox = false
 getgenv().soldieresp = false
 getgenv().warrioreesp = false
 getgenv().interior = false
+getgenv().horsegod = false
+getgenv().horsegod = false
+getgenv().horsestam = false
 
 local currentAnimationTracks = {}
+
+Player.CharacterAdded:Connect(function()
+	if getgenv().NoGear then
+		local args = {
+			[1] = "Choosing"
+		}
+
+		game:GetService("ReplicatedStorage"):WaitForChild("Wear3DClothesEvent"):FireServer(unpack(args))
+	end
+end)
 
 local function findLocalFunction(scriptName, functionName)
 	for _, obj in pairs(getgc(true)) do
@@ -200,6 +210,16 @@ do
 		Rounding = 0,
 		Callback = function(Value)
 
+		end
+	})
+	local PlayerSpeed = Tabs.Main:AddSlider("PlayerSpeed", {
+		Title = "Speed",
+		Default = 16,
+		Min = 16,
+		Max = 200,
+		Rounding = 1,
+		Callback = function(Value)
+			Character:WaitForChild("Humanoid").WalkSpeed = Value
 		end
 	})
 	--[[local DamageSpoof = Tabs.Secondary:AddToggle("damage", {Title = "Damage Spoof", Default = false, Description = "☉ only works on titans | BUGGY" })
@@ -582,7 +602,7 @@ do
 
 	local InfStaminaBool = Tabs.Third:AddToggle("infshiftstam", {Title = "Infinite Stamina", Default = false, Description = "☉ also gives you inf stamina as a human" })
 	--local NoSCooldown = Tabs.Third:AddToggle("nocds", {Title = "No Cooldown", Default = false })
-	local SpecialSkills = Tabs.Third:AddToggle("spskills", {Title = "Never Lose Special Skills", Default = false, Description = "☉ Hoard Roar, Berserk, if you reshift you get hoard roar back and every stage you get berserk back" })
+	--local SpecialSkills = Tabs.Third:AddToggle("spskills", {Title = "Never Lose Special Skills", Default = false, Description = "☉ Hoard Roar, Berserk, if you reshift you get hoard roar back and every stage you get berserk back" })
 
 	local NoGear = Tabs.Misc:AddToggle("gear", {Title = "No Gear", Default = false, Description = "☉ Removes some gear off your character" })
 
@@ -609,7 +629,7 @@ do
 	
 	Tabs.Misc:AddParagraph({
 		Title = "Changable Teams",
-		Content = "☉ Soldier: N/A\n☉ Interior Police: N/A"
+		Content = "☉ dont use interior police unless its Stage 11 or Stage 2, if you switch to soldiers as a warrior itll make you a soldier shifter"
 	})
 
 	Tabs.Misc:AddButton({
@@ -742,7 +762,7 @@ do
 		end
 	end)]]
 
-	SpecialSkills:OnChanged(function()
+	--[[SpecialSkills:OnChanged(function()
 		getgenv().SpecialSkills = Options.spskills.Value
 		while getgenv().SpecialSkills do
 			for _, Object in pairs(Player.PlayerGui:WaitForChild("ShiftersGui"):GetDescendants()) do
@@ -756,7 +776,7 @@ do
 			end
 			task.wait(0.1)
 		end
-	end)
+	end)]]
 
 	--[[Tabs.Misc:AddButton({
 		Title = "Enable Shifting",
@@ -902,8 +922,18 @@ do
 			if Character then
 				local humanoid = Character:WaitForChild("Humanoid")
 				if humanoid then
-					local TensionR = Character:FindFirstChild("Humanoid"):FindFirstChild("Gear"):FindFirstChild("HookTensionR")
-					local TensionL = Character:FindFirstChild("Humanoid"):FindFirstChild("Gear"):FindFirstChild("HookTensionL")
+					local Gear = Character:FindFirstChild("Humanoid"):FindFirstChild("Gear")
+					local APGear = Character:FindFirstChild("Humanoid"):FindFirstChild("APGear")
+
+					local TensionR, TensionL
+
+					if Gear then
+						TensionR = Gear:FindFirstChild("HookTensionR")
+						TensionL = Gear:FindFirstChild("HookTensionL")
+					elseif APGear then
+						TensionR = APGear:FindFirstChild("HookTensionR")
+						TensionL = APGear:FindFirstChild("HookTensionL")
+					end
 
 					if TensionR then
 						TensionR.Value = 0
@@ -1108,6 +1138,35 @@ do
 		end)
 		toggleTitanDetector()
 	end)
+	
+	local HorseGod = Tabs.Sixth:AddToggle("HorseGod", {Title = "Horse God Mode", Default = false, })
+
+	HorseGod:OnChanged(function()
+		getgenv().horsegod = Options.HorseGod.Value
+	end)
+
+	local HorseStamina = Tabs.Sixth:AddToggle("HorseStamina", {Title = "Infinite Horse Stamina", Default = false, })
+
+	HorseStamina:OnChanged(function()
+		getgenv().horsestam = Options.HorseStamina.Value
+	end)
+
+	local HorseSpeed = Tabs.Sixth:AddSlider("HorseSpeedSlider", {
+		Title = "Horse Speed",
+		Default = 30,
+		Min = 30,
+		Max = 100,
+		Rounding = 1,
+		Callback = function(Value)
+
+		end
+	})
+
+	local HorseSpeedVal = Options.HorseSpeedSlider.Value
+
+	HorseSpeed:OnChanged(function(Value)
+		HorseSpeedVal = Options.HorseSpeedSlider.Value
+	end)
 
 	game:GetService("RunService").RenderStepped:Connect(function()
 		if getgenv().MindlessNapeHitbox then
@@ -1163,6 +1222,44 @@ do
 				end
 			end
 		end
+		
+		for i, horse in pairs(workspace:WaitForChild("OnGameHorses"):GetChildren()) do
+			local horseHumanoid = horse:FindFirstChild("Humanoid")
+			local carriage = horse:FindFirstChild("Carriage")
+
+			if carriage then
+				pcall(function()
+					horseHumanoid = carriage.Humanoid
+				end)
+			end
+
+			if horseHumanoid then
+				if horseHumanoid.Health > 0 then
+					local horseOwner = horseHumanoid.Owner.Value
+
+					if horseOwner == Player.Name and horseHumanoid.Mounted.Value == true then
+						local config = horseHumanoid.Parent.Configuration
+
+						local god = horseHumanoid.God
+						local Stam = config.Stamina
+						local speed = config.CurrentSpeed
+						local maxspeed = config.MaxSpeed
+
+						if god and getgenv().horsegod then
+							god.Value = Options.HorseGod.Value
+						end
+
+						if Stam and getgenv().horsestam then
+							Stam.Value = 4000
+						end
+
+						if speed and maxspeed then
+							maxspeed.Value = HorseSpeedVal
+						end
+					end
+				end
+			end
+		end
 
 		if not Character:FindFirstChild("Shifter") then
 			local humanoid = Character:WaitForChild("Humanoid")
@@ -1207,7 +1304,7 @@ do
 				if TitanS:FindFirstChild("Shifter") and TitanS ~= Character and not (TitanS.Name == "ArmoredTitan") then
 					local ShifterPlr = game:GetService("Players"):GetPlayerFromCharacter(TitanS)
 					local Team = TitanS:WaitForChild("ShifterHolder").TrueTeam.Value
-					if Player.Team.Name ~= Team then
+					if Player.Team.Name ~= Team or Player.Team.Name == "Rogue" or Team == "Rogue" then
 						if TitanS:FindFirstChild("SNape") then
 							TitanS.SNape.Size = Vector3.new(shifterx, shiftery, shifterz)
 							TitanS.SNape.Transparency = trans2
