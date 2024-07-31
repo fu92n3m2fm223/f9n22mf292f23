@@ -1321,7 +1321,7 @@ do
 		if getgenv().HumanHitbox then
 			local localPlayer = game:GetService("Players").LocalPlayer
 			for _, Victim in pairs(game:GetService("Players"):GetPlayers()) do
-				if Victim ~= localPlayer and Victim.Character and not Victim.Character:FindFirstChild("Shifter") then
+				if Victim ~= localPlayer and Victim.Character and not Victim.Character:FindFirstChild("ShifterHolder") then
 					local Hitbox = Victim.Character:WaitForChild("HumanoidRootPart"):FindFirstChild("BulletsHitbox")
 					if Hitbox then
 						if Victim.Team.Name ~= localPlayer.Team.Name or localPlayer.Team.Name == "Rogue" or Victim.Team.Name == "Rogue" then
