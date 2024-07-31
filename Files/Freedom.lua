@@ -92,9 +92,8 @@ local function Animate(ID)
 	local Animation = Instance.new("Animation")
 	Animation.AnimationId = 'rbxassetid://' .. ID
 	local humanoid = Character:WaitForChild("Humanoid")
-	local animator = humanoid:FindFirstChildOfClass("Animator")
-	if animator then
-		local loadedAnimation = animator:LoadAnimation(Animation)
+	if humanoid then
+		local loadedAnimation = humanoid:LoadAnimation(Animation)
 		loadedAnimation:Play()
 	end
 end
