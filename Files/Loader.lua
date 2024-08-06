@@ -26,7 +26,7 @@ local function GetScript(Script)
 	elseif Script == "Shinden" then
 		if Executor == "Celery" or Executor == "Solara" then
 			if game.PlaceId == Games.Shinden.Main then
-				return 
+				return "https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/Shinden.lua"
 			end
 		elseif Executor == "Wave" or Executor == "Synapse Z" then
 			if game.PlaceId == Games.Shinden.Main then
