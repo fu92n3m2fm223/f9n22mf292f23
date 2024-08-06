@@ -14,17 +14,17 @@ local Executor = identifyexecutor()
 
 if game.PlaceId == Games.FreedomWar.Campaign then
 	if Executor == "Celery" or Executor == "Solara" then
-		return "https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/SolaraFreedom.lua"
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/SolaraFreedom.lua"))
 	elseif Executor == "Wave" or Executor == "Synapse Z" then
-		return "https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/Freedom.lua"
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/Freedom.lua"))
 	end
 end
 
 if game.PlaceId == Games.FreedomWar.Practice then
 	if Executor == "Celery" or Executor == "Solara" then
-		return "https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/SolaraFreedom.lua"
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/SolaraFreedom.lua"))
 	elseif Executor == "Wave" or Executor == "Synapse Z" then
-		return "https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/Freedom.lua"
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/Freedom.lua"))
 	end
 end
 --loadstring(game:HttpGet(GetScript("Shinden")))
