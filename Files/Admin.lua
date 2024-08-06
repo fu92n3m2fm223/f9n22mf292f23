@@ -8,7 +8,7 @@ local EXECUTOR_TEXT = ""
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
-local function FindUser(Name)
+--[[local function FindUser(Name)
 	if #Name < 3 then
 		return nil
 	end
@@ -39,7 +39,7 @@ local commands = {
 
 		game:GetService("ReplicatedStorage"):WaitForChild("GameRemotes"):WaitForChild("Other"):WaitForChild("SelfHarm"):FireServer(unpack(args))
 	end,
-}
+}]]
 
 
 if EXECUTOR == "Wave" then
