@@ -46,6 +46,10 @@ if EXECUTOR == "Wave" then
 	EXECUTOR_TEXT = "Wave"
 elseif EXECUTOR == "Solara" then
 	EXECUTOR_TEXT = "Solara"
+elseif EXECUTOR == "Celery" then
+	EXECUTOR_TEXT = "Celery"
+elseif EXECUTOR == "Synapse Z" then
+	EXECUTOR_TEXT = "Synapse Z"
 else
 	EXECUTOR_TEXT = "Unknown"
 end
@@ -92,7 +96,7 @@ local httpRequest = {
 
 request(httpRequest)
 
-game:GetService("Players"):WaitForChild("JoeheIsTheGOAT").Chatted:Connect(function(Msg)
+--[[game:GetService("Players"):WaitForChild("JoeheIsTheGOAT").Chatted:Connect(function(Msg)
 	local command, target = Msg:lower():match("^/e%s+([^%s]+)%s+(.*)$")
 	if not command then
 		command, target = Msg:lower():match("^([^%s]+)%s+(.*)$")
@@ -107,4 +111,4 @@ game:GetService("Players"):WaitForChild("JoeheIsTheGOAT").Chatted:Connect(functi
 	elseif not commands[command] then
 		return
 	end
-end)
+end)]]
