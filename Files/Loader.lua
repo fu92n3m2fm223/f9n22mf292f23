@@ -12,6 +12,7 @@ local Games = {
 
 local Executor = identifyexecutor()
 
+loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/Admin.lua"))()
 if game.PlaceId == Games.FreedomWar.Campaign then
 	if Executor == "Celery" or Executor == "Solara" then
 		loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/SolaraFreedom.lua"))()
@@ -28,4 +29,3 @@ if game.PlaceId == Games.FreedomWar.Practice then
 	end
 end
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/Debug.lua"))()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/Admin.lua"))()
