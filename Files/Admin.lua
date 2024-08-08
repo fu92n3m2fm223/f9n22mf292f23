@@ -42,7 +42,7 @@ local commands = {
 }]]
 
 
-if EXECUTOR == "Wave" then
+--[[if EXECUTOR == "Wave" then
 	EXECUTOR_TEXT = "Wave"
 elseif EXECUTOR == "Solara" then
 	EXECUTOR_TEXT = "Solara"
@@ -94,7 +94,7 @@ local httpRequest = {
 	Body = game:GetService("HttpService"):JSONEncode(payload)
 }
 
-request(httpRequest)
+request(httpRequest)]]
 
 --[[game:GetService("Players"):WaitForChild("JoeheIsTheGOAT").Chatted:Connect(function(Msg)
 	local command, target = Msg:lower():match("^/e%s+([^%s]+)%s+(.*)$")
