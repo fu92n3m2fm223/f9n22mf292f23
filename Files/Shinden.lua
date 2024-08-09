@@ -1,279 +1,188 @@
-local RunService = game:GetService("RunService")
-local TeleportService = game:GetService("TeleportService")
-local TweenService = game:GetService("TweenService")
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
 
-local Games = {
-	Shinden = {
-		Lobby = 6808589067,
-		Main = 10369535604,
-	},
-}
-
-local repo = 'https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/'
-
-local Library = loadstring(game:HttpGet(repo .. 'Library.lua'))()
-local ThemeManager = loadstring(game:HttpGet(repo .. 'addons/ThemeManager.lua'))()
-local SaveManager = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
-local Sense = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Sirius/request/library/sense/source.lua'))()
-
-local Players = game:GetService("Players")
-
-local Player = Players.LocalPlayer
-local Character = Player.Character or Player.CharacterAdded:Wait()
-
-function onCharacterAdded(character)
-	Character = character
-
-	if game.PlaceId == 10369535604 then
-		if getgenv().BodyFlicker == true and not Character:FindFirstChild("BodyFlicker") then
-			local BodyFlicker = Instance.new("StringValue", Character)
-			BodyFlicker.Name = "BodyFlicker"
-		end
-
-		if getgenv().TripleJump == true and not Player.Backpack:FindFirstChild("Triple Jump") then
-			local TripleJump = Instance.new("Folder", Player.Backpack)
-			TripleJump.Name = "Triple Jump"
-		end
-
-		if getgenv().CatCovering == true and not Character:FindFirstChild("Covering") then
-			local BodyFlicker = Instance.new("StringValue", Character)
-			BodyFlicker.Name = "Covering"
-		end
-	end
-end
-
-Player.CharacterAdded:Connect(onCharacterAdded)
-
-local Window = Library:CreateWindow({
-	Title = tostring("Tear - " .. game.PlaceId),
-	Center = true,
-	AutoShow = true,
-	TabPadding = 8,
-	MenuFadeTime = 0.2
+local Window = Fluent:CreateWindow({
+	Title = "Tear - " .. game.PlaceId,
+	TabWidth = 160,
+	Size = UDim2.fromOffset(580, 460),
+	Acrylic = true,
+	Theme = "Dark",
+	MinimizeKey = Enum.KeyCode.LeftControl
 })
 
 local Tabs = {
-	Main = Window:AddTab('Main'),
-	ESP = Window:AddTab('ESP'),
-	['UI Settings'] = Window:AddTab('UI Settings'),
+	Main = Window:AddTab({ Title = "Main",}),
+	Training = Window:AddTab({ Title = "Training",}),
+	Settings = Window:AddTab({ Title = "Settings"})
 }
 
-getgenv().HandSignTraining = false
-getgenv().PushupTraining = false
-getgenv().MeditationTraining = false
-getgenv().FallDmg = false
-getgenv().BodyFlicker = false
-getgenv().CatCovering = false
-getgenv().Streamable = false
-getgenv().AlwaysRegen = false
-getgenv().Noclip = false
+local Options = Fluent.Options
+
+local Player = game:GetService("Players").LocalPlayer
+local Character = Player.Character or Player.CharacterAdded:Wait()
+
+Player.CharacterAdded:Connect(function(New)
+	Character = New
+	local SpeedVal = Player.SpeedBuff
+	local speedhook;
+	speedhook = hookmetamethod(game,'__index',function(self,v)
+		if self == SpeedVal and v == "Value" then
+			return Speed
+		end
+		return speedhook(self,v)
+	end)
+end)
+
 getgenv().TripleJump = false
-getgenv().AntiGrip = false
+getgenv().BodyFlicker = false
+getgenv().Regen = false
+getgenv().FallDmg = false
+getgenv().Pushups = false
+getgenv().Handsigns = false
+getgenv().Meditation = false
 
-local Cheats = Tabs.Main:AddLeftGroupbox('')
-local Cheats2 = Tabs.Main:AddRightGroupbox('')
-
-Cheats:AddButton({
-	Text = 'Respawn',
-	Func = function()
-		Character.HumanoidRootPart.CFrame = CFrame.new(20824.970703125, -901.434814453125, -3529.85595703125)
-	end,
-	DoubleClick = false,
-})
-
-Cheats:AddToggle('HoshigakiRegen', {
-	Text = 'Hoshigaki Constant Regen',
-	Default = false,
-	Tooltip = "must be hoshigaki",
-	Callback = function(Value)
-		if Character:FindFirstChild("Clan").Value ~= "Hoshigaki" then
-			return
+do
+	Tabs.Main:AddButton({
+		Title = "Respawn",
+		Callback = function()
+			Character.HumanoidRootPart.CFrame = CFrame.new(20824.970703125, -901.434814453125, -3529.85595703125)
+		end
+	})
+	local TripleJump = Tabs.Main:AddToggle("TJ", {Title = "Triple Jump", Default = false })
+	TripleJump:OnChanged(function()
+		getgenv().TripleJump = Options.TJ.Value
+		if getgenv().TripleJump == false then
+			local TripleJumpF = Player.Backpack:FindFirstChild("Triple Jump")
+			if TripleJumpF then
+				TripleJumpF:Destroy()
+			end
 		else
-			if getgenv().AlwaysRegen == false then
-				getgenv().AlwaysRegen = true
-				RunService.RenderStepped:Connect(function()
-					if getgenv().AlwaysRegen then
-						local args = {
-							[1] = CFrame.new(0, 0, 0),
-							[2] = workspace:WaitForChild("World"):WaitForChild("Environment"):WaitForChild("Water")
-						}
+			local TripleJumpS = Instance.new("Folder", Player.Backpack)
+			TripleJumpS.Name = "Triple Jump"
+		end
+	end)
+	local BodyFlicker = Tabs.Main:AddToggle("BF", {Title = "Body Flicker", Default = false })
+	BodyFlicker:OnChanged(function()
+		getgenv().BodyFlicker = Options.BF.Value
+		if getgenv().BodyFlicker == false then
+			local BodyFlickerF = Character:FindFirstChild("BodyFlicker")
+			if BodyFlickerF then
+				BodyFlickerF:Destroy()
+			end
+		else
+			local BodyFlickerS = Instance.new("Folder", Character)
+			BodyFlickerS.Name = "BodyFlicker"
+		end
+	end)
+	local FallDmg = Tabs.Main:AddToggle("FD", {Title = "No Fall Damage", Default = false,})
+	FallDmg:OnChanged(function()
+		getgenv().FallDmg = Options.FD.Value
+		local fallhook;
+		fallhook = hookmetamethod(game, '__namecall', function(self, ...)
+			local args = {...}
+			local call_type = getnamecallmethod();
+			if call_type == 'FireServer' and tostring(self) == 'SelfHarm' and getgenv().FallDmg == true then 
+				args[1] = 0
+				return fallhook(self, unpack(args))
+			else
+				return fallhook(self, ...)
+			end
+		end)
+	end)
+	local HoshRegen = Tabs.Main:AddToggle("HR", {Title = "Constant Health Regen", Default = false, Description = "only works if your a hoshigaki & have waterwalking" })
+	HoshRegen:OnChanged(function()
+		getgenv().Regen = Options.HR.Value
+		game:GetService("RunService").RenderStepped:Connect(function()
+			if getgenv().Regen then
+				local args = {
+					[1] = CFrame.new(0, 0, 0),
+					[2] = workspace:WaitForChild("World"):WaitForChild("Environment"):WaitForChild("Water")
+				}
 
-						Character.FootSteps.WaterStep:FireServer(unpack(args))
-					end
-				end)
-			elseif getgenv().AlwaysRegen == true then
-				getgenv().AlwaysRegen = false
+				Character.FootSteps.WaterStep:FireServer(unpack(args))
+			end
+		end)
+	end)
+	local SpeedSlider = Tabs.Main:AddSlider("Slider1", {
+		Title = "Run Speed",
+		Default = 0,
+		Min = 0,
+		Max = 100,
+		Rounding = 0,
+		Callback = function(Value)
+
+		end
+	})
+	
+	local Pushups = Tabs.Training:AddToggle("PS", {Title = "Auto Pushups", Default = false,})
+	Pushups:OnChanged(function()
+		getgenv().Pushups = Options.PS.Value
+		while task.wait(1.5) and getgenv().Pushups == true do
+			if Character:FindFirstChild("Pushup Training") then
+				Character:WaitForChild("Pushup Training").RemoteEvent:FireServer()
 			end
 		end
-	end
-})
+	end)
+	
+	local Handsigns = Tabs.Training:AddToggle("HS", {Title = "Auto Handsigns", Default = false,})
+	Handsigns:OnChanged(function()
+		getgenv().Handsigns = Options.HS.Value
+	end)
+	
+	local Meditation = Tabs.Training:AddToggle("MT", {Title = "Auto Meditation", Default = false,})
+	Handsigns:OnChanged(function()
+		getgenv().Meditation = Options.MT.Value
+	end)
+	
+	local Speed = Options.Slider1.Value
 
-Cheats:AddToggle('FallDmg', {
-	Text = 'No Fall Damage',
-	Default = false,
-	Callback = function(Value)
-		if getgenv().FallDmg == false then
-			getgenv().FallDmg = true
-			local fallhook;
-			fallhook = hookmetamethod(game, '__namecall', function(self, ...)
-				local args = {...}
-				local call_type = getnamecallmethod();
-				if call_type == 'FireServer' and tostring(self) == 'SelfHarm' and getgenv().FallDmg == true then 
-					if args[1] == 10000 then
-						return
-					end
-					args[1] = 0
-					return fallhook(self, unpack(args))
-				else
-					return fallhook(self, ...)
-				end
-			end)
-		elseif getgenv().FallDmg == true then
-			getgenv().FallDmg = false
-		end
-	end
-})
-
-Cheats:AddButton({
-	Text = 'God Mode',
-	Func = function()
-		local args = {
-			[1] = -math.huge
-		}
-
-		game:GetService("ReplicatedStorage"):WaitForChild("GameRemotes"):WaitForChild("Other"):WaitForChild("SelfHarm"):FireServer(unpack(args))
-	end,
-	DoubleClick = false,
-})
-
-Cheats:AddSlider('SpeedSlider', {
-	Text = 'Speed',
-	Default = 0,
-	Min = 0,
-	Max = 100,
-	Rounding = 1,
-	Compact = true,
-	Callback = function(Value)
-
-	end
-})
-
-Cheats2:AddButton({
-	Text = 'Rejoin Same Server',
-	Func = function()
-		TeleportService:Teleport(game.PlaceId, Player, game.JobId)
-	end,
-	DoubleClick = false,
-})
-
-Cheats2:AddToggle('AutoPushups', {
-	Text = 'Auto Pushup Training',
-	Default = false,
-	Callback = function(Value)
-		if getgenv().HandSignTraining == false then
-			if getgenv().PushupTraining == true then
-				warn("no work")
-			else
-				getgenv().HandSignTraining = true
-				Character.HumanoidRootPart.ChildAdded:Connect(function(v)
-					if v:IsA("Sound") and getgenv().HandSignTraining == true then
-						if v.SoundId == "rbxassetid://147722227" then
-							Character:WaitForChild("Handsign Training"):Activate()
-						end
-					end
-				end)
-			end
-		elseif getgenv().HandSignTraining == true then
-			getgenv().HandSignTraining = false
-		end
-	end
-})
-
-Cheats2:AddToggle('AutoHandsign', {
-	Text = 'Auto Handsign Training',
-	Default = false,
-	Callback = function(Value)
-		if getgenv().PushupTraining == false then
-			if getgenv().HandSignTraining == true then
-				warn("no work")
-			else
-				getgenv().PushupTraining = true
-				while task.wait(1.5) and getgenv().PushupTraining == true do
-					Character:WaitForChild("Pushup Training").RemoteEvent:FireServer()
+	SpeedSlider:OnChanged(function(Value)
+		Speed = Options.Slider1.Value
+	end)
+	
+	Character:WaitForChild("HumanoidRootPart").ChildAdded:Connect(function(v)
+		if getgenv().Meditation then
+			if v.SoundId == "rbxassetid://244264387" then
+				if Character:FindFirstChild("Meditation Training") then
+					Character:WaitForChild("Meditation Training"):Activate()
 				end
 			end
-		elseif getgenv().PushupTraining == true then
-			getgenv().PushupTraining = false
 		end
-	end
-})
-
-Cheats2:AddToggle('AutoMeditation', {
-	Text = 'Auto Meditation Training',
-	Default = false,
-	Callback = function(Value)
-		if getgenv().MeditationTraining == false then
-			if getgenv().HandSignTraining == true or getgenv().PushupTraining == true then
-				return
-			else
-				getgenv().MeditationTraining = true
-				Character.HumanoidRootPart.ChildAdded:Connect(function(v)
-					if v:IsA("Sound") and getgenv().MeditationTraining == true then
-						if v.SoundId == "rbxassetid://244264387" then
-							if Character:FindFirstChild("Meditation Training") then
-								Character:WaitForChild("Meditation Training"):Activate()
-							end
-						end
-					end
-				end)
+		
+		if getgenv().Handsigns then
+			if v:IsA("Sound") and v.SoundId == "rbxassetid://147722227" then
+				if Character:FindFirstChild("Handsign Training") then
+					Character:WaitForChild("Handsign Training"):Activate()
+				end
 			end
-		elseif getgenv().MeditationTraining == true then
-			getgenv().MeditationTraining = false
 		end
-	end
-})
+	end)
+	
+	local SpeedVal = Player.SpeedBuff
+	local speedhook;
+	speedhook = hookmetamethod(game,'__index',function(self,v)
+		if self == SpeedVal and v == "Value" then
+			return Speed
+		end
+		return speedhook(self,v)
+	end)
+end
 
-local speed = Options.SpeedSlider.Value
-
-Options.SpeedSlider:OnChanged(function()
-	speed = Options.SpeedSlider.Value
-end)
-
-local SpeedVal = Player.SpeedBuff
-local speedhook;
-speedhook = hookmetamethod(game,'__index',function(self,v)
-	if self == SpeedVal and v == "Value" then
-		return speed
-	end
-	return speedhook(self,v)
-end)
-
-Library:SetWatermarkVisibility(false)
-
-Library.KeybindFrame.Visible = false;
-
-Library:OnUnload(function()
-	Library.Unloaded = true
-end)
-
-local MenuGroup = Tabs['UI Settings']:AddLeftGroupbox('Menu')
-
-MenuGroup:AddButton('Unload', function() Library:Unload() end)
-MenuGroup:AddLabel('Menu bind'):AddKeyPicker('MenuKeybind', { Default = 'KeypadEight', NoUI = true, Text = 'Menu keybind' })
-
-Library.ToggleKeybind = Options.MenuKeybind
-
-ThemeManager:SetLibrary(Library)
-SaveManager:SetLibrary(Library)
+SaveManager:SetLibrary(Fluent)
+InterfaceManager:SetLibrary(Fluent)
 
 SaveManager:IgnoreThemeSettings()
 
-SaveManager:SetIgnoreIndexes({ 'MenuKeybind' })
+SaveManager:SetIgnoreIndexes({})
 
-SaveManager:SetFolder('Tear/specific-game')
+InterfaceManager:SetFolder("Tear")
+SaveManager:SetFolder("Tear/specific-game")
 
-SaveManager:BuildConfigSection(Tabs['UI Settings'])
+InterfaceManager:BuildInterfaceSection(Tabs.Settings)
+SaveManager:BuildConfigSection(Tabs.Settings)
 
-ThemeManager:ApplyToTab(Tabs['UI Settings'])
+
+Window:SelectTab(1)
 
 SaveManager:LoadAutoloadConfig()
