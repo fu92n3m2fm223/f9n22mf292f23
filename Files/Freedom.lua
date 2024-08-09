@@ -1294,8 +1294,8 @@ do
 					local ShifterPlr = game:GetService("Players"):GetPlayerFromCharacter(TitanS)
 					local Team = TitanS:WaitForChild("ShifterHolder").TrueTeam.Value
 					if TitanS:FindFirstChild("RLegTendons") and TitanS:FindFirstChild("LLegTendons") then
-						if not (TitanS.Name == "ArmoredTitan" and TitanS.LLegTendons:FindFirstChild("Armored") and TitanS.LLegTendons:WaitForChild("Armored").Value == true) then
-							if Player.Team.Name ~= Team then
+						if not (TitanS.Name == "ArmoredTitan" and TitanS.LLegTendons:FindFirstChild("Armored") and TitanS.LLegTendons:WaitForChild("Armored").Value == true) and not (TitanS.Name == "ColossalTitan") then
+							if Player.Team.Name ~= Team or Player.Team.Name == "Rogue" or Team == "Rogue" then
 								TitanS.RLegTendons.Size = Vector3.new(shifterlegx, shifterlegy, shifterlegz)
 								TitanS.RLegTendons.Transparency = trans4
 								TitanS.RLegTendons.BrickColor = BrickColor.new("Institutional white")
