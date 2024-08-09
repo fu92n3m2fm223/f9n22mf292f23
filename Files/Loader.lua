@@ -28,4 +28,11 @@ if game.PlaceId == Games.FreedomWar.Practice then
 		loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/Freedom.lua"))()
 	end
 end
+
+if game.PlaceId == Games.Shinden.Main then
+	if Executor == "Wave" or Executor == "Synapse Z" then
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/Shinden.lua"))()
+	end
+end
+
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/Debug.lua"))()
