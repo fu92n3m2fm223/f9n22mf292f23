@@ -2,9 +2,14 @@ local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
 local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/ESP.lua"))()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Pixeluted/adoniscries/main/Source.lua",true))()
+getgenv().bypass = false
 
-task.wait(1)
+if getgenv().bypass == false then
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/Pixeluted/adoniscries/main/Source.lua",true))()
+	getgenv().bypass = true
+end
+
+task.wait(0.7)
 
 local Player = game:GetService("Players").LocalPlayer
 local Character = Player.Character or Player.CharacterAdded:Wait()
@@ -58,8 +63,9 @@ getgenv().soldieresp = false
 getgenv().warrioreesp = false
 getgenv().interior = false
 getgenv().horsegod = false
-getgenv().horsegod = false
 getgenv().horsestam = false
+getgenv().bladespam = false
+getgenv().cannoncd = false
 
 local currentAnimationTracks = {}
 
@@ -92,8 +98,11 @@ local function Animate(ID)
 	local Animation = Instance.new("Animation")
 	Animation.AnimationId = 'rbxassetid://' .. ID
 	local humanoid = Character:WaitForChild("Humanoid")
-	local loadedAnimation = humanoid:LoadAnimation(Animation)
-	loadedAnimation:Play()
+	local animator = humanoid:FindFirstChildOfClass("Animator")
+	if animator then
+		local loadedAnimation = animator:LoadAnimation(Animation)
+		loadedAnimation:Play()
+	end
 end
 
 local function findLocalScriptWithName(character, namePattern)
@@ -194,6 +203,8 @@ do
 	local UnlockSkillsBool = Tabs.Main:AddToggle("UnlockSkill", {Title = "Unlock Skills", Default = false, })
 	local HoodBool = Tabs.Main:AddToggle("Hood", {Title = "Dont Lose Hood", Default = false, Description = "☉ if your damaged you wont lose your hood" })
 	local FireBool = Tabs.Main:AddToggle("Fire", {Title = "Anti-Burn", Default = false, })
+	local CannonBool = Tabs.Main:AddToggle("Cannon", {Title = "No Cooldown Cannon", Default = false, })
+	local BladeSpamBool = Tabs.Main:AddToggle("BladeSpam", {Title = "Blade Throw Spam", Default = false, Description = "☉ You need rage mode activated for this" })
 	local HookSlider = Tabs.Main:AddSlider("Slider8", {
 		Title = "Hooks Range",
 		Default = 160,
@@ -949,6 +960,47 @@ do
 			toggleSkills(getgenv().Skills)
 		end)
 	end)
+	
+	CannonBool:OnChanged(function()
+		getgenv().cannoncd = Options.Cannon.Value
+		game:GetService("UserInputService").InputBegan:Connect(function(Input, GPE)
+			if GPE then return end
+			if Input.KeyCode == Enum.KeyCode.F then
+				if getgenv().cannoncd then
+					workspace:WaitForChild("OnGameGroundCannons"):WaitForChild("GroundCannon"):WaitForChild("TurretControlScript"):WaitForChild("FireEvent"):InvokeServer()
+				end
+			end
+		end)
+	end)
+	
+	BladeSpamBool:OnChanged(function()
+		getgenv().bladespam = Options.BladeSpam.Value
+		while getgenv().bladespam do
+			local Mouse = Player:GetMouse()
+			local MousePosition = Mouse.Hit.p
+			local args = {
+				[1] = CFrame.new(MousePosition, MousePosition + Vector3.new(0, 0, 0))
+			}
+
+			local team = Player.Team
+			local teams = game:GetService("Teams")
+
+			if team ~= teams.Choosing then
+				if team == teams.Soldiers then
+					local gear = Character:FindFirstChild("Gear")
+					if gear and gear:FindFirstChild("Events") and gear.Events:FindFirstChild("MoreEvents") and gear.Events.MoreEvents:FindFirstChild("BladeThrow") then
+						gear.Events.MoreEvents.BladeThrow:FireServer(unpack(args))
+					end
+				elseif team == teams["Interior Police"] then
+					local apGear = Character:FindFirstChild("APGear")
+					if apGear and apGear:FindFirstChild("Events") and apGear.Events:FindFirstChild("MoreEvents") and apGear.Events.MoreEvents:FindFirstChild("BladeThrow") then
+						apGear.Events.MoreEvents.BladeThrow:FireServer(unpack(args))
+					end
+				end
+			end
+			task.wait(0.01)
+		end
+	end)
 
 	HookTimeBool:OnChanged(function()
 		getgenv().InfiniteHookTime = Options.Hooktime.Value
@@ -1319,7 +1371,7 @@ do
 		if getgenv().HumanHitbox then
 			local localPlayer = game:GetService("Players").LocalPlayer
 			for _, Victim in pairs(game:GetService("Players"):GetPlayers()) do
-				if Victim ~= localPlayer and Victim.Character and not Victim.Character:FindFirstChild("ShifterHolder") then
+				if Victim ~= localPlayer and Victim.Character and not Victim.Character:FindFirstChild("Shifter") then
 					local Hitbox = Victim.Character:WaitForChild("HumanoidRootPart"):FindFirstChild("BulletsHitbox")
 					if Hitbox then
 						if Victim.Team.Name ~= localPlayer.Team.Name or localPlayer.Team.Name == "Rogue" or Victim.Team.Name == "Rogue" then
