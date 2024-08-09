@@ -48,7 +48,9 @@ getgenv().warrioreesp = false
 getgenv().interior = false
 getgenv().horsegod = false
 getgenv().horsegod = false
+getgenv().cannoncd = false
 getgenv().horsestam = false
+getgenv().bladespam = false
 
 local Options = Fluent.Options
 
@@ -121,6 +123,7 @@ local Animations = {
 	["Rodeo Dance"] = 5918728267,
 	["Break Dance"] = 5915648917,
 	["Fashionable"] = 3333331310,
+	["Breakdance"] = 10214311282,
 	["Robot"] = 3338025566,
 	["Twirl"] = 3334968680,
 	["Idol"] = 4101966434,
@@ -166,6 +169,8 @@ do
 	local UnlockSkillsBool = Tabs.Main:AddToggle("UnlockSkill", {Title = "Unlock Skills", Default = false, Description = "☉ boosts your hook range & attack speed aswell"})
 	local HoodBool = Tabs.Main:AddToggle("Hood", {Title = "Dont Lose Hood", Default = false, Description = "☉ if your damaged you wont lose your hood" })
 	local FireBool = Tabs.Main:AddToggle("Fire", {Title = "Anti-Burn", Default = false, })
+	local CannonBool = Tabs.Main:AddToggle("Cannon", {Title = "No Cooldown Cannon", Default = false, })
+	local BladeSpamBool = Tabs.Main:AddToggle("BladeSpam", {Title = "Blade Throw Spam", Default = false, Description = "☉ You need rage mode activated for this" })
 	local NoCooldownBool = Tabs.Main:AddToggle("Nocooldown", {Title = "No Cooldown", Default = false })
 	local AntiHookBool = Tabs.Main:AddToggle("antihook", {Title = "Anti Hook", Default = false, })
 	local AntiHookSlider = Tabs.Main:AddSlider("Slider9", {
@@ -606,6 +611,20 @@ do
 		end
 	})
 	
+	Tabs.Third:AddButton({
+		Title = "Infinite Timer",
+		Description = "☉ i dont recommend using unless your forced or on your 3rd shift",
+		Callback = function()
+			for i, v in pairs(Character:GetChildren()) do
+				for i, v in pairs(Character:GetChildren()) do
+					if v.Name == "FELocal" or v.Name == "ARLocal" or v.Name == "COLocal" or v.Name == "JALocal" or v.Name == "ATLocal" or v.Name == "CALocal" or v.Name == "BELocal" then
+						v.Stats.Time:Destroy()
+					end
+				end
+			end
+		end
+	})
+	
 	local ShifterSpeed = Tabs.Third:AddSlider("ShifterSpeed", {
 		Title = "Speed",
 		Default = 16,
@@ -652,6 +671,15 @@ do
 	})
 
 	TeamDropdown:OnChanged(function(Value)
+		local stageValue = workspace:FindFirstChild("GameStateValues").Stage.Value
+		if stageValue ~= 11 and stageValue ~= 12 and Value == "Interior Police" and not (game.PlaceId == 11567929685) then
+			Fluent:Notify({
+				Title = "Tear",
+				Content = "Unable to switch to Interior Police at the moment, it is not stage 11 or 12",
+				Duration = 8
+			})
+			return
+		end
 		Player.PlayerGui:WaitForChild("LobbyGui").TeamSelectionEvent:FireServer(Value)
 	end)
 
@@ -861,6 +889,18 @@ do
 			toggleSkills(getgenv().Skills)
 		end)
 	end)
+	
+	CannonBool:OnChanged(function()
+		getgenv().cannoncd = Options.Cannon.Value
+		game:GetService("UserInputService").InputBegan:Connect(function(Input, GPE)
+			if GPE then return end
+			if Input.KeyCode == Enum.KeyCode.F then
+				if getgenv().cannoncd then
+					workspace:WaitForChild("OnGameGroundCannons"):WaitForChild("GroundCannon"):WaitForChild("TurretControlScript"):WaitForChild("FireEvent"):InvokeServer()
+				end
+			end
+		end)
+	end)
 
 	HookTimeBool:OnChanged(function()
 		getgenv().InfiniteHookTime = Options.Hooktime.Value
@@ -971,6 +1011,35 @@ do
 					Skill.Cooldown.Value = 2000
 				end
 			end
+		end
+	end)
+	
+	BladeSpamBool:OnChanged(function()
+		getgenv().bladespam = Options.BladeSpam.Value
+		while getgenv().bladespam do
+			local Mouse = Player:GetMouse()
+			local MousePosition = Mouse.Hit.p
+			local args = {
+				[1] = CFrame.new(MousePosition, MousePosition + Vector3.new(0, 0, 0))
+			}
+
+			local team = Player.Team
+			local teams = game:GetService("Teams")
+
+			if team ~= teams.Choosing then
+				if team == teams.Soldiers then
+					local gear = Character:FindFirstChild("Gear")
+					if gear and gear:FindFirstChild("Events") and gear.Events:FindFirstChild("MoreEvents") and gear.Events.MoreEvents:FindFirstChild("BladeThrow") then
+						gear.Events.MoreEvents.BladeThrow:FireServer(unpack(args))
+					end
+				elseif team == teams["Interior Police"] then
+					local apGear = Character:FindFirstChild("APGear")
+					if apGear and apGear:FindFirstChild("Events") and apGear.Events:FindFirstChild("MoreEvents") and apGear.Events.MoreEvents:FindFirstChild("BladeThrow") then
+						apGear.Events.MoreEvents.BladeThrow:FireServer(unpack(args))
+					end
+				end
+			end
+			task.wait(0.01)
 		end
 	end)
 
@@ -1084,11 +1153,11 @@ do
 		toggleTitanDetector()
 	end)
 	
-	local HorseGod = Tabs.Sixth:AddToggle("HorseGod", {Title = "Horse God Mode", Default = false, })
+	--[[local HorseGod = Tabs.Sixth:AddToggle("HorseGod", {Title = "Horse God Mode", Default = false, })
 	
 	HorseGod:OnChanged(function()
 		getgenv().horsegod = Options.HorseGod.Value
-	end)
+	end)]]
 	
 	local HorseStamina = Tabs.Sixth:AddToggle("HorseStamina", {Title = "Infinite Horse Stamina", Default = false, })
 
@@ -1139,18 +1208,29 @@ do
 		
 		if getgenv().HumanHitbox then
 			local localPlayer = game:GetService("Players").LocalPlayer
+			local isLocalPlayerWarrior = false
+
+			for _, v in pairs(workspace.PlayersDataFolder:GetChildren()) do
+				if v.Name == localPlayer.Name and v:FindFirstChild("Warrior") and v.Warrior.Value == true then
+					isLocalPlayerWarrior = true
+					break
+				end
+			end
+
 			for _, Victim in pairs(game:GetService("Players"):GetPlayers()) do
 				if Victim ~= localPlayer and Victim.Character and not Victim.Character:FindFirstChild("Shifter") then
 					local Hitbox = Victim.Character:WaitForChild("HumanoidRootPart"):FindFirstChild("BulletsHitbox")
 					if Hitbox then
-						local isWarrior = false
-						for i, v in pairs(workspace.PlayersDataFolder:GetChildren()) do
+						local isVictimWarrior = false
+						for _, v in pairs(workspace.PlayersDataFolder:GetChildren()) do
 							if v.Name == Victim.Name and v:FindFirstChild("Warrior") and v.Warrior.Value == true then
-								isWarrior = true
+								isVictimWarrior = true
 								break
 							end
 						end
-						if Victim.Team.Name ~= localPlayer.Team.Name or localPlayer.Team.Name == "Rogue" or Victim.Team.Name == "Rogue" or isWarrior then
+
+						if (Victim.Team.Name ~= localPlayer.Team.Name or localPlayer.Team.Name == "Rogue" or Victim.Team.Name == "Rogue") and 
+							(not isLocalPlayerWarrior or not isVictimWarrior) then
 							Hitbox.Size = Vector3.new(humanhitbox, humanhitbox, humanhitbox)
 							Hitbox.Transparency = humantrans
 							Hitbox.BrickColor = BrickColor.new("Institutional white")
@@ -1215,7 +1295,7 @@ do
 					local ShifterPlr = game:GetService("Players"):GetPlayerFromCharacter(TitanS)
 					local Team = TitanS:WaitForChild("ShifterHolder").TrueTeam.Value
 					if TitanS:FindFirstChild("RLegTendons") and TitanS:FindFirstChild("LLegTendons") then
-						if not (TitanS.Name == "ArmoredTitan" and TitanS.LLegTendons:FindFirstChild("Armored") and TitanS.LLegTendons:WaitForChild("Armored").Value == true) then
+						if not (TitanS.Name == "ArmoredTitan" and TitanS.LLegTendons:FindFirstChild("Armored") and TitanS.LLegTendons:WaitForChild("Armored").Value == true) and not (TitanS.Name == "ColossalTitan") then
 							if Player.Team.Name ~= Team or Player.Team.Name == "Rogue" or Team == "Rogue" then
 								TitanS.RLegTendons.Size = Vector3.new(shifterlegx, shifterlegy, shifterlegz)
 								TitanS.RLegTendons.Transparency = trans4
