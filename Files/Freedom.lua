@@ -1232,11 +1232,11 @@ do
 		toggleTitanDetector()
 	end)
 	
-	local HorseGod = Tabs.Sixth:AddToggle("HorseGod", {Title = "Horse God Mode", Default = false, })
+	--local HorseGod = Tabs.Sixth:AddToggle("HorseGod", {Title = "Horse God Mode", Default = false, })
 
-	HorseGod:OnChanged(function()
+	--[[HorseGod:OnChanged(function()
 		getgenv().horsegod = Options.HorseGod.Value
-	end)
+	end)]]
 
 	local HorseStamina = Tabs.Sixth:AddToggle("HorseStamina", {Title = "Infinite Horse Stamina", Default = false, })
 
