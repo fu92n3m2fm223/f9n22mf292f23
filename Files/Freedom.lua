@@ -67,6 +67,7 @@ getgenv().horsestam = false
 getgenv().bladespam = false
 getgenv().cannoncd = false
 getgenv().noblind = false
+getgenv().Stun = false
 
 
 local currentAnimationTracks = {}
@@ -624,6 +625,7 @@ do
 
 	local InfStaminaBool = Tabs.Third:AddToggle("infshiftstam", {Title = "Infinite Stamina", Default = false, Description = "☉ also gives you inf stamina as a human" })
 	local NoBlindBool = Tabs.Third:AddToggle("noblind", {Title = "No Blind", Default = false, Description = "☉ makes it so you wont go blind if your eyes are cut" })
+	local StunBool = Tabs.Third:AddToggle("nostun", {Title = "No Stun", Default = false, })
 	--local NoSCooldown = Tabs.Third:AddToggle("nocds", {Title = "No Cooldown", Default = false })
 	--local SpecialSkills = Tabs.Third:AddToggle("spskills", {Title = "Never Lose Special Skills", Default = false, Description = "☉ Hoard Roar, Berserk, if you reshift you get hoard roar back and every stage you get berserk back" })
 
@@ -631,6 +633,10 @@ do
 	
 	NoBlindBool:OnChanged(function(Value)
 		getgenv().noblind = Options.noblind.Value
+	end)
+	
+	StunBool:OnChanged(function(Value)
+		getgenv().Stun = Options.nostun.Value
 	end)
 
 	Tabs.Misc:AddButton({
@@ -754,11 +760,13 @@ do
 
 			game:GetService("ReplicatedStorage"):WaitForChild("Wear3DClothesEvent"):FireServer(unpack(args))
 		else
-			local args = {
-				[1] = Player.Team.Name
-			}
+			if not Character:FindFirstChild("Shifter") then
+				local args = {
+					[1] = Player.Team.Name
+				}
 
-			game:GetService("ReplicatedStorage"):WaitForChild("Wear3DClothesEvent"):FireServer(unpack(args))
+				game:GetService("ReplicatedStorage"):WaitForChild("Wear3DClothesEvent"):FireServer(unpack(args))
+			end
 		end
 	end)
 
@@ -1298,7 +1306,26 @@ do
 		if getgenv().noblind then
 			for _, Object in pairs(Player.PlayerGui:FindFirstChild("ShiftersGui"):GetDescendants()) do
 				if Object.Name == "LBlind" or Object.Name == "RBlind" or Object.Name == "FullBlind" then
-					Object.Visible = false
+					if Object.Visible == true then
+						Object.Visible = false
+					end
+				end
+			end
+		end
+
+		if getgenv().Stun then
+			if Character:FindFirstChild("Shifter") then
+				for _, Object in pairs(Character:GetDescendants()) do
+					if Object:IsA("BoolValue") and Object.Name == "Stun" and Object.Parent and Object.Parent.Name == "PunchImpact" then
+						if Object.Value == true then
+							for _, Descendant in pairs(Character:GetDescendants()) do
+								if Descendant:IsA("RemoteEvent") and Descendant.Name == "UnstunnedEvent" then
+									Descendant:FireServer(true)
+									break
+								end
+							end
+						end
+					end
 				end
 			end
 		end
