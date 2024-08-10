@@ -51,6 +51,7 @@ getgenv().horsegod = false
 getgenv().cannoncd = false
 getgenv().horsestam = false
 getgenv().bladespam = false
+getgenv().noblind = false
 
 local Options = Fluent.Options
 
@@ -582,6 +583,7 @@ do
 	end)
 
 	local InfStaminaBool = Tabs.Third:AddToggle("infshiftstam", {Title = "Infinite Stamina", Default = false, Description = "☉ also gives you inf stamina as a human" })
+	local NoBlindBool = Tabs.Third:AddToggle("noblind", {Title = "No Blind", Default = false, Description = "☉ makes it so you wont go blind if your eyes are cut" })
 	--local NoSCooldown = Tabs.Third:AddToggle("nocds", {Title = "No Cooldown", Default = false })
 	Tabs.Third:AddButton({
 		Title = "Quick Uppercut",
@@ -610,6 +612,10 @@ do
 			end)
 		end
 	})
+	
+	NoBlindBool:OnChanged(function(Value)
+		getgenv().noblind = Options.noblind.Value
+	end)
 	
 	Tabs.Third:AddButton({
 		Title = "Infinite Timer",
@@ -1249,6 +1255,14 @@ do
 			getgenv().AHSpeed = 0.25
 		elseif ahspeed == 4 then
 			getgenv().AHSpeed = 0.1
+		end
+		
+		if getgenv().noblind then
+			for _, Object in pairs(Player.PlayerGui:FindFirstChild("ShiftersGui"):GetDescendants()) do
+				if Object.Name == "LBlind" or Object.Name == "RBlind" or Object.Name == "FullBlind" then
+					Object.Visible = false
+				end
+			end
 		end
 		
 		for i, horse in pairs(workspace:WaitForChild("OnGameHorses"):GetChildren()) do
