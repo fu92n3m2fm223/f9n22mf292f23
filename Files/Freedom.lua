@@ -66,6 +66,8 @@ getgenv().horsegod = false
 getgenv().horsestam = false
 getgenv().bladespam = false
 getgenv().cannoncd = false
+getgenv().noblind = false
+
 
 local currentAnimationTracks = {}
 
@@ -621,10 +623,15 @@ do
 	end)
 
 	local InfStaminaBool = Tabs.Third:AddToggle("infshiftstam", {Title = "Infinite Stamina", Default = false, Description = "☉ also gives you inf stamina as a human" })
+	local NoBlindBool = Tabs.Third:AddToggle("noblind", {Title = "No Blind", Default = false, Description = "☉ makes it so you wont go blind if your eyes are cut" })
 	--local NoSCooldown = Tabs.Third:AddToggle("nocds", {Title = "No Cooldown", Default = false })
 	--local SpecialSkills = Tabs.Third:AddToggle("spskills", {Title = "Never Lose Special Skills", Default = false, Description = "☉ Hoard Roar, Berserk, if you reshift you get hoard roar back and every stage you get berserk back" })
 
 	local NoGear = Tabs.Misc:AddToggle("gear", {Title = "No Gear", Default = false, Description = "☉ Removes some gear off your character" })
+	
+	NoBlindBool:OnChanged(function(Value)
+		getgenv().noblind = Options.noblind.Value
+	end)
 
 	Tabs.Misc:AddButton({
 		Title = "Unlock Emotes",
@@ -1286,6 +1293,14 @@ do
 			getgenv().AHSpeed = 0.2
 		elseif ahspeed == 4 then
 			getgenv().AHSpeed = 0.15
+		end
+		
+		if getgenv().noblind then
+			for _, Object in pairs(Player.PlayerGui:FindFirstChild("ShiftersGui"):GetDescendants()) do
+				if Object.Name == "LBlind" or Object.Name == "RBlind" or Object.Name == "FullBlind" then
+					Object.Visible = false
+				end
+			end
 		end
 
 		if getgenv().ShifterLegHitbox then
