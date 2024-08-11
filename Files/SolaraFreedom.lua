@@ -674,6 +674,30 @@ do
 		end
 	})
 	
+	local function returnstable()
+		for _, Object in pairs(workspace:GetDescendants()) do
+			if Object.Name == "Stable" then
+				return Object:WaitForChild("CarriageSpawns"):WaitForChild("CarriageSpawn")
+			end
+		end
+	end
+
+	local Input = Tabs.Misc:AddInput("GP", {
+		Title = "GP Addon",
+		Default = "0",
+		Placeholder = "how much gp u want added",
+		Numeric = false,
+		Finished = true,
+		Callback = function(Value)
+			local args = {
+				[1] = "CannonCarriage",
+				[2] = returnstable(),
+				[3] = -Value
+			}
+
+			game:GetService("ReplicatedStorage"):WaitForChild("DeployEvent"):FireServer(unpack(args))
+		end
+	})
 
 	local TeamDropdown = Tabs.Misc:AddDropdown("Team Change", {
 		Title = "Change Team",
