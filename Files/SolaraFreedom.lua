@@ -1365,7 +1365,7 @@ do
 		end]]
 
 		if getgenv().InfStamina then
-			Character:WaitForChild("Humanoid").Stamina.Value = 2400
+			Character:WaitForChild("Humanoid"):WaitForChild("Stamina").Value = 2400
 		end
 
 		if getgenv().InfiniteGas then
