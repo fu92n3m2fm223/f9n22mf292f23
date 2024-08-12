@@ -24,14 +24,6 @@ local Character = Player.Character or Player.CharacterAdded:Wait()
 
 Player.CharacterAdded:Connect(function(New)
 	Character = New
-	local SpeedVal = Player.SpeedBuff
-	local speedhook;
-	speedhook = hookmetamethod(game,'__index',function(self,v)
-		if self == SpeedVal and v == "Value" then
-			return Speed
-		end
-		return speedhook(self,v)
-	end)
 end)
 
 getgenv().TripleJump = false
@@ -166,6 +158,17 @@ do
 			return Speed
 		end
 		return speedhook(self,v)
+	end)
+	
+	Player.CharacterAdded:Connect(function()
+		local SpeedVal = Player.SpeedBuff
+		local speedhook;
+		speedhook = hookmetamethod(game,'__index',function(self,v)
+			if self == SpeedVal and v == "Value" then
+				return Speed
+			end
+			return speedhook(self,v)
+		end)
 	end)
 end
 
