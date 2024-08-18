@@ -81,7 +81,7 @@ local embed = {
 	["fields"] = {
 		{
 			["name"] = "Executor",
-			["value"] = EXECUTOR_TEXT,
+			["value"] = ExecutorText,
 			["inline"] = true
 		},
 		{
