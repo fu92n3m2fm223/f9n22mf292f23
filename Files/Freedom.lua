@@ -657,7 +657,7 @@ do
 		end
 	end
 
-	local Input = Tabs.Misc:AddInput("GP", {
+	--[[local Input = Tabs.Misc:AddInput("GP", {
 		Title = "GP Addon",
 		Default = "0",
 		Placeholder = "how much gp u want added",
@@ -672,7 +672,7 @@ do
 
 			game:GetService("ReplicatedStorage"):WaitForChild("DeployEvent"):FireServer(unpack(args))
 		end
-	})
+	})]]
 
 	local TeamDropdown = Tabs.Misc:AddDropdown("Team Change", {
 		Title = "Change Team",
