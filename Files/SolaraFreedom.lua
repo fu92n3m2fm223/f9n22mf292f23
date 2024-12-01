@@ -53,9 +53,10 @@ getgenv().horsestam = false
 getgenv().bladespam = false
 getgenv().noblind = false
 getgenv().Stun = false
+getgenv().inftimer = false
+getgenv().autopickup = false
 
 local Options = Fluent.Options
-
 
 Player.CharacterAdded:Connect(function()
 	if getgenv().NoGear then
@@ -72,6 +73,7 @@ Player.CharacterAdded:Connect(function()
 end)
 
 local currentAnimationTracks = {}
+local inftimertable = {}
 
 local function Animate(ID)
 	local Animation = Instance.new("Animation")
@@ -585,6 +587,7 @@ do
 
 	local InfStaminaBool = Tabs.Third:AddToggle("infshiftstam", {Title = "Infinite Stamina", Default = false, Description = "☉ also gives you inf stamina as a human" })
 	local NoBlindBool = Tabs.Third:AddToggle("noblind", {Title = "No Blind", Default = false, Description = "☉ makes it so you wont go blind if your eyes are cut" })
+	local InftimerBool = Tabs.Third:AddToggle("inftimer", {Title = "Infinite Timer", Default = false})
 	local StunBool = Tabs.Third:AddToggle("nostun", {Title = "No Stun", Default = false, })
 	--local NoSCooldown = Tabs.Third:AddToggle("nocds", {Title = "No Cooldown", Default = false })
 	Tabs.Third:AddButton({
@@ -617,6 +620,10 @@ do
 	
 	NoBlindBool:OnChanged(function(Value)
 		getgenv().noblind = Options.noblind.Value
+	end)
+	
+	InftimerBool:OnChanged(function(Value)
+		getgenv().inftimer = Options.inftimer.Value
 	end)
 	
 	StunBool:OnChanged(function(Value)
@@ -663,6 +670,62 @@ do
 	})
 
 	local NoGear = Tabs.Misc:AddToggle("gear", {Title = "No Gear", Default = false, Description = "☉ Removes some gear off your character" })
+	
+	if fireproximityprompt then
+		local PickupBool = Tabs.Misc:AddToggle("autopick", {Title = "Auto-Pickup Gifts", Default = false, })
+
+		PickupBool:OnChanged(function()
+			getgenv().autopickup = Options.autopick.Value
+			while getgenv().autopickup do
+				local cache = {}
+
+				local function isPlayerWithinDistance(prompt)
+					local player = game.Players.LocalPlayer
+					if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+						local playerPosition = player.Character.HumanoidRootPart.Position
+						local promptPosition = prompt.Parent.Position
+						return (playerPosition - promptPosition).Magnitude <= prompt.MaxActivationDistance
+					end
+					return false
+				end
+
+				local function processGift(gift)
+					local proximityPrompt = gift:FindFirstChild("GToOpen")
+					if proximityPrompt and proximityPrompt:IsA("ProximityPrompt") then
+						if not table.find(cache, proximityPrompt) then
+							table.insert(cache, proximityPrompt)
+						end
+					end
+				end
+
+				for _, gift in ipairs(workspace:GetDescendants()) do
+					if gift:IsA("BasePart") and gift.Name == "Gift" then
+						processGift(gift)
+					end
+				end
+
+				workspace.ChildAdded:Connect(function(child)
+					if child:IsA("BasePart") and child.Name == "Gift" then
+						processGift(child)
+					end
+				end)
+
+				while task.wait(0.001) and getgenv().autopickup do
+					for i = #cache, 1, -1 do
+						local prompt = cache[i]
+						if prompt and prompt.Parent and prompt.Enabled then
+							if isPlayerWithinDistance(prompt) then
+								prompt.RequiresLineOfSight = false
+								fireproximityprompt(prompt)
+							end
+						else
+							table.remove(cache, i)
+						end
+					end
+				end
+			end
+		end)
+	end
 
 	Tabs.Misc:AddButton({
 		Title = "Unlock Emotes",
@@ -1288,7 +1351,51 @@ do
 		elseif ahspeed == 4 then
 			getgenv().AHSpeed = 0.1
 		end
-		
+
+		if getgenv().inftimer then
+			local validNames = {
+				"FELocal", "ARLocal", "COLocal", "JALocal", 
+				"ATLocal", "CALocal", "BELocal"
+			}
+
+			for _, name in ipairs(validNames) do
+				local foundInstance = Character:FindFirstChild(name)
+				if foundInstance then
+					local statsFolder = foundInstance:FindFirstChild("Stats")
+					if statsFolder then
+						local shifts = statsFolder:FindFirstChild("Shifts")
+						if shifts and shifts.Value == 3 then
+							local timer = statsFolder:FindFirstChild("Timer")
+							if timer then
+								local newtimer = timer:Clone()
+								newtimer.Parent = foundInstance
+								timer:Destroy()
+							end
+						end
+					end
+				end
+			end
+
+			if not Character:FindFirstChild("Shifter") then
+				for _, name in ipairs(validNames) do
+					local foundInstance = Character:FindFirstChild(name)
+					if foundInstance then
+						local statsFolder = foundInstance:FindFirstChild("Stats")
+						if statsFolder then
+							local existingTime = statsFolder:FindFirstChild("Time")
+							if not existingTime then
+								local timer = foundInstance:FindFirstChild("Timer")
+								if timer then
+									local clonedTimer = timer:Clone()
+									clonedTimer.Parent = statsFolder
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+
 		if getgenv().noblind then
 			for _, Object in pairs(Player.PlayerGui:FindFirstChild("ShiftersGui"):GetDescendants()) do
 				if Object.Name == "LBlind" or Object.Name == "RBlind" or Object.Name == "FullBlind" then
