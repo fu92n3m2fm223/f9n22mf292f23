@@ -55,6 +55,33 @@ getgenv().noblind = false
 getgenv().Stun = false
 getgenv().inftimer = false
 getgenv().autopickup = false
+getgenv().staffnotify = false
+
+local StaffList = {
+	39716623, -- Administrator
+	5052488353, -- Owner
+	989251425, -- Head Staff
+	3891230967, -- Developer
+	923860344, -- Developer
+	3349285656, -- Administrator
+	563460081, -- Head Administrator
+	2840164930, -- Moderator
+	320954812, -- Administrator
+	1218375944, -- Moderator
+	291309580, -- Moderator
+	1649580586, -- Moderator
+	2664727049, -- Moderator
+}
+
+for _, Player in pairs(game:GetService("Players"):GetPlayers()) do
+	if table.find(Player.UserId, StaffList) then
+		Fluent:Notify({
+			Title = "Tear",
+			Content = "Staff Member " .. Player.Name .. " is in this server",
+			Duration = 8
+		})
+	end
+end
 
 local Options = Fluent.Options
 
@@ -737,6 +764,11 @@ do
 		end
 	})
 	
+	local staffnotiff = Tabs.Misc:AddToggle("staffnotif", {Title = "Staff Notification", Default = false, Description = "☉ notifies you if a staff member joins"})
+	staffnotiff:OnChanged(function()
+		getgenv().staffnotify = Options.staffnotif.Value
+	end)
+	
 	local function returnstable()
 		for _, Object in pairs(workspace:GetDescendants()) do
 			if Object.Name == "Stable" then
@@ -1281,6 +1313,16 @@ do
 
 	HorseSpeed:OnChanged(function(Value)
 		HorseSpeedVal = Options.HorseSpeedSlider.Value
+	end)
+	
+	game:GetService("Players").PlayerAdded:Connect(function(Player)
+		if table.find(StaffList, Player.UserId) and getgenv().staffnotify then
+			Fluent:Notify({
+				Title = "Tear",
+				Content = "Staff Member " .. Player.Name .. " Has Joined",
+				Duration = 8
+			})
+		end
 	end)
 
 	game:GetService("RunService").RenderStepped:Connect(function()
