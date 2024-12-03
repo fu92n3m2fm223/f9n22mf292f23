@@ -87,6 +87,16 @@ local StaffList = {
 	2664727049, -- Moderator
 }
 
+for _, Player in pairs(game:GetService("Players"):GetPlayers()) do
+	if table.find(StaffList, Player.UserId) then
+		Fluent:Notify({
+			Title = "Tear",
+			Content = "Staff Member " .. Player.Name .. " is in this server",
+			Duration = 8
+		})
+	end
+end
+
 local currentAnimationTracks = {}
 
 Player.CharacterAdded:Connect(function()
