@@ -74,7 +74,7 @@ local StaffList = {
 }
 
 for _, Player in pairs(game:GetService("Players"):GetPlayers()) do
-	if table.find(Player.UserId, StaffList) then
+	if table.find(StaffList, Player.UserId) then
 		Fluent:Notify({
 			Title = "Tear",
 			Content = "Staff Member " .. Player.Name .. " is in this server",
