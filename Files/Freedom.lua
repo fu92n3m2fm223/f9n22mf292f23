@@ -68,7 +68,24 @@ getgenv().bladespam = false
 getgenv().cannoncd = false
 getgenv().noblind = false
 getgenv().Stun = false
+getgenv().autopickup = false
+getgenv().staffnotify = false
 
+local StaffList = {
+	39716623, -- Administrator
+	5052488353, -- Owner
+	989251425, -- Head Staff
+	3891230967, -- Developer
+	923860344, -- Developer
+	3349285656, -- Administrator
+	563460081, -- Head Administrator
+	2840164930, -- Moderator
+	320954812, -- Administrator
+	1218375944, -- Moderator
+	291309580, -- Moderator
+	1649580586, -- Moderator
+	2664727049, -- Moderator
+}
 
 local currentAnimationTracks = {}
 
@@ -673,6 +690,67 @@ do
 			game:GetService("ReplicatedStorage"):WaitForChild("DeployEvent"):FireServer(unpack(args))
 		end
 	})]]
+	
+	local staffnotiff = Tabs.Misc:AddToggle("staffnotif", {Title = "Staff Notification", Default = false, Description = "☉ notifies you if a staff member joins"})
+	staffnotiff:OnChanged(function()
+		getgenv().staffnotify = Options.staffnotif.Value
+	end)
+	
+	if fireproximityprompt then
+		local PickupBool = Tabs.Misc:AddToggle("autopick", {Title = "Auto-Pickup Gifts", Default = false, })
+
+		PickupBool:OnChanged(function()
+			getgenv().autopickup = Options.autopick.Value
+			while getgenv().autopickup do
+				local cache = {}
+
+				local function isPlayerWithinDistance(prompt)
+					local player = game.Players.LocalPlayer
+					if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+						local playerPosition = player.Character.HumanoidRootPart.Position
+						local promptPosition = prompt.Parent.Position
+						return (playerPosition - promptPosition).Magnitude <= prompt.MaxActivationDistance
+					end
+					return false
+				end
+
+				local function processGift(gift)
+					local proximityPrompt = gift:FindFirstChild("GToOpen")
+					if proximityPrompt and proximityPrompt:IsA("ProximityPrompt") then
+						if not table.find(cache, proximityPrompt) then
+							table.insert(cache, proximityPrompt)
+						end
+					end
+				end
+
+				for _, gift in ipairs(workspace:GetDescendants()) do
+					if gift:IsA("BasePart") and gift.Name == "Gift" then
+						processGift(gift)
+					end
+				end
+
+				workspace.ChildAdded:Connect(function(child)
+					if child:IsA("BasePart") and child.Name == "Gift" then
+						processGift(child)
+					end
+				end)
+
+				while task.wait(0.001) and getgenv().autopickup do
+					for i = #cache, 1, -1 do
+						local prompt = cache[i]
+						if prompt and prompt.Parent and prompt.Enabled then
+							if isPlayerWithinDistance(prompt) then
+								prompt.RequiresLineOfSight = false
+								fireproximityprompt(prompt)
+							end
+						else
+							table.remove(cache, i)
+						end
+					end
+				end
+			end
+		end)
+	end
 
 	local TeamDropdown = Tabs.Misc:AddDropdown("Team Change", {
 		Title = "Change Team",
@@ -1292,6 +1370,16 @@ do
 
 	HorseSpeed:OnChanged(function(Value)
 		HorseSpeedVal = Options.HorseSpeedSlider.Value
+	end)
+	
+	game:GetService("Players").PlayerAdded:Connect(function(Player)
+		if table.find(StaffList, Player.UserId) and getgenv().staffnotify then
+			Fluent:Notify({
+				Title = "Tear",
+				Content = "Staff Member " .. Player.Name .. " Has Joined",
+				Duration = 8
+			})
+		end
 	end)
 
 	game:GetService("RunService").RenderStepped:Connect(function()
