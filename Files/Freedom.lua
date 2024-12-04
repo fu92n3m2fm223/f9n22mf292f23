@@ -716,7 +716,7 @@ do
 				local cache = {}
 
 				local function isPlayerWithinDistance(prompt)
-					local player = game.Players.LocalPlayer
+					local player = game:GetService("Players").LocalPlayer
 					if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
 						local playerPosition = player.Character.HumanoidRootPart.Position
 						local promptPosition = prompt.Parent.Position
