@@ -20,7 +20,7 @@ end)
 
 local function toggleTitanDetector()
 	if not Character:FindFirstChild("Shifter") then
-		local titanDetector = Character:WaitForChild("TitanDetector")
+		local titanDetector = Character:WaitForChild("Humanoid"):WaitForChild("Invinsible")
 		if titanDetector then
 			titanDetector.Enabled = not getgenv().titandetection
 		end
