@@ -581,7 +581,7 @@ do
 	local humantrans = Options.Size2.Value
 
 	--local dmg = Options.Slider7.Value
-	local hooks = Options.Slider8.Value
+	--local hooks = Options.Slider8.Value
 	local ahspeed = Options.Slider9.Value
 
 	Slider1:OnChanged(function(Value)
