@@ -12,7 +12,7 @@ end)
 
 local function toggleTitanDetector()
 	if not Character:FindFirstChild("Shifter") then
-		local titanDetector = Character:WaitForChild("TitanDetector")
+		local titanDetector = Character:WaitForChild("Humanoid"):WaitForChild("Invinsible")
 		if titanDetector then
 			titanDetector.Enabled = not getgenv().titandetection
 		end
@@ -40,6 +40,7 @@ getgenv().InfStamina = false
 getgenv().DamageSpoof = false
 getgenv().NoGear = false
 getgenv().hood = false
+--getgenv().hoodkey = false
 getgenv().fire = false
 getgenv().ESP = false
 getgenv().HumanHitbox = false
@@ -200,6 +201,7 @@ do
 	local HookTimeBool = Tabs.Main:AddToggle("Hooktime", {Title = "Infinite Hook Time", Default = false })
 	local UnlockSkillsBool = Tabs.Main:AddToggle("UnlockSkill", {Title = "Unlock Skills", Default = false, Description = "☉ boosts your hook range & attack speed aswell"})
 	local HoodBool = Tabs.Main:AddToggle("Hood", {Title = "Dont Lose Hood", Default = false, Description = "☉ if your damaged you wont lose your hood" })
+	--local HoodKeyBool = Tabs.Main:AddToggle("HoodKey", {Title = "Hood Keybind", Default = false, Description = "☉ lets you quickly put on & take off your hood" })
 	local FireBool = Tabs.Main:AddToggle("Fire", {Title = "Anti-Burn", Default = false, })
 	local CannonBool = Tabs.Main:AddToggle("Cannon", {Title = "No Cooldown Cannon", Default = false, })
 	local BladeSpamBool = Tabs.Main:AddToggle("BladeSpam", {Title = "Blade Throw Spam", Default = false, Description = "☉ You need rage mode activated for this" })
@@ -1187,6 +1189,10 @@ do
 			HoodRemote.Name = "LoseHoodEvent"
 		end
 	end)
+	
+	--[[HoodKeyBool:OnChanged(function()
+		getgenv().hoodkey = Options.HoodKey
+	end)]]
 	
 	FireBool:OnChanged(function()
 		getgenv().fire = Options.Fire.Value
