@@ -71,6 +71,8 @@ elseif Executor == "Solara" then
 	ExecutorText = "Solara"
 elseif Executor == "Synapse Z" then
 	ExecutorText = "Synapse Z"
+elseif Executor == "AWP" then
+	ExecutorText = "AWP"
 else
 	ExecutorText = "Unknown"
 end
