@@ -20,9 +20,9 @@ end)
 
 local function toggleTitanDetector()
 	if not Character:FindFirstChild("Shifter") then
-		local titanDetector = Character:WaitForChild("Humanoid"):WaitForChild("Invinsible")
+		local titanDetector = Character:WaitForChild("TitanDetector")
 		if titanDetector then
-			titanDetector.Value = not getgenv().titandetection
+			titanDetector.Enabled = not getgenv().titandetection
 		end
 	end
 end
@@ -236,7 +236,7 @@ do
 	local FireBool = Tabs.Main:AddToggle("Fire", {Title = "Anti-Burn", Default = false, })
 	local CannonBool = Tabs.Main:AddToggle("Cannon", {Title = "No Cooldown Cannon", Default = false, })
 	local BladeSpamBool = Tabs.Main:AddToggle("BladeSpam", {Title = "Blade Throw Spam", Default = false, Description = "☉ You need rage mode activated for this" })
-	--[[local HookSlider = Tabs.Main:AddSlider("Slider8", {
+	local HookSlider = Tabs.Main:AddSlider("Slider8", {
 		Title = "Hooks Range",
 		Default = 160,
 		Min = 100,
@@ -245,7 +245,7 @@ do
 		Callback = function(Value)
 
 		end
-	})]]
+	})
 	local NoCooldownBool = Tabs.Main:AddToggle("Nocooldown", {Title = "No Cooldown", Default = false })
 	local AntiHookBool = Tabs.Main:AddToggle("antihook", {Title = "Anti Hook", Default = false })
 	local AntiHookSlider = Tabs.Main:AddSlider("Slider9", {
@@ -581,7 +581,7 @@ do
 	local humantrans = Options.Size2.Value
 
 	--local dmg = Options.Slider7.Value
-	--local hooks = Options.Slider8.Value
+	local hooks = Options.Slider8.Value
 	local ahspeed = Options.Slider9.Value
 
 	Slider1:OnChanged(function(Value)
@@ -611,9 +611,9 @@ do
 	--[[Slider7:OnChanged(function(Value)
 		dmg = Options.Slider7.Value
 	end)]]
-	--[[HookSlider:OnChanged(function(Value)
+	HookSlider:OnChanged(function(Value)
 		hooks = Options.Slider8.Value
-	end)]]
+	end)
 
 	Leg1:OnChanged(function(Value)
 		legx = Options.Leg1.Value
@@ -1513,7 +1513,7 @@ do
 			end
 		end
 
-		--[[if not Character:FindFirstChild("Shifter") then
+		if not Character:FindFirstChild("Shifter") then
 			local humanoid = Character:WaitForChild("Humanoid")
 			local gear = humanoid:WaitForChild("Gear")
 			local upgrades = gear:WaitForChild("Upgrades")
@@ -1524,7 +1524,7 @@ do
 			else
 				return
 			end
-		end]]
+		end
 
 		if getgenv().InfiniteGas then
 			Character:WaitForChild("Humanoid"):WaitForChild("Gear"):WaitForChild("Gas").Value = 2000
