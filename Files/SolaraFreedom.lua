@@ -169,6 +169,7 @@ local Animations = {
 	["Hype"] = 3695333486,
 	["Spinner"] = 7921684457,
 	["Jaw Walk"] = 7018026891,
+	["Yoga"] = 7466046574,
 }
 
 local Window = Fluent:CreateWindow({
