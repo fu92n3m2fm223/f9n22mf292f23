@@ -235,7 +235,7 @@ do
 	local UnlockSkillsBool = Tabs.Main:AddToggle("UnlockSkill", {Title = "Unlock Skills", Default = false, })
 	local HoodBool = Tabs.Main:AddToggle("Hood", {Title = "Dont Lose Hood", Default = false, Description = "☉ if your damaged you wont lose your hood" })
 	local FireBool = Tabs.Main:AddToggle("Fire", {Title = "Anti-Burn", Default = false, })
-	local CannonBool = Tabs.Main:AddToggle("Cannon", {Title = "No Cooldown Cannon", Default = false, })
+	--local CannonBool = Tabs.Main:AddToggle("Cannon", {Title = "No Cooldown Cannon", Default = false, })
 	local BladeSpamBool = Tabs.Main:AddToggle("BladeSpam", {Title = "Blade Throw Spam", Default = false, Description = "☉ You need rage mode activated for this" })
 	--[[local HookSlider = Tabs.Main:AddSlider("Slider8", {
 		Title = "Hooks Range",
@@ -1102,7 +1102,7 @@ do
 		end)
 	end)
 	
-	CannonBool:OnChanged(function()
+	--[[CannonBool:OnChanged(function()
 		getgenv().cannoncd = Options.Cannon.Value
 		game:GetService("UserInputService").InputBegan:Connect(function(Input, GPE)
 			if GPE then return end
@@ -1112,7 +1112,7 @@ do
 				end
 			end
 		end)
-	end)
+	end)]]
 	
 	BladeSpamBool:OnChanged(function()
 		getgenv().bladespam = Options.BladeSpam.Value
@@ -1335,6 +1335,8 @@ do
 		})
 	end
 	
+	ESP.Load()
+	
 	local function initializeCartESP()
 		for _, Cart in pairs(workspace:WaitForChild("OnGameHorses"):GetChildren()) do
 			if string.find(Cart.Name, "Carriage") then
@@ -1355,8 +1357,6 @@ do
 			end
 		end
 	end
-
-	ESP.Load()
 
 	local ESPBool = Tabs.Fifth:AddToggle("ESP", {Title = "ESP", Default = false, })
 	local ESPBoxBool = Tabs.Fifth:AddToggle("ESPBox", {Title = "Boxes", Default = false, })
@@ -1524,6 +1524,12 @@ do
 		
 		if Fluent.Unloaded then
 			ESP.Unload()
+		end
+		
+		if Character:FindFirstChild("Shifter") then
+			for _, v in pairs(Player.PlayerGui:WaitForChild("SkillsGui"):GetChildren()) do
+				v.Enabled = false
+			end
 		end
 		
 		if ahspeed == 1 then
