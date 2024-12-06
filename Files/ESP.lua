@@ -31,7 +31,7 @@ local getChildren = workspace.GetChildren;
 local toOrientation = CFrame.identity.ToOrientation;
 local pointToObjectSpace = CFrame.identity.PointToObjectSpace;
 local lerpColor = Color3.new().Lerp;
-local min2 = Vector2.zero.Min;
+local min2 = Vector2.zero.Min
 local max2 = Vector2.zero.Max;
 local lerp2 = Vector2.zero.Lerp;
 local min3 = Vector3.zero.Min;
@@ -730,11 +730,36 @@ function EspInterface.getWeapon(player)
 end
 
 function EspInterface.isFriendly(player)
-	return player.Team and player.Team == localPlayer.Team;
+	if player.Team and player.Team == localPlayer.Team then
+		if player.Team.Name == "Rogue" and localPlayer.Team.Name == "Rogue" then
+			return false
+		end
+
+		local isPlayerWarrior = false
+
+		for _, v in pairs(workspace.PlayersDataFolder:GetChildren()) do
+			if v.Name == player.Name and v:FindFirstChild("Warrior") and v.Warrior.Value == true then
+				isPlayerWarrior = true
+				break
+			end
+		end
+
+		if isPlayerWarrior then
+			return false
+		end
+
+		return true
+	end
+
+	return false
 end
 
 function EspInterface.getTeamColor(player)
-	return player.Team and player.Team.TeamColor and player.Team.TeamColor.Color;
+	if player.Team and player.Team.TeamColor then
+		return player.Team.TeamColor.Color
+	end
+
+	return Color3.fromRGB(128, 128, 128)
 end
 
 function EspInterface.getCharacter(player)
