@@ -1580,26 +1580,28 @@ do
 
 			if horseHumanoid then
 				if horseHumanoid.Health > 0 then
-					local horseOwner = horseHumanoid.Owner.Value
+					if horseHumanoid.Owner then
+						local horseOwner = horseHumanoid.Owner.Value
 
-					if horseOwner == Player.Name and horseHumanoid.Mounted.Value == true then
-						local config = horseHumanoid.Parent.Configuration
+						if horseOwner == Player.Name and horseHumanoid.Mounted.Value == true then
+							local config = horseHumanoid.Parent.Configuration
 
-						local god = horseHumanoid.God
-						local Stam = config.Stamina
-						local speed = config.CurrentSpeed
-						local maxspeed = config.MaxSpeed
+							local god = horseHumanoid.God
+							local Stam = config.Stamina
+							local speed = config.CurrentSpeed
+							local maxspeed = config.MaxSpeed
 
-						if god and getgenv().horsegod then
-							god.Value = Options.HorseGod.Value
-						end
+							if god and getgenv().horsegod then
+								god.Value = Options.HorseGod.Value
+							end
 
-						if Stam and getgenv().horsestam then
-							Stam.Value = 4000
-						end
+							if Stam and getgenv().horsestam then
+								Stam.Value = 4000
+							end
 
-						if speed and maxspeed then
-							maxspeed.Value = HorseSpeedVal
+							if speed and maxspeed then
+								maxspeed.Value = HorseSpeedVal
+							end
 						end
 					end
 				end
