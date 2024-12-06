@@ -132,14 +132,18 @@ function EspObject:_create(class, properties)
 end
 
 function EspObject:getDisplayName()
-	local character = self.player.Character
-	if character then
-		local shifter = findFirstChild(character, "Shifter")
-		if shifter and shifter:IsA("StringValue") then
-			return shifter.Value
+	if game.PlaceId == 11564374799 then
+		local character = self.player.Character
+		if character then
+			local shifter = findFirstChild(character, "Shifter")
+			if shifter and shifter:IsA("StringValue") then
+				return shifter.Value
+			end
 		end
+		return string.upper(self.player.DisplayName)
+	else
+		return string.upper(self.player.DisplayName)
 	end
-	return string.upper(self.player.DisplayName)
 end
 
 function EspObject:Construct()
@@ -747,28 +751,34 @@ function EspInterface.getWeapon(player)
 end
 
 function EspInterface.isFriendly(player)
-	if player.Team and player.Team == localPlayer.Team then
-		if player.Team.Name == "Rogue" and localPlayer.Team.Name == "Rogue" then
-			return false
-		end
-
-		local isPlayerWarrior = false
-
-		for _, v in pairs(workspace:WaitForChild("PlayersDataFolder"):GetChildren()) do
-			if v.Name == player.Name and v:FindFirstChild("Warrior") and v.Warrior.Value == true then
-				isPlayerWarrior = true
-				break
+	if game.PlaceId == 11564374799 or game.PlaceId == 11567929685 then
+		if player.Team and player.Team == localPlayer.Team then
+			if player.Team.Name == "Rogue" and localPlayer.Team.Name == "Rogue" then
+				return false
 			end
+			
+			if game.PlaceId == 11564374799 then
+				local isPlayerWarrior = false
+				
+				for _, v in pairs(workspace:WaitForChild("PlayersDataFolder"):GetChildren()) do
+					if v.Name == player.Name and v:FindFirstChild("Warrior") and v.Warrior.Value == true then
+						isPlayerWarrior = true
+						break
+					end
+				end
+				
+				if isPlayerWarrior then
+					return false
+				end
+			end
+
+			return true
 		end
 
-		if isPlayerWarrior then
-			return false
-		end
-
-		return true
+		return false
+	else
+		return player.Team and player.Team == localPlayer.Team;
 	end
-	
-	return false
 end
 
 function EspInterface.getTeamColor(player)
