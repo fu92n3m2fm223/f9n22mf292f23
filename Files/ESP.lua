@@ -202,11 +202,12 @@ function EspObject:Update()
 	self.weapon = interface.getWeapon(self.player);
 	self.enabled = self.options.enabled and self.character and not (#interface.whitelist > 0 and not find(interface.whitelist, self.player.UserId));
 
-	local head = self.enabled and findFirstChild(self.character, "Head");
-	if not head then
-		self.charCache = {};
-		self.onScreen = false;
-		return;
+	local head = nil;
+	if self.enabled then
+		head = findFirstChild(self.character, "Head");
+		if not head and findFirstChild(self.character, "Head") then
+			head = findFirstChild(findFirstChild(self.character, "Head"), "Head");
+		end
 	end
 
 	local _, onScreen, depth = worldToScreen(head.Position);
@@ -750,7 +751,7 @@ function EspInterface.isFriendly(player)
 
 		return true
 	end
-
+	
 	return false
 end
 
