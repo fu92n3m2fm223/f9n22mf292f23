@@ -1,4 +1,4 @@
---[[local Games = {
+local Games = {
 	FreedomWar = {
 		Lobby = 11534222714,
 		Campaign = 11564374799,
@@ -35,4 +35,4 @@ if game.PlaceId == Games.Shinden.Main then
 	end
 end
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/Debug.lua"))()]]
+loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/Debug.lua"))()
