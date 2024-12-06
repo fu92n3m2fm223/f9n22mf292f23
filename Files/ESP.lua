@@ -750,4 +750,4 @@ function EspInterface.getHealth(player)
 	return 100, 100;
 end
 
-return riotESP
+return EspInterface
