@@ -236,7 +236,7 @@ do
 	local FireBool = Tabs.Main:AddToggle("Fire", {Title = "Anti-Burn", Default = false, })
 	local CannonBool = Tabs.Main:AddToggle("Cannon", {Title = "No Cooldown Cannon", Default = false, })
 	local BladeSpamBool = Tabs.Main:AddToggle("BladeSpam", {Title = "Blade Throw Spam", Default = false, Description = "☉ You need rage mode activated for this" })
-	local HookSlider = Tabs.Main:AddSlider("Slider8", {
+	--[[local HookSlider = Tabs.Main:AddSlider("Slider8", {
 		Title = "Hooks Range",
 		Default = 160,
 		Min = 100,
@@ -245,8 +245,19 @@ do
 		Callback = function(Value)
 
 		end
-	})
+	})]]
 	local NoCooldownBool = Tabs.Main:AddToggle("Nocooldown", {Title = "No Cooldown", Default = false })
+	local TitanDmg = Tabs.Main:AddToggle("dmgslid", {Title = "Titan Damage", Default = false, Description = "☉ Allows you to constantly do the same damage to any titans you kill" })
+	local TitanDmgSlider = Tabs.Main:AddSlider("TitanDmgSlid", {
+		Title = "Damage",
+		Default = 670,
+		Min = 100,
+		Max = 1170,
+		Rounding = 0,
+		Callback = function(Value)
+
+		end
+	})
 	local AntiHookBool = Tabs.Main:AddToggle("antihook", {Title = "Anti Hook", Default = false })
 	local AntiHookSlider = Tabs.Main:AddSlider("Slider9", {
 		Title = "Anti Hook Speed",
@@ -580,8 +591,8 @@ do
 	local humanhitbox = Options.Size.Value
 	local humantrans = Options.Size2.Value
 
-	--local dmg = Options.Slider7.Value
-	local hooks = Options.Slider8.Value
+	local dmg = Options.TitanDmgSlid.Value
+	--local hooks = Options.Slider8.Value
 	local ahspeed = Options.Slider9.Value
 
 	Slider1:OnChanged(function(Value)
@@ -608,12 +619,12 @@ do
 	Trans2:OnChanged(function(Value)
 		trans2 = Options.Trans2.Value
 	end)
-	--[[Slider7:OnChanged(function(Value)
-		dmg = Options.Slider7.Value
-	end)]]
-	HookSlider:OnChanged(function(Value)
-		hooks = Options.Slider8.Value
+	TitanDmgSlider:OnChanged(function(Value)
+		dmg = Options.TitanDmgSlid.Value
 	end)
+	--[[HookSlider:OnChanged(function(Value)
+		hooks = Options.Slider8.Value
+	end)]]
 
 	Leg1:OnChanged(function(Value)
 		legx = Options.Leg1.Value
@@ -1196,6 +1207,11 @@ do
 			end)
 		end
 	end)
+	
+	TitanDmg:OnChanged(function()
+		getgenv().DamageSpoof = Options.dmgslid.Value
+	end)
+
 
 	NoCooldownBool:OnChanged(function()
 		getgenv().NoCooldown = Options.Nocooldown.Value
@@ -1352,6 +1368,18 @@ do
 			end
 		end)
 		toggleTitanDetector()
+	end)
+	
+	
+	local TitanDmgHook; TitanDmgHook = hookmetamethod(game, '__namecall', function(self, ...)
+		local args = {...}
+		local call_type = getnamecallmethod();
+		if call_type == 'FireServer' and tostring(self) == 'HitEvent' and getgenv().DamageSpoof then 
+			args[2] = dmg
+			return TitanDmgHook(self, unpack(args))
+		else
+			return TitanDmgHook(self, ...)
+		end
 	end)
 	
 	--local HorseGod = Tabs.Sixth:AddToggle("HorseGod", {Title = "Horse God Mode", Default = false, })
@@ -1513,7 +1541,7 @@ do
 			end
 		end
 
-		if not Character:FindFirstChild("Shifter") then
+		--[[if not Character:FindFirstChild("Shifter") then
 			local humanoid = Character:WaitForChild("Humanoid")
 			local gear = humanoid:WaitForChild("Gear")
 			local upgrades = gear:WaitForChild("Upgrades")
@@ -1524,7 +1552,7 @@ do
 			else
 				return
 			end
-		end
+		end]]
 
 		if getgenv().InfiniteGas then
 			Character:WaitForChild("Humanoid"):WaitForChild("Gear"):WaitForChild("Gas").Value = 2000
