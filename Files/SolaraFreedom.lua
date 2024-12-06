@@ -1284,6 +1284,8 @@ do
 		})
 	end
 	
+	ESP.Load()
+	
 	local function initializeCartESP()
 		for _, Cart in pairs(workspace:WaitForChild("OnGameHorses"):GetChildren()) do
 			if string.find(Cart.Name, "Carriage") then
@@ -1304,8 +1306,6 @@ do
 			end
 		end
 	end
-	
-	ESP.Load()
 	
 	local ESPBool = Tabs.Fifth:AddToggle("ESP", {Title = "ESP", Default = false, })
 	local ESPBoxBool = Tabs.Fifth:AddToggle("ESPBox", {Title = "Boxes", Default = false, })
