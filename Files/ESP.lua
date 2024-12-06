@@ -737,7 +737,7 @@ function EspInterface.isFriendly(player)
 
 		local isPlayerWarrior = false
 
-		for _, v in pairs(workspace.PlayersDataFolder:GetChildren()) do
+		for _, v in pairs(workspace:WaitForChild("PlayersDataFolder"):GetChildren()) do
 			if v.Name == player.Name and v:FindFirstChild("Warrior") and v.Warrior.Value == true then
 				isPlayerWarrior = true
 				break
