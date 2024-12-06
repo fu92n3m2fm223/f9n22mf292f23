@@ -131,6 +131,17 @@ function EspObject:_create(class, properties)
 	return drawing;
 end
 
+function EspObject:getDisplayName()
+	local character = self.player.Character
+	if character then
+		local shifter = findFirstChild(character, "Shifter")
+		if shifter and shifter:IsA("StringValue") then
+			return shifter.Value
+		end
+	end
+	return string.upper(self.player.DisplayName)
+end
+
 function EspObject:Construct()
 	self.charCache = {};
 	self.childCount = 0;
@@ -167,7 +178,7 @@ function EspObject:Construct()
 			healthBarOutline = self:_create("Line", { Thickness = 6, Visible = false }),
 			healthBar = self:_create("Line", { Thickness = 4, Visible = false }),
 			healthText = self:_create("Text", { Center = true, Visible = false }),
-			name = self:_create("Text", { Text = string.upper(self.player.DisplayName), Center = true, Visible = false }),
+			name = self:_create("Text", { Text = self:getDisplayName(), Center = true, Visible = false }),
 			distance = self:_create("Text", { Center = true, Visible = false }),
 			weapon = self:_create("Text", { Center = true, Visible = false }),
 		},
