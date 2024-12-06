@@ -201,7 +201,7 @@ do
 	local HoodBool = Tabs.Main:AddToggle("Hood", {Title = "Dont Lose Hood", Default = false, Description = "☉ if your damaged you wont lose your hood" })
 	--local HoodKeyBool = Tabs.Main:AddToggle("HoodKey", {Title = "Hood Keybind", Default = false, Description = "☉ lets you quickly put on & take off your hood" })
 	local FireBool = Tabs.Main:AddToggle("Fire", {Title = "Anti-Burn", Default = false, })
-	local CannonBool = Tabs.Main:AddToggle("Cannon", {Title = "No Cooldown Cannon", Default = false, })
+	--local CannonBool = Tabs.Main:AddToggle("Cannon", {Title = "No Cooldown Cannon", Default = false, })
 	local BladeSpamBool = Tabs.Main:AddToggle("BladeSpam", {Title = "Blade Throw Spam", Default = false, Description = "☉ You need rage mode activated for this" })
 	local NoCooldownBool = Tabs.Main:AddToggle("Nocooldown", {Title = "No Cooldown", Default = false })
 	local AntiHookBool = Tabs.Main:AddToggle("antihook", {Title = "Anti Hook", Default = false, })
@@ -1019,12 +1019,22 @@ do
 	UnlockSkillsBool:OnChanged(function()
 		getgenv().Skills = Options.UnlockSkill.Value
 		toggleSkills(getgenv().Skills)
+		if Character:FindFirstChild("Shifter") then
+			for _, v in pairs(Player.PlayerGui:WaitForChild("SkillsGui"):GetChildren()) do
+				v.Enabled = false
+			end
+		end
 		Player.CharacterAdded:Connect(function()
 			toggleSkills(getgenv().Skills)
+			if Character:FindFirstChild("Shifter") then
+				for _, v in pairs(Player.PlayerGui:WaitForChild("SkillsGui"):GetChildren()) do
+					v.Enabled = false
+				end
+			end
 		end)
 	end)
 	
-	CannonBool:OnChanged(function()
+	--[[CannonBool:OnChanged(function()
 		getgenv().cannoncd = Options.Cannon.Value
 		game:GetService("UserInputService").InputBegan:Connect(function(Input, GPE)
 			if GPE then return end
@@ -1042,7 +1052,7 @@ do
 				end
 			end
 		end)
-	end)
+	end)]]
 
 	HookTimeBool:OnChanged(function()
 		getgenv().InfiniteHookTime = Options.Hooktime.Value
@@ -1593,6 +1603,12 @@ do
 						end
 					end
 				end
+			end
+		end
+		
+		if Character:FindFirstChild("Shifter") then
+			for _, v in pairs(Player.PlayerGui:WaitForChild("SkillsGui"):GetChildren()) do
+				v.Enabled = false
 			end
 		end
 
