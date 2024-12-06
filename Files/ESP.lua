@@ -137,12 +137,12 @@ function EspObject:getDisplayName()
 		if character then
 			local shifter = findFirstChild(character, "Shifter")
 			if shifter and shifter:IsA("StringValue") then
-				return shifter.Value
+				return self.player.Name .." | ".. shifter.Value
 			end
 		end
-		return string.upper(self.player.Name)
+		return self.player.Name
 	else
-		return string.upper(self.player.Name)
+		return self.player.Name
 	end
 end
 
