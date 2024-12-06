@@ -210,11 +210,16 @@ function EspObject:Update()
 		end
 	end
 
-	local _, onScreen, depth = worldToScreen(head.Position);
-	self.onScreen = onScreen;
-	self.distance = depth;
+	if head then
+		local _, onScreen, depth = worldToScreen(head.Position);
+		self.onScreen = onScreen;
+		self.distance = depth;
+	else
+		self.onScreen = false;
+		self.distance = math.huge; -- Default to an infinite distance if no head is found
+	end
 
-	if interface.sharedSettings.limitDistance and depth > interface.sharedSettings.maxDistance then
+	if interface.sharedSettings.limitDistance and self.distance > interface.sharedSettings.maxDistance then
 		self.onScreen = false;
 	end
 
@@ -236,7 +241,7 @@ function EspObject:Update()
 
 		self.corners = calculateCorners(getBoundingBox(cache));
 	elseif self.options.offScreenArrow then
-		if interface.sharedSettings.limitDistance and depth > interface.sharedSettings.maxDistance then
+		if interface.sharedSettings.limitDistance and self.distance > interface.sharedSettings.maxDistance then
 			self.direction = nil
 			return
 		end
