@@ -205,8 +205,8 @@ function EspObject:Update()
 	local head = nil;
 	if self.enabled then
 		head = findFirstChild(self.character, "Head");
-		if not head and findFirstChild(self.character, "Head") then
-			head = findFirstChild(findFirstChild(self.character, "Head"), "Head");
+		if head and isA(head, "Model") then
+			head = findFirstChild(head, "Head");
 		end
 	end
 
