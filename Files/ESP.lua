@@ -140,9 +140,9 @@ function EspObject:getDisplayName()
 				return shifter.Value
 			end
 		end
-		return string.upper(self.player.DisplayName)
+		return string.upper(self.player.Name)
 	else
-		return string.upper(self.player.DisplayName)
+		return string.upper(self.player.Name)
 	end
 end
 
