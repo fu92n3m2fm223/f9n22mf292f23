@@ -666,7 +666,7 @@ do
 					local statsFolder = v:FindFirstChild("Stats")
 					if statsFolder and statsFolder:FindFirstChild("Time") then
 						clonedTime2 = statsFolder.Time:Clone()
-						clonedTime2.Parent = game:GetService("ReplicatedStorage")
+						clonedTime2.Parent = game:GetService("RobloxReplicatedStorage")
 						statsFolder.Time:Destroy()
 					end
 				end
