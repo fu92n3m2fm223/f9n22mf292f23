@@ -1497,6 +1497,16 @@ do
 			})
 		end
 	end)
+	
+	game:GetService("Players").PlayerRemoving:Connect(function(Player)
+		if table.find(StaffList, Player.UserId) and getgenv().staffnotify then
+			Fluent:Notify({
+				Title = "Tear",
+				Content = "Staff Member " .. Player.Name .. " Has Left",
+				Duration = 8
+			})
+		end
+	end)
 
 	game:GetService("RunService").RenderStepped:Connect(function()
 		if getgenv().MindlessNapeHitbox then
