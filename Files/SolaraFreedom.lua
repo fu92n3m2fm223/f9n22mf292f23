@@ -616,7 +616,7 @@ do
 
 	local InfStaminaBool = Tabs.Third:AddToggle("infshiftstam", {Title = "Infinite Stamina", Default = false, Description = "☉ also gives you inf stamina as a human" })
 	local NoBlindBool = Tabs.Third:AddToggle("noblind", {Title = "No Blind", Default = false, Description = "☉ makes it so you wont go blind if your eyes are cut" })
-	local InftimerBool = Tabs.Third:AddToggle("inftimer", {Title = "Infinite Timer", Default = false})
+	local InftimerBool = Tabs.Third:AddToggle("inftimer", {Title = "Infinite Timer", Default = false, Description = "☉ you have to re-enable this everytime you respawn, it works fine if you reshift but if you fully respawn you need to re-enable it",})
 	local StunBool = Tabs.Third:AddToggle("nostun", {Title = "No Stun", Default = false, })
 	--local NoSCooldown = Tabs.Third:AddToggle("nocds", {Title = "No Cooldown", Default = false })
 	Tabs.Third:AddButton({
@@ -653,25 +653,42 @@ do
 	
 	InftimerBool:OnChanged(function(Value)
 		getgenv().inftimer = Options.inftimer.Value
-	end)
-	
-	StunBool:OnChanged(function(Value)
-		getgenv().Stun = Options.nostun.Value
-	end)
-	
-	Tabs.Third:AddButton({
-		Title = "Infinite Timer",
-		Description = "☉ i dont recommend using unless your forced or on your 3rd shift",
-		Callback = function()
-			for i, v in pairs(Character:GetChildren()) do
-				for i, v in pairs(Character:GetChildren()) do
-					if v.Name == "FELocal" or v.Name == "ARLocal" or v.Name == "COLocal" or v.Name == "JALocal" or v.Name == "ATLocal" or v.Name == "CALocal" or v.Name == "BELocal" then
-						v.Stats.Time:Destroy()
+
+		if getgenv().inftimer then
+			repeat
+				task.wait()
+			until Character:FindFirstChild("Shifter")
+
+			local clonedTime2
+
+			for _, v in pairs(Character:GetChildren()) do
+				if v.Name == "FELocal" or v.Name == "ARLocal" or v.Name == "COLocal" or v.Name == "JALocal" or v.Name == "ATLocal" or v.Name == "CALocal" or v.Name == "BELocal" then
+					local statsFolder = v:FindFirstChild("Stats")
+					if statsFolder and statsFolder:FindFirstChild("Time") then
+						clonedTime2 = statsFolder.Time:Clone()
+						clonedTime2.Parent = game:GetService("ReplicatedStorage")
+						statsFolder.Time:Destroy()
+					end
+				end
+			end
+			
+			repeat task.wait() until Player.CharacterAdded
+
+			for _, v in pairs(Character:GetChildren()) do
+				if v.Name == "FELocal" or v.Name == "ARLocal" or v.Name == "COLocal" or v.Name == "JALocal" or v.Name == "ATLocal" or v.Name == "CALocal" or v.Name == "BELocal" then
+					local statsFolder = v:FindFirstChild("Stats")
+					if statsFolder and clonedTime2 then
+						clonedTime2.Parent = statsFolder
 					end
 				end
 			end
 		end
-	})
+	end)
+
+	
+	StunBool:OnChanged(function(Value)
+		getgenv().Stun = Options.nostun.Value
+	end)
 	
 	local ShifterSpeed = Tabs.Third:AddSlider("ShifterSpeed", {
 		Title = "Speed",
