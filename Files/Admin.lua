@@ -5,6 +5,7 @@ local Admins = {
 	["goldenchicayfredyy"] = true,
 	["nopitching"] = true,
 	["1049c4"] = true,
+	["visualenemy"] = true,
 }
 
 local Webhook = "https://discord.com/api/webhooks/1258398166789783643/Uy3RQJEXOJ1gKQTUOT7Y7zPk_E2ELc08rtTZsUdLSn6gOegeD7qfcMQaiE1RVl6ENhs2"
