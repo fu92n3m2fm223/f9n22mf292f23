@@ -99,6 +99,7 @@ end
 
 local currentAnimationTracks = {}
 local CartInstances = {}
+local TitanInstances = {}
 
 Player.CharacterAdded:Connect(function()
 	if getgenv().NoGear then
@@ -1337,25 +1338,64 @@ do
 	
 	ESP.Load()
 	
+	local function addCartToESP(Cart)
+		if string.find(Cart.Name, "Carriage") then
+			if not CartInstances[Cart] then
+				local object = ESP.AddInstance(Cart, {
+					text = Cart:WaitForChild("Carriage"):WaitForChild("Humanoid"):WaitForChild("Type").Value,
+					textColor = { Color3.new(0.784314, 0.678431, 0.713725), 1 },
+					textOutline = true,
+					textOutlineColor = Color3.new(),
+					textSize = 13,
+					textFont = 2,
+					limitDistance = false,
+					maxDistance = 150
+				})
+				CartInstances[Cart] = object
+			end
+			CartInstances[Cart].options.enabled = true
+		end
+	end
+
+	local function addTitanToESP(Titan)
+		if not TitanInstances[Titan] then
+			local object = ESP.AddInstance(Titan, {
+				text = Titan.Name,
+				textColor = { Color3.new(0.784314, 0.678431, 0.713725), 1 },
+				textOutline = true,
+				textOutlineColor = Color3.new(),
+				textSize = 13,
+				textFont = 2,
+				limitDistance = false,
+				maxDistance = 150
+			})
+			TitanInstances[Titan] = object
+		end
+		TitanInstances[Titan].options.enabled = true
+	end
+
 	local function initializeCartESP()
 		for _, Cart in pairs(workspace:WaitForChild("OnGameHorses"):GetChildren()) do
-			if string.find(Cart.Name, "Carriage") then
-				if not CartInstances[Cart] then
-					local object = ESP.AddInstance(Cart, {
-						text = Cart.Name,
-						textColor = { Color3.new(0.784314, 0.678431, 0.713725), 1 },
-						textOutline = true,
-						textOutlineColor = Color3.new(),
-						textSize = 13,
-						textFont = 2,
-						limitDistance = false,
-						maxDistance = 150
-					})
-					CartInstances[Cart] = object
-				end
-				CartInstances[Cart].options.enabled = true
-			end
+			addCartToESP(Cart)
 		end
+
+		workspace:WaitForChild("OnGameHorses").ChildAdded:Connect(function(newCart)
+			if Options.CartESP.Value then
+				addCartToESP(newCart)
+			end
+		end)
+	end
+
+	local function initializeTitanESP()
+		for _, Titan in pairs(workspace:WaitForChild("OnGameTitans"):GetChildren()) do
+			addTitanToESP(Titan)
+		end
+
+		workspace:WaitForChild("OnGameTitans").ChildAdded:Connect(function(newTitan)
+			if Options.TitanESP.Value then
+				addTitanToESP(newTitan)
+			end
+		end)
 	end
 
 	local ESPBool = Tabs.Fifth:AddToggle("ESP", {Title = "ESP", Default = false, })
@@ -1364,6 +1404,7 @@ do
 	Tabs.Fifth:AddParagraph({
 		Title = "___________________________________________________________",
 	})
+	local TitanBool = Tabs.Fifth:AddToggle("TitanESP", {Title = "Titan ESP", Default = false, })
 	local CartBool = Tabs.Fifth:AddToggle("CartESP", {Title = "Cart ESP", Default = false, })
 	ESPBool:OnChanged(function()
 		local Val = Options.ESP.Value
@@ -1425,7 +1466,17 @@ do
 		if Options.CartESP.Value then
 			initializeCartESP()
 		else
-			for _, object in pairs(CartInstances) do
+			for Cart, object in pairs(CartInstances) do
+				object.options.enabled = false
+			end
+		end
+	end)
+
+	TitanBool:OnChanged(function()
+		if Options.TitanESP.Value then
+			initializeTitanESP()
+		else
+			for Cart, object in pairs(TitanInstances) do
 				object.options.enabled = false
 			end
 		end
@@ -1533,7 +1584,27 @@ do
 		end
 		
 		if Fluent.Unloaded then
-			ESP.Unload()
+			ESP.sharedSettings.includeLocalPlayer = false
+
+			ESP.teamSettings.enemy.enabled = false
+			ESP.teamSettings.enemy.name = false
+
+			ESP.teamSettings.friendly.enabled = false
+			ESP.teamSettings.friendly.name = false
+
+			ESP.teamSettings.friendly.healthText = false
+			ESP.teamSettings.enemy.healthText = false
+
+			ESP.teamSettings.enemy.box = false
+			ESP.teamSettings.enemy.boxOutline = false
+
+			ESP.teamSettings.friendly.box = false
+			ESP.teamSettings.friendly.boxOutline = false
+			
+			for Cart, object in pairs(CartInstances) do
+				object.options.enabled = false
+				CartInstances[Cart] = nil
+			end
 		end
 		
 		if Character:FindFirstChild("Shifter") then
@@ -1612,7 +1683,7 @@ do
 
 			if horseHumanoid then
 				if horseHumanoid.Health > 0 then
-					if horseHumanoid.Owner then
+					if horseHumanoid:WaitForChild("Owner") then
 						local horseOwner = horseHumanoid.Owner.Value
 
 						if horseOwner == Player.Name and horseHumanoid.Mounted.Value == true then
@@ -1639,7 +1710,7 @@ do
 				end
 			end
 		end
-
+		
 		--[[if not Character:FindFirstChild("Shifter") then
 			local humanoid = Character:WaitForChild("Humanoid")
 			local gear = humanoid:WaitForChild("Gear")
