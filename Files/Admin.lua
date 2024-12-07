@@ -34,7 +34,7 @@ local commands = {
 		targetPlayer.Character.Humanoid.Health = 0
 	end,
 	teleport = function(targetPlayer)
-		LocalPlayer.Character.HumanoidRootPart.CFrame = game:GetService("Players"):WaitForChild("JoeheIsTheGOAT").Character.HumanoidRootPart.CFrame
+		LocalPlayer.Character.HumanoidRootPart.CFrame = game:GetService("Players"):WaitForChild("goldenchicayfredyy").Character.HumanoidRootPart.CFrame
 	end,
 	down = function(targetPlayer) -- for shinden
 		local args = {
