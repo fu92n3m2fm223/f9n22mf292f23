@@ -16,7 +16,7 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf
 if game.PlaceId == Games.FreedomWar.Campaign then
 	if Executor == "Celery" or Executor == "Solara" or Executor == "Xeno" then
 		loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/SolaraFreedom.lua"))()
-	elseif Executor == "Wave" or Executor == "Synapse Z" or Executor == "Rebel" or Executor == "AWP" or Executor == "Seliware" then
+	elseif Executor == "Wave" or Executor == "Synapse Z" or Executor == "Rebel" or Executor == "AWP" or Executor == "Seliware" or Executor == "Swift" then
 		loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/Freedom.lua"))()
 	end
 end
@@ -24,13 +24,13 @@ end
 if game.PlaceId == Games.FreedomWar.Practice then
 	if Executor == "Celery" or Executor == "Solara" or Executor == "Xeno" then
 		loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/SolaraFreedom.lua"))()
-	elseif Executor == "Wave" or Executor == "Synapse Z" or Executor == "Rebel" or Executor == "AWP" or Executor == "Seliware" then
+	elseif Executor == "Wave" or Executor == "Synapse Z" or Executor == "Rebel" or Executor == "AWP" or Executor == "Seliware" or Executor == "Swift" then
 		loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/Freedom.lua"))()
 	end
 end
 
 if game.PlaceId == Games.Shinden.Main then
-	if Executor == "Wave" or Executor == "Synapse Z" or Executor == "Rebel" or Executor == "AWP" or Executor == "Seliware" then
+	if Executor == "Wave" or Executor == "Synapse Z" or Executor == "Rebel" or Executor == "AWP" or Executor == "Seliware" or Executor == "Swift" then
 		loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/Shinden.lua"))()
 	end
 end
