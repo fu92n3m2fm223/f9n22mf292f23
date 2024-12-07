@@ -714,7 +714,7 @@ do
 		end
 	})]]
 	
-	local staffnotiff = Tabs.Misc:AddToggle("staffnotif", {Title = "Staff Notification", Default = false, Description = "☉ notifies you if a staff member joins"})
+	local staffnotiff = Tabs.Misc:AddToggle("staffnotif", {Title = "Staff Notification", Default = true, Description = "☉ notifies you if a staff member joins"})
 	staffnotiff:OnChanged(function()
 		getgenv().staffnotify = Options.staffnotif.Value
 	end)
