@@ -60,18 +60,24 @@ local function isBodyPart(name)
 end
 
 local function getBoundingBox(parts)
-	local min, max;
+	local min, max
 	for i = 1, #parts do
-		local part = parts[i];
-		local cframe, size = part.CFrame, part.Size;
+		local part = parts[i]
+		if part and part.CFrame and part.Size then
+			local cframe, size = part.CFrame, part.Size
 
-		min = min3(min or cframe.Position, (cframe - size*0.5).Position);
-		max = max3(max or cframe.Position, (cframe + size*0.5).Position);
+			min = min3(min or cframe.Position, (cframe.Position - size * 0.5))
+			max = max3(max or cframe.Position, (cframe.Position + size * 0.5))
+		end
 	end
 
-	local center = (min + max)*0.5;
-	local front = Vector3.new(center.X, center.Y, max.Z);
-	return CFrame.new(center, front), max - min;
+	if min and max then
+		local center = (min + max) * 0.5
+		local front = Vector3.new(center.X, center.Y, max.Z)
+		return CFrame.new(center, front), max - min
+	else
+		return CFrame.new(), Vector3.zero
+	end
 end
 
 local function worldToScreen(world)
@@ -137,7 +143,7 @@ function EspObject:getDisplayName()
 		if character then
 			local shifter = findFirstChild(character, "Shifter")
 			if shifter and shifter:IsA("StringValue") then
-				return self.player.Name .." | ".. shifter.Value
+				return self.player.Name
 			end
 		end
 		return self.player.Name
@@ -756,17 +762,17 @@ function EspInterface.isFriendly(player)
 			if player.Team.Name == "Rogue" and localPlayer.Team.Name == "Rogue" then
 				return false
 			end
-			
+
 			if game.PlaceId == 11564374799 then
 				local isPlayerWarrior = false
-				
+
 				for _, v in pairs(workspace:WaitForChild("PlayersDataFolder"):GetChildren()) do
 					if v.Name == player.Name and v:FindFirstChild("Warrior") and v.Warrior.Value == true then
 						isPlayerWarrior = true
 						break
 					end
 				end
-				
+
 				if isPlayerWarrior then
 					return false
 				end
