@@ -66,18 +66,18 @@ local function getBoundingBox(parts)
 		if part and part.CFrame and part.Size then
 			local cframe, size = part.CFrame, part.Size
 
-			min = min3(min or cframe.Position, (cframe.Position - size * 0.5))
-			max = max3(max or cframe.Position, (cframe.Position + size * 0.5))
+			min = min and min3(min, (cframe.Position - size * 0.5)) or (cframe.Position - size * 0.5)
+			max = max and max3(max, (cframe.Position + size * 0.5)) or (cframe.Position + size * 0.5)
 		end
 	end
 
-	if min and max then
-		local center = (min + max) * 0.5
-		local front = Vector3.new(center.X, center.Y, max.Z)
-		return CFrame.new(center, front), max - min
-	else
-		return CFrame.new(), Vector3.zero
+	if not min or not max then
+		return nil, nil
 	end
+
+	local center = (min + max) * 0.5
+	local front = Vector3.new(center.X, center.Y, max.Z)
+	return CFrame.new(center, front), max - min
 end
 
 local function worldToScreen(world)
