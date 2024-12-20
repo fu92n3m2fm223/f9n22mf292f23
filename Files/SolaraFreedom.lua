@@ -40,7 +40,7 @@ getgenv().InfStamina = false
 getgenv().DamageSpoof = false
 getgenv().NoGear = false
 getgenv().hood = false
---getgenv().hoodkey = false
+getgenv().hoodkey = false
 getgenv().fire = false
 getgenv().HumanHitbox = false
 getgenv().horsegod = false
@@ -200,7 +200,20 @@ do
 	local HookTimeBool = Tabs.Main:AddToggle("Hooktime", {Title = "Infinite Hook Time", Default = false })
 	local UnlockSkillsBool = Tabs.Main:AddToggle("UnlockSkill", {Title = "Unlock Skills", Default = false, Description = "☉ boosts your hook range & attack speed aswell"})
 	local HoodBool = Tabs.Main:AddToggle("Hood", {Title = "Dont Lose Hood", Default = false, Description = "☉ if your damaged you wont lose your hood" })
-	--local HoodKeyBool = Tabs.Main:AddToggle("HoodKey", {Title = "Hood Keybind", Default = false, Description = "☉ lets you quickly put on & take off your hood" })
+	local HoodKeyBool = Tabs.Main:AddToggle("HoodKey", {Title = "Quick Hood", Default = false, Description = "☉ lets you quickly put on & take off your hood, you can change your keybind below" })
+	local HoodKeybind
+	HoodKeybind = Tabs.Main:AddKeybind("HoodKeybind", {
+		Title = "Hood Keybind",
+		Mode = "Toggle",
+		Default = "LeftControl",
+		Callback = function(Value)
+			
+		end,
+
+		ChangedCallback = function(New)
+
+		end
+	})
 	local FireBool = Tabs.Main:AddToggle("Fire", {Title = "Anti-Burn", Default = false, })
 	--local CannonBool = Tabs.Main:AddToggle("Cannon", {Title = "No Cooldown Cannon", Default = false, })
 	local BladeSpamBool = Tabs.Main:AddToggle("BladeSpam", {Title = "Blade Throw Spam", Default = false, Description = "☉ You need rage mode activated for this" })
@@ -1224,9 +1237,31 @@ do
 		end
 	end)
 	
-	--[[HoodKeyBool:OnChanged(function()
-		getgenv().hoodkey = Options.HoodKey
-	end)]]
+	HoodKeyBool:OnChanged(function()
+		getgenv().hoodkey = Options.HoodKey.Value
+	end)
+	
+	game:GetService("UserInputService").InputBegan:Connect(function(Input, GPE)
+		if not GPE and getgenv().hoodkey == true and Input.KeyCode == Enum.KeyCode[HoodKeybind.Value] then
+			if Character:FindFirstChild("Humanoid") and workspace:WaitForChild("PlayersDataFolder")[Player.Name].Cloak.Value == 1 then
+				if Character:FindFirstChild("Humanoid"):WaitForChild("Hood").Value == false then
+					local ohString1 = "Hood"
+					local ohNil2 = nil
+					local ohBoolean3 = true
+
+					Player:WaitForChild("PlayerGui"):WaitForChild("MenuGui").ClothesChange:InvokeServer(ohString1, ohNil2, ohBoolean3)
+				else
+					local ohString1 = "Hood"
+					local ohNil2 = nil
+					local ohBoolean3 = false
+
+					Player:WaitForChild("PlayerGui"):WaitForChild("MenuGui").ClothesChange:InvokeServer(ohString1, ohNil2, ohBoolean3)
+				end
+			else
+				return
+			end
+		end
+	end)
 	
 	FireBool:OnChanged(function()
 		getgenv().fire = Options.Fire.Value
