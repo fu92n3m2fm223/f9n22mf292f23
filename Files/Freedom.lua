@@ -2,12 +2,8 @@ local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
 local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/refs/heads/main/Files/ESP.lua"))()
-getgenv().bypass = false
 
-if getgenv().bypass == false then
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/Pixeluted/adoniscries/main/Source.lua",true))()
-	getgenv().bypass = true
-end
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Pixeluted/adoniscries/main/Source.lua",true))()
 
 task.wait(0.7)
 
@@ -59,6 +55,7 @@ getgenv().hood = false
 getgenv().fire = false
 getgenv().ESP = false
 getgenv().HumanHitbox = false
+getgenv().hoodkey = false
 getgenv().soldieresp = false
 getgenv().warrioreesp = false
 getgenv().interior = false
@@ -235,6 +232,20 @@ do
 	local HookTimeBool = Tabs.Main:AddToggle("Hooktime", {Title = "Infinite Hook Time", Default = false })
 	local UnlockSkillsBool = Tabs.Main:AddToggle("UnlockSkill", {Title = "Unlock Skills", Default = false, })
 	local HoodBool = Tabs.Main:AddToggle("Hood", {Title = "Dont Lose Hood", Default = false, Description = "☉ if your damaged you wont lose your hood" })
+	local HoodKeyBool = Tabs.Main:AddToggle("HoodKey", {Title = "Quick Hood", Default = false, Description = "☉ lets you quickly put on & take off your hood, you can change your keybind below" })
+	local HoodKeybind
+	HoodKeybind = Tabs.Main:AddKeybind("HoodKeybind", {
+		Title = "Hood Keybind",
+		Mode = "Toggle",
+		Default = "LeftControl",
+		Callback = function(Value)
+
+		end,
+
+		ChangedCallback = function(New)
+
+		end
+	})
 	local FireBool = Tabs.Main:AddToggle("Fire", {Title = "Anti-Burn", Default = false, })
 	--local CannonBool = Tabs.Main:AddToggle("Cannon", {Title = "No Cooldown Cannon", Default = false, })
 	local BladeSpamBool = Tabs.Main:AddToggle("BladeSpam", {Title = "Blade Throw Spam", Default = false, Description = "☉ You need rage mode activated for this" })
@@ -1259,6 +1270,32 @@ do
 		else
 			local HoodRemote = Instance.new("RemoteEvent", Player.PlayerGui.LowHealthGui)
 			HoodRemote.Name = "LoseHoodEvent"
+		end
+	end)
+	
+	HoodKeyBool:OnChanged(function()
+		getgenv().hoodkey = Options.HoodKey.Value
+	end)
+
+	game:GetService("UserInputService").InputBegan:Connect(function(Input, GPE)
+		if not GPE and getgenv().hoodkey == true and Input.KeyCode == Enum.KeyCode[HoodKeybind.Value] then
+			if Character:FindFirstChild("Humanoid") and workspace:WaitForChild("PlayersDataFolder")[Player.Name].Cloak.Value == 1 then
+				if Character:FindFirstChild("Humanoid"):WaitForChild("Hood").Value == false then
+					local ohString1 = "Hood"
+					local ohNil2 = nil
+					local ohBoolean3 = true
+
+					Player:WaitForChild("PlayerGui"):WaitForChild("MenuGui").ClothesChange:InvokeServer(ohString1, ohNil2, ohBoolean3)
+				else
+					local ohString1 = "Hood"
+					local ohNil2 = nil
+					local ohBoolean3 = false
+
+					Player:WaitForChild("PlayerGui"):WaitForChild("MenuGui").ClothesChange:InvokeServer(ohString1, ohNil2, ohBoolean3)
+				end
+			else
+				return
+			end
 		end
 	end)
 	
