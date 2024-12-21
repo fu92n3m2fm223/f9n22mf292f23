@@ -1675,7 +1675,7 @@ do
 		end
 
 		if getgenv().noblind then
-			for _, Object in pairs(Player.PlayerGui:FindFirstChild("ShiftersGui"):GetDescendants()) do
+			for _, Object in pairs(Player.PlayerGui:WaitForChild("ShiftersGui"):GetDescendants()) do
 				if Object.Name == "LBlind" or Object.Name == "RBlind" or Object.Name == "FullBlind" then
 					if Object.Visible == true then
 						Object.Visible = false
