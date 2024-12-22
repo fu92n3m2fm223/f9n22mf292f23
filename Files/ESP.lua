@@ -86,20 +86,26 @@ local function worldToScreen(world)
 end
 
 local function calculateCorners(cframe, size)
-	local corners = create(#VERTICES);
-	for i = 1, #VERTICES do
-		corners[i] = worldToScreen((cframe + size*0.5*VERTICES[i]).Position);
-	end
+    if not cframe or not size then return {} end
 
-	local min = min2(viewportSize, unpack(corners));
-	local max = max2(Vector2.zero, unpack(corners));
-	return {
-		corners = corners,
-		topLeft = Vector2.new(floor(min.X), floor(min.Y)),
-		topRight = Vector2.new(floor(max.X), floor(min.Y)),
-		bottomLeft = Vector2.new(floor(min.X), floor(max.Y)),
-		bottomRight = Vector2.new(floor(max.X), floor(max.Y))
-	};
+    local corners = create(#VERTICES)
+    for i = 1, #VERTICES do
+        local vertex = VERTICES[i]
+        if vertex and cframe and size then
+            local corner = cframe + size * 0.5 * vertex
+            corners[i] = worldToScreen(corner.Position)
+        end
+    end
+
+    local min = min2(viewportSize, unpack(corners))
+    local max = max2(Vector2.zero, unpack(corners))
+    return {
+        corners = corners,
+        topLeft = Vector2.new(floor(min.X), floor(min.Y)),
+        topRight = Vector2.new(floor(max.X), floor(min.Y)),
+        bottomLeft = Vector2.new(floor(min.X), floor(max.Y)),
+        bottomRight = Vector2.new(floor(max.X), floor(max.Y))
+    }
 end
 
 local function rotateVector(vector, radians)
