@@ -215,7 +215,7 @@ do
 		end
 	})
 	local FireBool = Tabs.Main:AddToggle("Fire", {Title = "Anti-Burn", Default = false, })
-	--local CannonBool = Tabs.Main:AddToggle("Cannon", {Title = "No Cooldown Cannon", Default = false, })
+	local CannonBool = Tabs.Main:AddToggle("Cannon", {Title = "No Cooldown Cannon", Default = false, })
 	local BladeSpamBool = Tabs.Main:AddToggle("BladeSpam", {Title = "Blade Throw Spam", Default = false, Description = "☉ You need rage mode activated for this" })
 	local NoCooldownBool = Tabs.Main:AddToggle("Nocooldown", {Title = "No Cooldown", Default = false })
 	local AntiHookBool = Tabs.Main:AddToggle("antihook", {Title = "Anti Hook", Default = false, })
@@ -1065,17 +1065,15 @@ do
 		end)
 	end)
 	
-	--[[CannonBool:OnChanged(function()
+	CannonBool:OnChanged(function()
 		getgenv().cannoncd = Options.Cannon.Value
 		game:GetService("UserInputService").InputBegan:Connect(function(Input, GPE)
 			if GPE then return end
 			if Input.KeyCode == Enum.KeyCode.F then
 				if getgenv().cannoncd then
 					if Character:WaitForChild("Humanoid").SeatPart then
-						if Character:WaitForChild("Humanoid").SeatPart.Parent.Name == "GroundCannon" then
-							workspace:WaitForChild("OnGameGroundCannons"):WaitForChild("GroundCannon"):WaitForChild("TurretControlScript"):WaitForChild("FireEvent"):InvokeServer()
-						elseif Character:WaitForChild("Humanoid").SeatPart.Parent.Name == "WallCannon" then
-							workspace:WaitForChild("Karanese"):WaitForChild("DistrictWallRail"):WaitForChild("WallCannon"):WaitForChild("TurretControlScript"):WaitForChild("FireEvent"):InvokeServer()
+						if Character:WaitForChild("Humanoid").SeatPart.Parent.Name == "GroundCannon" or Character:WaitForChild("Humanoid").SeatPart.Parent.Name == "WallCannon" then
+							Character:WaitForChild("Humanoid").SeatPart.Parent:WaitForChild("TurretControlScript"):WaitForChild("FireEvent"):InvokeServer()
 						end
 					else
 						return
@@ -1083,7 +1081,7 @@ do
 				end
 			end
 		end)
-	end)]]
+	end)
 
 	HookTimeBool:OnChanged(function()
 		getgenv().InfiniteHookTime = Options.Hooktime.Value
