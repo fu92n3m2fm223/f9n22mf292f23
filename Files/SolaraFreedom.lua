@@ -182,14 +182,14 @@ local Window = Fluent:CreateWindow({
 })
 
 local Tabs = {
-	Main = Window:AddTab({ Title = "Human", Icon = "" }),
-	Third = Window:AddTab({ Title = "Shifter", Icon = "" }),
-	Secondary = Window:AddTab({ Title = "Hitboxes", Icon = "" }),
-	Sixth = Window:AddTab({ Title = "Horse", Icon = "" }),
-	Fifth = Window:AddTab({ Title = "ESP", Icon = "" }),
-	Fourth = Window:AddTab({ Title = "Animations", Icon = "" }),
-	Misc = Window:AddTab({ Title = "Misc", Icon = "" }),
-	Settings = Window:AddTab({ Title = "Settings", Icon = "" })
+	Main = Window:AddTab({ Title = "Human", Icon = "rbxassetid://10709752906" }),
+	Third = Window:AddTab({ Title = "Shifter", Icon = "rbxassetid://10709805144" }),
+	Secondary = Window:AddTab({ Title = "Hitboxes", Icon = "rbxassetid://10734953451" }),
+	Sixth = Window:AddTab({ Title = "Horse", Icon = "rbxassetid://10709775704" }),
+	Fifth = Window:AddTab({ Title = "ESP", Icon = "rbxassetid://10747384037" }),
+	Fourth = Window:AddTab({ Title = "Animations", Icon = "rbxassetid://10709789686" }),
+	Misc = Window:AddTab({ Title = "Misc", Icon = "rbxassetid://10709782497" }),
+	Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
 }
 
 do
