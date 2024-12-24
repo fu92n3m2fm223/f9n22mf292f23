@@ -994,6 +994,9 @@ do
 				if input.KeyCode == Enum.KeyCode.P and Character:FindFirstChild("Shifter") and not gameProcessed then
 					local scriptWithEvent = findLocalScriptWithName(Character, "Local")
 					if scriptWithEvent then
+						for i,v in pairs(Character:WaitForChild("Humanoid"):GetPlayingAnimationTracks()) do
+							v:Stop()
+						end
 						local args = {
 							[1] = false,
 							[3] = false
