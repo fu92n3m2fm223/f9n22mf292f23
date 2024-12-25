@@ -14,17 +14,17 @@ local Executor = identifyexecutor()
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/Admin.lua"))()
 if game.PlaceId == Games.FreedomWar.Campaign then
-	if Executor == "Celery" or Executor == "Solara" or Executor == "Selene" or Executor == "Xeno" then
+	if Executor == "Celery" or Executor == "Solara" or Executor == "Swift" or Executor == "Xeno" then
 		loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/SolaraFreedom.lua"))()
-	elseif Executor == "Wave" or Executor == "Synapse Z" or Executor == "Rebel" or Executor == "AWP" or Executor == "Seliware" or Executor == "Swift" or Executor == "SirHurt" then
+	elseif Executor == "Wave" or Executor == "Synapse Z" or Executor == "Rebel" or Executor == "AWP" or Executor == "Seliware" or Executor == "SirHurt" then
 		loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/Freedom.lua"))()
 	end
 end
 
 if game.PlaceId == Games.FreedomWar.Practice then
-	if Executor == "Celery" or Executor == "Solara" or Executor == "Selene" or Executor == "Xeno" then
+	if Executor == "Celery" or Executor == "Solara" or Executor == "Swift" or Executor == "Xeno" then
 		loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/SolaraFreedom.lua"))()
-	elseif Executor == "Wave" or Executor == "Synapse Z" or Executor == "Rebel" or Executor == "AWP" or Executor == "Seliware" or Executor == "Swift" or Executor == "SirHurt" then
+	elseif Executor == "Wave" or Executor == "Synapse Z" or Executor == "Rebel" or Executor == "AWP" or Executor == "Seliware" or Executor == "SirHurt" then
 		loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/Freedom.lua"))()
 	end
 end
