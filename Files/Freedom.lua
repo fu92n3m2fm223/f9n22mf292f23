@@ -111,6 +111,10 @@ Player.CharacterAdded:Connect(function()
 	if getgenv().fire then
 		Character:WaitForChild("Humanoid").Burning:Destroy()
 	end
+	
+	if getgenv().hood then
+		Player:WaitForChild("PlayerGui"):WaitForChild("LowHealthGui").LoseHoodEvent:Destroy()
+	end
 end)
 
 local function findLocalFunction(scriptName, functionName)
@@ -544,6 +548,9 @@ do
 
 		end
 	})
+	Tabs.Secondary:AddParagraph({
+		Title = "_______________________________________________________________",
+	})
 	local HumanHitbox = Tabs.Secondary:AddToggle("Human", {Title = "Human Hitbox", Default = false })
 	HumanHitbox:OnChanged(function()
 		getgenv().HumanHitbox = Options.Human.Value
@@ -565,7 +572,7 @@ do
 		Title = "Size",
 		Default = 3,
 		Min = 3,
-		Max = 10,
+		Max = 20,
 		Rounding = 1,
 		Callback = function(Value)
 
@@ -1235,12 +1242,12 @@ do
 						TensionL = APGear:FindFirstChild("HookTensionL")
 					end
 
-					if TensionR then
-						TensionR.Value = 0
+					if TensionR.Value > 60 then
+						TensionR.Value = 60
 					end
 
-					if TensionL then
-						TensionL.Value = 0
+					if TensionL.Value > 60 then
+						TensionL.Value = 60
 					end
 				end
 			end
@@ -1254,30 +1261,52 @@ do
 			local debounce1 = false
 			local maindebounce = false
 
-			Character:WaitForChild("HumanoidRootPart").ChildAdded:Connect(function(child)
-				if getgenv().AntiHook then
-					if (child.Name == "EAttachment" or child.Name == "QAttachment") then
-						if not debounce1 then
-							debounce1 = true
-							if not maindebounce then
-								maindebounce = true
-								local args = {[1] = Character:WaitForChild("HumanoidRootPart")}
-								if Character:FindFirstChild("APGear") then
-									Character:WaitForChild("APGear").Events.MoreEvents.CastQKey:FireServer(unpack(args))
-								else
-									Character:WaitForChild("Gear").Events.MoreEvents.CastQKey:FireServer(unpack(args))
+			local function setupCharacter(character)
+				Character:WaitForChild("HumanoidRootPart").ChildAdded:Connect(function(child)
+					if getgenv().AntiHook then
+						if (child.Name == "EAttachment" or child.Name == "QAttachment") then
+							if not debounce1 then
+								debounce1 = true
+								if not maindebounce then
+									maindebounce = true
+									local args = { [1] = Character:WaitForChild("HumanoidRootPart") }
+									local gear = Character:FindFirstChild("APGear") or Character:WaitForChild("Gear")
+									local hookL = Character:WaitForChild("Humanoid").Gear:FindFirstChild("HookTensionL").Value
+									local hookR = Character:WaitForChild("Humanoid").Gear:FindFirstChild("HookTensionR").Value
+									local hook
+
+									if hookL == 0 and hookR == 0 then
+										hook = Character:WaitForChild("Gear").Events.MoreEvents.CastEKey
+									elseif hookR > 0 and hookL == 0 then
+										hook = Character:WaitForChild("Gear").Events.MoreEvents.CastQKey
+									elseif hookR == 0 and hookL > 0 then
+										hook = Character:WaitForChild("Gear").Events.MoreEvents.CastEKey
+									end
+
+									if hook then
+										hook:FireServer(unpack(args))
+									end
+
+									task.delay(0.05, function()
+										maindebounce = false
+									end)
 								end
-								task.delay(0.05, function()
-									maindebounce = false
-								end)
+								task.wait(getgenv().AHSpeed)
+								debounce1 = false
+							else
+								child:Destroy()
 							end
-							task.wait(getgenv().AHSpeed)
-							debounce1 = false
-						else
-							child:Destroy()
 						end
 					end
-				end
+				end)
+			end
+
+			if Character then
+				setupCharacter(Character)
+			end
+
+			Player.CharacterAdded:Connect(function(character)
+				setupCharacter(character)
 			end)
 		end
 	end)
@@ -1285,7 +1314,6 @@ do
 	TitanDmg:OnChanged(function()
 		getgenv().DamageSpoof = Options.dmgslid.Value
 	end)
-
 
 	NoCooldownBool:OnChanged(function()
 		getgenv().NoCooldown = Options.Nocooldown.Value
