@@ -97,6 +97,10 @@ Player.CharacterAdded:Connect(function()
 	if getgenv().fire then
 		Character:WaitForChild("Humanoid").Burning:Destroy()
 	end
+	
+	if getgenv().hood then
+		Player:WaitForChild("PlayerGui"):WaitForChild("LowHealthGui").LoseHoodEvent:Destroy()
+	end
 end)
 
 local currentAnimationTracks = {}
@@ -516,7 +520,7 @@ do
 		Title = "Size",
 		Default = 3,
 		Min = 3,
-		Max = 10,
+		Max = 20,
 		Rounding = 1,
 		Callback = function(Value)
 
@@ -1102,12 +1106,12 @@ do
 						TensionL = APGear:FindFirstChild("HookTensionL")
 					end
 
-					if TensionR then
-						TensionR.Value = 0
+					if TensionR.Value > 60 then
+						TensionR.Value = 60
 					end
 
-					if TensionL then
-						TensionL.Value = 0
+					if TensionL.Value > 60 then
+						TensionL.Value = 60
 					end
 				end
 			end
@@ -1122,19 +1126,31 @@ do
 			local maindebounce = false
 
 			local function setupCharacter(character)
-				character:WaitForChild("HumanoidRootPart").ChildAdded:Connect(function(child)
+				Character:WaitForChild("HumanoidRootPart").ChildAdded:Connect(function(child)
 					if getgenv().AntiHook then
 						if (child.Name == "EAttachment" or child.Name == "QAttachment") then
 							if not debounce1 then
 								debounce1 = true
 								if not maindebounce then
 									maindebounce = true
-									local args = {[1] = character:WaitForChild("HumanoidRootPart")}
-									if character:FindFirstChild("APGear") then
-										character:WaitForChild("APGear").Events.MoreEvents.CastQKey:FireServer(unpack(args))
-									else
-										character:WaitForChild("Gear").Events.MoreEvents.CastQKey:FireServer(unpack(args))
+									local args = { [1] = Character:WaitForChild("HumanoidRootPart") }
+									local gear = Character:FindFirstChild("APGear") or Character:WaitForChild("Gear")
+									local hookL = Character:WaitForChild("Humanoid").Gear:FindFirstChild("HookTensionL").Value
+									local hookR = Character:WaitForChild("Humanoid").Gear:FindFirstChild("HookTensionR").Value
+									local hook
+
+									if hookL == 0 and hookR == 0 then
+										hook = Character:WaitForChild("Gear").Events.MoreEvents.CastEKey
+									elseif hookR > 0 and hookL == 0 then
+										hook = Character:WaitForChild("Gear").Events.MoreEvents.CastQKey
+									elseif hookR == 0 and hookL > 0 then
+										hook = Character:WaitForChild("Gear").Events.MoreEvents.CastEKey
 									end
+
+									if hook then
+										hook:FireServer(unpack(args))
+									end
+
 									task.delay(0.05, function()
 										maindebounce = false
 									end)
