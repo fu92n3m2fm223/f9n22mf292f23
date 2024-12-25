@@ -228,7 +228,6 @@ do
 	local GasBool = Tabs.Main:AddToggle("InfiniteGas", {Title = "Infinite Gas", Default = false })
 	local BladesBool = Tabs.Main:AddToggle("InfiniteBlades", {Title = "Infinite Blades", Default = false })
 	local AutoreloadBool = Tabs.Main:AddToggle("Autoreload", {Title = "Autoreload Blades", Default = false })
-	local BladeLossBool = Tabs.Main:AddToggle("bladeloss", {Title = "Infinite Blade Durability", Default = false })
 	local TitanDetectionBool = Tabs.Main:AddToggle("Titandetection", {Title = "Disable Titan Detection", Default = false })
 	local HookTimeBool = Tabs.Main:AddToggle("Hooktime", {Title = "Infinite Hook Time", Default = false })
 	local UnlockSkillsBool = Tabs.Main:AddToggle("UnlockSkill", {Title = "Unlock Skills", Default = false, })
@@ -1131,16 +1130,6 @@ do
 		if getgenv().InfiniteBlades then
 			while getgenv().InfiniteBlades do
 				Character:WaitForChild("Humanoid"):WaitForChild("Gear"):WaitForChild("Blades").Value = 8
-				task.wait(0.01)
-			end
-		end
-	end)
-
-	BladeLossBool:OnChanged(function()
-		getgenv().bladeloss = Options.bladeloss.Value
-		if getgenv().bladeloss then
-			while getgenv().bladeloss do
-				Character:WaitForChild("Humanoid"):WaitForChild("Gear").BladeDurability.Value = 4
 				task.wait(0.01)
 			end
 		end
