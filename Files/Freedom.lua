@@ -61,6 +61,7 @@ getgenv().warrioreesp = false
 getgenv().interior = false
 getgenv().horsegod = false
 getgenv().horsestam = false
+getgenv().instanthook = false
 getgenv().bladespam = false
 getgenv().cannoncd = false
 getgenv().noblind = false
@@ -259,6 +260,7 @@ do
 
 		end
 	})]]
+	local InstantHookBool = Tabs.Main:AddToggle("InstantHook", {Title = "Instant Hook", Default = false })
 	local NoCooldownBool = Tabs.Main:AddToggle("Nocooldown", {Title = "No Cooldown", Default = false })
 	local TitanDmg = Tabs.Main:AddToggle("dmgslid", {Title = "Titan Damage", Default = false, Description = "☉ Allows you to constantly do the same damage to any titans you kill" })
 	local TitanDmgSlider = Tabs.Main:AddSlider("TitanDmgSlid", {
@@ -1061,6 +1063,67 @@ do
 
 	GasBool:OnChanged(function()
 		getgenv().InfiniteGas = Options.InfiniteGas.Value
+	end)
+	
+	local function setupOdmInstantHook()
+		local normal = {}
+		local four, two = nil, nil
+		local savefunc
+
+		for i, func in next, getreg() do
+			if type(func) ~= 'function' then continue end
+			local info = debug.getinfo(func)
+			if not info.source:find('Gear') then continue end
+			local upValues = debug.getupvalues(func)
+			local constants = debug.getconstants(func)
+			for up, value in next, constants do
+				if value == 400 or value == 200 then
+					if value == 400 then four = up end
+					if value == 200 then two = up end
+					savefunc = func
+				end
+			end
+		end
+
+		return savefunc, four, two
+	end
+
+	local function waitforodm()
+		local odmHookFunction, odmHookOne, odmHookTwo = setupOdmInstantHook()
+		while not (odmHookFunction and odmHookOne and odmHookTwo) do
+			task.wait()
+			odmHookFunction, odmHookOne, odmHookTwo = setupOdmInstantHook()
+		end
+		return odmHookFunction, odmHookOne, odmHookTwo
+	end
+
+	local odmHookFunction, odmHookOne, odmHookTwo = waitforodm()
+
+	InstantHookBool:OnChanged(function()
+		getgenv().instanthook = Options.InstantHook.Value
+		if odmHookFunction and odmHookOne and odmHookTwo then
+			if getgenv().instanthook then
+				debug.setconstant(odmHookFunction, odmHookOne, 10000000)
+				debug.setconstant(odmHookFunction, odmHookTwo, 10000000)
+			else
+				debug.setconstant(odmHookFunction, odmHookOne, 400)
+				debug.setconstant(odmHookFunction, odmHookTwo, 200)
+			end
+		end
+	end)
+
+	Player.CharacterAdded:Connect(function(character)
+		repeat task.wait() until character:FindFirstChild("Gear")
+		odmHookFunction, odmHookOne, odmHookTwo = waitforodm()
+		if odmHookFunction and odmHookOne and odmHookTwo then
+			if getgenv().instanthook then
+				debug.setconstant(odmHookFunction, odmHookOne, 10000000)
+				debug.setconstant(odmHookFunction, odmHookTwo, 10000000)
+			else
+				debug.setconstant(odmHookFunction, odmHookOne, 400)
+				debug.setconstant(odmHookFunction, odmHookTwo, 200)
+			end
+		end
 	end)
 
 	BladesBool:OnChanged(function()
