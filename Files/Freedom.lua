@@ -907,11 +907,25 @@ do
 			game:GetService("ReplicatedStorage"):WaitForChild("Wear3DClothesEvent"):FireServer(unpack(args))
 		else
 			if not Character:FindFirstChild("Shifter") then
-				local args = {
-					[1] = Player.Team.Name
-				}
+				if Player.Team.Name == "Rogue" then
+					local args = {
+						[1] = "Soldiers"
+					}
 
-				game:GetService("ReplicatedStorage"):WaitForChild("Wear3DClothesEvent"):FireServer(unpack(args))
+					game:GetService("ReplicatedStorage"):WaitForChild("Wear3DClothesEvent"):FireServer(unpack(args))
+					task.wait(0.3)
+					local ohString1 = "Cloak"
+					local ohNil2 = nil
+					local ohBoolean3 = true
+
+					Player:WaitForChild("PlayerGui"):WaitForChild("MenuGui").ClothesChange:InvokeServer(ohString1, ohNil2, ohBoolean3)
+				else
+					local args = {
+						[1] = Player.Team.Name
+					}
+
+					game:GetService("ReplicatedStorage"):WaitForChild("Wear3DClothesEvent"):FireServer(unpack(args))
+				end
 			end
 		end
 	end)
