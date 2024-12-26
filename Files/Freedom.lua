@@ -109,7 +109,7 @@ Player.CharacterAdded:Connect(function()
 	end
 	
 	if getgenv().fire then
-		Character:WaitForChild("Humanoid").Burning:Destroy()
+		Character:WaitForChild("Humanoid"):WaitForChild("Burning"):Destroy()
 	end
 	
 	if getgenv().hood then
