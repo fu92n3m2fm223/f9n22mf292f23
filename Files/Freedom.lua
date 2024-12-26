@@ -14,18 +14,11 @@ Player.CharacterAdded:Connect(function(New)
 	Character = New
 end)
 
-local function toggleTitanDetector()
-	if not Character:FindFirstChild("Shifter") then
-		local titanDetector = Character:WaitForChild("TitanDetector")
-		if titanDetector then
-			titanDetector.Enabled = not getgenv().titandetection
-		end
-	end
-end
+local Options = Fluent.Options
 
-Player.CharacterAdded:Connect(function()
-	toggleTitanDetector()
-end)
+local function toggleTitanDetector()
+	Character:WaitForChild("Humanoid"):WaitForChild("Invinsible").Value = Options.Titandetection.Value
+end
 
 local originalKick = hookfunction(Player.Kick, function()
 	return nil
@@ -226,8 +219,6 @@ local Tabs = {
 	Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
 }
 
-local Options = Fluent.Options
-
 do
 	local GasBool = Tabs.Main:AddToggle("InfiniteGas", {Title = "Infinite Gas", Default = false })
 	local BladesBool = Tabs.Main:AddToggle("InfiniteBlades", {Title = "Infinite Blades", Default = false })
@@ -264,6 +255,18 @@ do
 		end
 	})]]
 	local InstantHookBool = Tabs.Main:AddToggle("InstantHook", {Title = "Instant Hook", Default = false })
+	InstantHookKeybind = Tabs.Main:AddKeybind("InstantHookKey", {
+		Title = "Instant Hook Keybind",
+		Mode = "Toggle",
+		Default = "LeftControl",
+		Callback = function(Value)
+
+		end,
+
+		ChangedCallback = function(New)
+
+		end
+	})
 	local NoCooldownBool = Tabs.Main:AddToggle("Nocooldown", {Title = "No Cooldown", Default = false })
 	local TitanDmg = Tabs.Main:AddToggle("dmgslid", {Title = "Titan Damage", Default = false, Description = "☉ Allows you to constantly do the same damage to any titans you kill" })
 	local TitanDmgSlider = Tabs.Main:AddSlider("TitanDmgSlid", {
@@ -1145,6 +1148,22 @@ do
 			end
 		end
 	end)
+	
+	game:GetService("UserInputService").InputBegan:Connect(function(Input, GPE)
+		if not GPE and Input.KeyCode == Enum.KeyCode[InstantHookKeybind.Value] then
+			Options.InstantHook.Value = not Options.InstantHook.Value
+			getgenv().instanthook = Options.InstantHook.Value
+			Options.InstantHook:SetValue(Options.InstantHook.Value)
+
+			local status = getgenv().instanthook and "enabled" or "disabled"
+
+			Fluent:Notify({
+				Title = "Tear",
+				Content = "Instant Hook has been " .. status .. ".",
+				Duration = 3
+			})
+		end
+	end)
 
 	BladesBool:OnChanged(function()
 		getgenv().InfiniteBlades = Options.InfiniteBlades.Value
@@ -1871,6 +1890,8 @@ do
 		if getgenv().InfiniteGas then
 			Character:WaitForChild("Humanoid"):WaitForChild("Gear"):WaitForChild("Gas").Value = 2000
 		end
+		
+		Character:WaitForChild("Humanoid"):WaitForChild("Invinsible").Value = Options.Titandetection.Value
 		
 		if getgenv().HumanHitbox then
 			local localPlayer = game:GetService("Players").LocalPlayer
