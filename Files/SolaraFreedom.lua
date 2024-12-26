@@ -10,18 +10,11 @@ Player.CharacterAdded:Connect(function(New)
 	Character = New
 end)
 
-local function toggleTitanDetector()
-	if not Character:FindFirstChild("Shifter") then
-		local titanDetector = Character:WaitForChild("TitanDetector")
-		if titanDetector then
-			titanDetector.Enabled = not getgenv().titandetection
-		end
-	end
-end
+local Options = Fluent.Options
 
-Player.CharacterAdded:Connect(function()
-	toggleTitanDetector()
-end)
+local function toggleTitanDetector()
+	Character:WaitForChild("Humanoid"):WaitForChild("Invinsible").Value = Options.Titandetection.Value
+end
 
 getgenv().InfiniteGas = false
 getgenv().InfiniteBlades = false
@@ -82,8 +75,6 @@ for _, Player in pairs(game:GetService("Players"):GetPlayers()) do
 		})
 	end
 end
-
-local Options = Fluent.Options
 
 Player.CharacterAdded:Connect(function()
 	if getgenv().NoGear then
@@ -1612,6 +1603,8 @@ do
 				end
 			end
 		end
+		
+		Character:WaitForChild("Humanoid"):WaitForChild("Invinsible").Value = Options.Titandetection.Value
 		
 		if getgenv().HumanHitbox then
 			local localPlayer = game:GetService("Players").LocalPlayer
