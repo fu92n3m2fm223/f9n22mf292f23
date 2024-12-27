@@ -282,101 +282,56 @@ function EspObject:Update()
 end
 
 function EspObject:Render()
-	local onScreen = self.onScreen or false
-	local enabled = self.enabled or false
-	local visible = self.drawings.visible
-	local hidden = self.drawings.hidden
-	local box3d = self.drawings.box3d
-	local interface = self.interface
-	local options = self.options or {}
-	local corners = self.corners or {}
+	local onScreen = self.onScreen or false;
+	local enabled = self.enabled or false;
+	local visible = self.drawings.visible;
+	local hidden = self.drawings.hidden;
+	local box3d = self.drawings.box3d;
+	local interface = self.interface;
+	local options = self.options;
+	local corners = self.corners;
 
-	local function updateDrawing(drawing, position, size, color, transparency)
-		if drawing and position and size and color and transparency then
-			drawing.Position = position
-			drawing.Size = size
-			drawing.Color = color
-			drawing.Transparency = transparency
-		end
+	visible.box.Visible = enabled and onScreen and options.box;
+	visible.boxOutline.Visible = visible.box.Visible and options.boxOutline;
+	if visible.box.Visible then
+		local box = visible.box;
+		box.Position = corners.topLeft;
+		box.Size = corners.bottomRight - corners.topLeft;
+		box.Color = parseColor(self, options.boxColor[1]);
+		box.Transparency = options.boxColor[2];
+
+		local boxOutline = visible.boxOutline;
+		boxOutline.Position = box.Position;
+		boxOutline.Size = box.Size;
+		boxOutline.Color = parseColor(self, options.boxOutlineColor[1], true);
+		boxOutline.Transparency = options.boxOutlineColor[2];
 	end
 
-	local boxVisible = enabled and onScreen and options.box
-	visible.box.Visible = boxVisible
-	visible.boxOutline.Visible = boxVisible and options.boxOutline
-
-	if boxVisible then
-		local topLeft = corners.topLeft or Vector2.new(0, 0)
-		local bottomRight = corners.bottomRight or Vector2.new(0, 0)
-		local size = bottomRight - topLeft
-
-		updateDrawing(
-			visible.box,
-			topLeft,
-			size,
-			parseColor(self, options.boxColor and options.boxColor[1] or Color3.new(1, 1, 1)),
-			options.boxColor and options.boxColor[2] or 1
-		)
-
-		updateDrawing(
-			visible.boxOutline,
-			topLeft,
-			size,
-			parseColor(self, options.boxOutlineColor and options.boxOutlineColor[1] or Color3.new(0, 0, 0), true),
-			options.boxOutlineColor and options.boxOutlineColor[2] or 1
-		)
+	visible.boxFill.Visible = enabled and onScreen and options.boxFill;
+	if visible.boxFill.Visible then
+		local boxFill = visible.boxFill;
+		boxFill.Position = corners.topLeft;
+		boxFill.Size = corners.bottomRight - corners.topLeft;
+		boxFill.Color = parseColor(self, options.boxFillColor[1]);
+		boxFill.Transparency = options.boxFillColor[2];
 	end
 
-	local boxFillVisible = enabled and onScreen and options.boxFill
-	visible.boxFill.Visible = boxFillVisible
+	visible.healthBar.Visible = enabled and onScreen and options.healthBar;
+	visible.healthBarOutline.Visible = visible.healthBar.Visible and options.healthBarOutline;
+	if visible.healthBar.Visible then
+		local barFrom = corners.topLeft - HEALTH_BAR_OFFSET;
+		local barTo = corners.bottomLeft - HEALTH_BAR_OFFSET;
 
-	if boxFillVisible then
-		local topLeft = corners.topLeft or Vector2.new(0, 0)
-		local bottomRight = corners.bottomRight or Vector2.new(0, 0)
-		local size = bottomRight - topLeft
+		local healthBar = visible.healthBar;
+		healthBar.To = barTo;
+		healthBar.From = lerp2(barTo, barFrom, self.health/self.maxHealth);
+		healthBar.Color = lerpColor(options.dyingColor, options.healthyColor, self.health/self.maxHealth);
 
-		updateDrawing(
-			visible.boxFill,
-			topLeft,
-			size,
-			parseColor(self, options.boxFillColor and options.boxFillColor[1] or Color3.new(1, 1, 1)),
-			options.boxFillColor and options.boxFillColor[2] or 0.5
-		)
-	end
-
-	local healthBarVisible = enabled and onScreen and options.healthBar
-	visible.healthBar.Visible = healthBarVisible
-	visible.healthBarOutline.Visible = healthBarVisible and options.healthBarOutline
-
-	if healthBarVisible then
-		local topLeft = corners.topLeft or Vector2.new(0, 0)
-		local bottomLeft = corners.bottomLeft or Vector2.new(0, 0)
-		local barFrom = topLeft - Vector2.new(5, 0)
-		local barTo = bottomLeft - Vector2.new(5, 0)
-
-		local healthPercent = math.clamp(self.health / self.maxHealth, 0, 1)
-
-		if visible.healthBar then
-			visible.healthBar.From = barTo
-			visible.healthBar.To = barTo:Lerp(barFrom, healthPercent)
-			visible.healthBar.Color = parseColor(self, options.healthyColor or Color3.new(0, 1, 0))
-		end
-
-		if visible.healthBarOutline then
-			visible.healthBarOutline.From = barFrom - Vector2.new(1, 1)
-			visible.healthBarOutline.To = barTo + Vector2.new(1, 1)
-			visible.healthBarOutline.Color = parseColor(self, options.healthBarOutlineColor and options.healthBarOutlineColor[1] or Color3.new(0, 0, 0), true)
-			visible.healthBarOutline.Transparency = options.healthBarOutlineColor and options.healthBarOutlineColor[2] or 1
-		end
-	end
-
-	local nameVisible = enabled and onScreen and options.name
-	visible.name.Visible = nameVisible
-
-	if nameVisible and visible.name and corners.topLeft and corners.topRight then
-		visible.name.Position = (corners.topLeft + corners.topRight) * 0.5 - Vector2.new(0, visible.name.TextBounds.Y) - Vector2.new(0, 5)
-		visible.name.Text = self.name or "Unknown"
-		visible.name.Color = parseColor(self, options.nameColor and options.nameColor[1] or Color3.new(1, 1, 1))
-		visible.name.Transparency = options.nameColor and options.nameColor[2] or 1
+		local healthBarOutline = visible.healthBarOutline;
+		healthBarOutline.To = barTo + HEALTH_BAR_OUTLINE_OFFSET;
+		healthBarOutline.From = barFrom - HEALTH_BAR_OUTLINE_OFFSET;
+		healthBarOutline.Color = parseColor(self, options.healthBarOutlineColor[1], true);
+		healthBarOutline.Transparency = options.healthBarOutlineColor[2];
 	end
 
 	visible.name.Visible = enabled and onScreen and options.name;
