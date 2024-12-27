@@ -1096,7 +1096,7 @@ do
 		for i, func in next, getreg() do
 			if type(func) ~= 'function' then continue end
 			local info = debug.getinfo(func)
-			if not info.source:find('Gear') then continue end
+			if not info.source:find('Gear') or not info.source:find('APGear') then continue end
 			local upValues = debug.getupvalues(func)
 			local constants = debug.getconstants(func)
 			for up, value in next, constants do
