@@ -560,7 +560,7 @@ do
 		if getgenv().HumanHitbox == false then
 			for _, Victim in pairs(game:GetService("Players"):GetPlayers()) do
 				if Victim.Character and not Victim.Character:FindFirstChild("Shifter") then
-					local Hitbox = Victim.Character:WaitForChild("HumanoidRootPart"):WaitForChild("BulletsHitbox")
+					local Hitbox = Victim.Character:FindFirstChild("HumanoidRootPart"):FindFirstChild("BulletsHitbox")
 					if Hitbox then
 						Hitbox.Size = Vector3.new(3, 3, 2)
 						Hitbox.Transparency = 1
@@ -1096,7 +1096,8 @@ do
 		for i, func in next, getreg() do
 			if type(func) ~= 'function' then continue end
 			local info = debug.getinfo(func)
-			if not info.source:find('Gear') or not info.source:find('APGear') then continue end
+			if not (info.source:find('Gear') or info.source:find('APGear')) then continue end
+			if not info.source:find('Gear') then continue end
 			local upValues = debug.getupvalues(func)
 			local constants = debug.getconstants(func)
 			for up, value in next, constants do
@@ -1111,16 +1112,24 @@ do
 		return savefunc, four, two
 	end
 
-	local function waitforodm()
-		local odmHookFunction, odmHookOne, odmHookTwo = setupOdmInstantHook()
-		while not (odmHookFunction and odmHookOne and odmHookTwo) do
-			task.wait()
-			odmHookFunction, odmHookOne, odmHookTwo = setupOdmInstantHook()
-		end
-		return odmHookFunction, odmHookOne, odmHookTwo
+	local function waitforodm(callback)
+		task.spawn(function()
+			local odmHookFunction, odmHookOne, odmHookTwo = setupOdmInstantHook()
+			while not (odmHookFunction and odmHookOne and odmHookTwo) do
+				task.wait()
+				odmHookFunction, odmHookOne, odmHookTwo = setupOdmInstantHook()
+			end
+			callback(odmHookFunction, odmHookOne, odmHookTwo)
+		end)
 	end
 
-	local odmHookFunction, odmHookOne, odmHookTwo = waitforodm()
+	local odmHookFunction, odmHookOne, odmHookTwo
+
+	waitforodm(function(func, one, two)
+		odmHookFunction = func
+		odmHookOne = one
+		odmHookTwo = two
+	end)
 
 	InstantHookBool:OnChanged(function()
 		getgenv().instanthook = Options.InstantHook.Value
@@ -1132,22 +1141,29 @@ do
 				debug.setconstant(odmHookFunction, odmHookOne, 400)
 				debug.setconstant(odmHookFunction, odmHookTwo, 200)
 			end
+		else
+			return
 		end
 	end)
 
 	Player.CharacterAdded:Connect(function(character)
 		repeat task.wait() until character:FindFirstChild("Gear")
-		odmHookFunction, odmHookOne, odmHookTwo = waitforodm()
-		if odmHookFunction and odmHookOne and odmHookTwo then
-			if getgenv().instanthook then
-				debug.setconstant(odmHookFunction, odmHookOne, 10000000)
-				debug.setconstant(odmHookFunction, odmHookTwo, 10000000)
-			else
-				debug.setconstant(odmHookFunction, odmHookOne, 400)
-				debug.setconstant(odmHookFunction, odmHookTwo, 200)
+		waitforodm(function(func, one, two)
+			odmHookFunction = func
+			odmHookOne = one
+			odmHookTwo = two
+			if odmHookFunction and odmHookOne and odmHookTwo then
+				if getgenv().instanthook then
+					debug.setconstant(odmHookFunction, odmHookOne, 10000000)
+					debug.setconstant(odmHookFunction, odmHookTwo, 10000000)
+				else
+					debug.setconstant(odmHookFunction, odmHookOne, 400)
+					debug.setconstant(odmHookFunction, odmHookTwo, 200)
+				end
 			end
-		end
+		end)
 	end)
+
 	
 	game:GetService("UserInputService").InputBegan:Connect(function(Input, GPE)
 		if not GPE and Input.KeyCode == Enum.KeyCode[InstantHookKeybind.Value] then
@@ -1241,14 +1257,9 @@ do
 
 			if team ~= teams.Choosing then
 				if team == teams.Soldiers then
-					local gear = Character:FindFirstChild("Gear")
+					local gear = Character:FindFirstChild("Gear") or Character:FindFirstChild("APGear")
 					if gear and gear:FindFirstChild("Events") and gear.Events:FindFirstChild("MoreEvents") and gear.Events.MoreEvents:FindFirstChild("BladeThrow") then
 						gear.Events.MoreEvents.BladeThrow:FireServer(unpack(args))
-					end
-				elseif team == teams["Interior Police"] then
-					local apGear = Character:FindFirstChild("APGear")
-					if apGear and apGear:FindFirstChild("Events") and apGear.Events:FindFirstChild("MoreEvents") and apGear.Events.MoreEvents:FindFirstChild("BladeThrow") then
-						apGear.Events.MoreEvents.BladeThrow:FireServer(unpack(args))
 					end
 				end
 			end
