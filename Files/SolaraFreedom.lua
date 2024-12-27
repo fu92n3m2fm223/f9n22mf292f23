@@ -1230,14 +1230,9 @@ do
 
 			if team ~= teams.Choosing then
 				if team == teams.Soldiers then
-					local gear = Character:FindFirstChild("Gear")
+					local gear = Character:FindFirstChild("Gear") or Character:FindFirstChild("APGear")
 					if gear and gear:FindFirstChild("Events") and gear.Events:FindFirstChild("MoreEvents") and gear.Events.MoreEvents:FindFirstChild("BladeThrow") then
 						gear.Events.MoreEvents.BladeThrow:FireServer(unpack(args))
-					end
-				elseif team == teams["Interior Police"] then
-					local apGear = Character:FindFirstChild("APGear")
-					if apGear and apGear:FindFirstChild("Events") and apGear.Events:FindFirstChild("MoreEvents") and apGear.Events.MoreEvents:FindFirstChild("BladeThrow") then
-						apGear.Events.MoreEvents.BladeThrow:FireServer(unpack(args))
 					end
 				end
 			end
