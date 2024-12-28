@@ -1281,7 +1281,7 @@ do
 		getgenv().fire = Options.Fire.Value
 
 		if getgenv().fire then
-			Character:WaitForChild("Humanoid").Burning:Destroy()
+			Character:WaitForChild("Humanoid"):WaitForChild("Burning"):Destroy()
 		else
 			local BurnBool = Instance.new("BoolValue", Character:WaitForChild("Humanoid"))
 			BurnBool.Name = "Burning"
