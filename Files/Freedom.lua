@@ -1872,25 +1872,27 @@ do
 
 						if horseOwner == Player.Name and horseHumanoid.Mounted.Value == true then
 							local config = horseHumanoid.Parent.Configuration
+							
+							if config then
+								local Stam = config.Stamina
+								local speed = config.CurrentSpeed
+								local maxspeed = config.MaxSpeed
 
-							local Stam = config.Stamina
-							local speed = config.CurrentSpeed
-							local maxspeed = config.MaxSpeed
-
-							if horseHumanoid and getgenv().horsegod then
-								if isnetworkowner(horse:WaitForChild("HumanoidRootPart")) then
-									if horseHumanoid.Health ~= "nan" then
-										horseHumanoid.Health = "nan"
+								if horseHumanoid and getgenv().horsegod then
+									if isnetworkowner(horse:WaitForChild("HumanoidRootPart")) then
+										if horseHumanoid.Health ~= "nan" then
+											horseHumanoid.Health = "nan"
+										end
 									end
 								end
-							end
 
-							if Stam and getgenv().horsestam then
-								Stam.Value = 4000
-							end
+								if Stam and getgenv().horsestam then
+									Stam.Value = 4000
+								end
 
-							if speed and maxspeed then
-								maxspeed.Value = HorseSpeedVal
+								if speed and maxspeed then
+									maxspeed.Value = HorseSpeedVal
+								end
 							end
 						end
 					end
