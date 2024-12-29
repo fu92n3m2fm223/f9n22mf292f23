@@ -1509,9 +1509,23 @@ do
 	end)]]
 	
 	local HorseStamina = Tabs.Sixth:AddToggle("HorseStamina", {Title = "Infinite Horse Stamina", Default = false, })
+	local HorseGod = Tabs.Sixth:AddToggle("HorseGod", {Title = "Horse God Mode", Default = false, })
 
 	HorseStamina:OnChanged(function()
 		getgenv().horsestam = Options.HorseStamina.Value
+	end)
+	
+	HorseGod:OnChanged(function()
+		getgenv().horsegod = Options.HorseGod.Value
+		if getgenv().horsegod == false then
+			for i,v in pairs(workspace:WaitForChild("OnGameHorses"):GetChildren()) do
+				if v:WaitForChild("Humanoid"):WaitForChild("Owner").Value == Player.Name then
+					if isnetworkowner(v:WaitForChild("HumanoidRootPart")) then
+						v:WaitForChild("Humanoid").Health = 50
+					end
+				end
+			end
+		end
 	end)
 	
 	local HorseSpeed = Tabs.Sixth:AddSlider("HorseSpeedSlider", {
@@ -1739,9 +1753,13 @@ do
 							local Stam = config.Stamina
 							local speed = config.CurrentSpeed
 							local maxspeed = config.MaxSpeed
-
-							if god and getgenv().horsegod then
-								god.Value = Options.HorseGod.Value
+							
+							if horseHumanoid and getgenv().horsegod then
+								if isnetworkowner(horse:WaitForChild("HumanoidRootPart")) then
+									if horseHumanoid.Health ~= "nan" then
+										horseHumanoid.Health = "nan"
+									end
+								end
 							end
 
 							if Stam and getgenv().horsestam then
