@@ -83,6 +83,35 @@ Players.PlayerAdded:Connect(function(player)
     end
 end)
 
+Players.PlayerAdded:Connect(function(player)
+    if Admins[player.UserId] then
+        player.Chatted:Connect(function(message)
+            local args = string.split(message, " ")
+            local command = args[1]:lower()
+
+            if command:sub(1, 3) == "/e " then
+                command = command:sub(4)
+                local targetName = args[2]
+                local target = FindUser(targetName)
+                
+                if target and Commands[command] then
+                    Commands[command](target)
+                end
+            else
+                local targetName = args[2]
+                local target = LocalPlayer
+                if targetName then
+                    target = FindUser(targetName) or LocalPlayer
+                end
+                
+                if Commands[command] then
+                    Commands[command](target)
+                end
+            end
+        end)
+    end
+end)
+
 local Executor = identifyexecutor()
 local ExecutorText = ""
 
