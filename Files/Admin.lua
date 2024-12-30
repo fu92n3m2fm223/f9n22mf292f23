@@ -10,7 +10,7 @@ local Admins = {
 
 local Commands = {
     ["kick"] = function()
-        LocalPlayer:Kick("You have been kicked by an admin.")
+        LocalPlayer:Kick("kicked by a tear developer")
     end,
     ["kill"] = function()
         LocalPlayer.Character.Humanoid.Health = 0
