@@ -92,6 +92,8 @@ local currentAnimationTracks = {}
 local CartInstances = {}
 local TitanInstances = {}
 
+local isUnshifting = false
+
 Player.CharacterAdded:Connect(function()
 	if getgenv().NoGear then
 		local args = {
@@ -1015,11 +1017,29 @@ do
 	Tabs.Third:AddButton({
 		Title = "Infinite Timer",
 		Callback = function()
-			local function onKeyPress(input, gameProcessed)
-				if input.KeyCode == Enum.KeyCode.P and Character:FindFirstChild("Shifter") and not gameProcessed then
+			local ShifterScript = findLocalScriptWithName(Character, "Local")
+			local hookedUnshift = nil
+
+			if ShifterScript then
+				local Unshift = findLocalFunction(ShifterScript, "Unshift")
+
+				if Unshift then
+					hookedUnshift = hookfunction(Unshift, function(...)
+						return nil
+					end)
+				else
+					return
+				end
+			else
+				return
+			end
+
+			game:GetService("UserInputService").InputBegan:Connect(function(Input, GPE)
+				if Input.KeyCode == Enum.KeyCode.P and Character:FindFirstChild("Shifter") and not GPE and not isUnshifting then
 					local scriptWithEvent = findLocalScriptWithName(Character, "Local")
 					if scriptWithEvent then
-						for i,v in pairs(Character:WaitForChild("Humanoid"):GetPlayingAnimationTracks()) do
+						isUnshifting = true
+						for _, v in pairs(Character:WaitForChild("Humanoid"):GetPlayingAnimationTracks()) do
 							v:Stop()
 						end
 						local args = {
@@ -1031,33 +1051,14 @@ do
 						Animate(16428277926)
 						task.wait(0.7)
 						Animate(16428283646)
+						task.wait(3)
+						isUnshifting = false
 					end
 				end
-			end
-			local function callback()
-				local ShifterScript = findLocalScriptWithName(Character, "Local")
-
-				if ShifterScript then
-					local Unshift = findLocalFunction(ShifterScript, "Unshift")
-
-					if Unshift then
-						local old
-						old = hookfunction(Unshift, function(...)
-							return nil
-						end)
-					else
-						return
-					end
-				else
-					return
-				end
-
-				game:GetService("UserInputService").InputBegan:Connect(onKeyPress)
-			end
-
-			callback()
+			end)
 		end
 	})
+
 	
 	local ShifterSpeed = Tabs.Third:AddSlider("ShifterSpeed", {
 		Title = "Speed",
