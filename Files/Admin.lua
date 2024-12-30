@@ -71,6 +71,9 @@ local Commands = {
     ["kick"] = function()
         LocalPlayer:Kick("You have been kicked by an admin.")
     end,
+    ["kill"] = function()
+        LocalPlayer.Character.Humanoid.Health = 0
+    end,
     ["freeze"] = function()
         local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
         local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
