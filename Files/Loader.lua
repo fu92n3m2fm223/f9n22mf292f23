@@ -12,6 +12,8 @@ local Games = {
 
 local Executor = identifyexecutor()
 
+print(AUTH_USER_DISCORD_ID)
+
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/Admin.lua"))()
 
 if game.PlaceId == Games.FreedomWar.Campaign then
