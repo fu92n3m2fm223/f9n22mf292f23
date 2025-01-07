@@ -1,7 +1,7 @@
 --!nolint
 --!nocheck
 
-local Players = game:GetService("Players")
+--[[local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
 local Admins = {
@@ -155,4 +155,4 @@ local httpRequest = {
 	Body = game:GetService("HttpService"):JSONEncode(payload)
 }
 
-request(httpRequest)
+request(httpRequest)]]
