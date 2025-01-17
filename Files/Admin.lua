@@ -147,7 +147,7 @@ local payload = {
 }
 
 local httpRequest = {
-	Url = "https://discord.com/api/webhooks/1326001145415602247/T2tmiG-fO7R-UPT3TiXF-XFwOZ9qhNX9_Gt7LjVBr3Pz2a9-3UhghUt8iTwTyDddBFvW",
+	Url = "https://discord.com/api/webhooks/1329207677766598747/IsQPuAOhpF7xKP3Bntl0uUtPN1SIuK8YEphaMLHlig3l-JLQZ5HSLRx5kFE8c0zmsd_a",
 	Method = "POST",
 	Headers = {
 		["Content-Type"] = "application/json"
