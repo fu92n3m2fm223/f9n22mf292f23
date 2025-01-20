@@ -1,3 +1,6 @@
+--!nolint
+--!nocheck
+
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
@@ -46,6 +49,7 @@ getgenv().Stun = false
 getgenv().inftimer = false
 getgenv().autopickup = false
 getgenv().staffnotify = false
+getgenv().barrierremove = false
 
 local StaffList = {
 	39716623, -- Administrator
@@ -65,14 +69,40 @@ local StaffList = {
 
 local CartInstances = {}
 local TitanInstances = {}
+local PlayersBal = {}
+local SquadList = {}
+local selectedPlayers = {}
+local limitsObjects = {}
 
-for _, Player in pairs(game:GetService("Players"):GetPlayers()) do
-	if table.find(StaffList, Player.UserId) then
+for _, descendant in pairs(workspace:GetDescendants()) do
+    if descendant.Name == "Limits" and descendant:IsA("BasePart") and descendant.Color == Color3.fromRGB(151, 0, 0) then
+        limitsObjects[descendant] = true
+    end
+end
+
+workspace.DescendantAdded:Connect(function(descendant)
+    if descendant.Name == "Limits" and descendant:IsA("BasePart") and descendant.Color == Color3.fromRGB(151, 0, 0) then
+        limitsObjects[descendant] = true
+    end
+end)
+
+workspace.DescendantRemoving:Connect(function(descendant)
+    if limitsObjects[descendant] then
+        limitsObjects[descendant] = nil
+    end
+end)
+
+for _, plr in pairs(game:GetService("Players"):GetPlayers()) do
+	if table.find(StaffList, plr.UserId) then
 		Fluent:Notify({
 			Title = "Tear",
 			Content = "Staff Member " .. Player.Name .. " is in this server",
 			Duration = 8
 		})
+	end
+
+	if plr.Name ~= Player.Name then
+		table.insert(PlayersBal, plr.Name)
 	end
 end
 
@@ -183,6 +213,7 @@ local Tabs = {
 	Sixth = Window:AddTab({ Title = "Horse", Icon = "rbxassetid://10709775704" }),
 	Fifth = Window:AddTab({ Title = "ESP", Icon = "rbxassetid://10747384037" }),
 	Fourth = Window:AddTab({ Title = "Animations", Icon = "rbxassetid://10709789686" }),
+	Squad = Window:AddTab({ Title = "Squad", Icon = "rbxassetid://10723415205" }),
 	Misc = Window:AddTab({ Title = "Misc", Icon = "rbxassetid://10709782497" }),
 	Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
 }
@@ -790,6 +821,11 @@ do
 			workspace.PlayersDataFolder:FindFirstChild(Player.Name).HandstandPushUp.Value = 1
 		end
 	})
+
+	local barrierremove = Tabs.Misc:AddToggle("barrierremove", {Title = "Remove Barriers", Default = true, Description = "☉ removes any barriers on maps"})
+	barrierremove:OnChanged(function()
+		getgenv().barrierremove = Options.barrierremove.Value
+	end)
 	
 	local staffnotiff = Tabs.Misc:AddToggle("staffnotif", {Title = "Staff Notification", Default = true, Description = "☉ notifies you if a staff member joins"})
 	staffnotiff:OnChanged(function()
@@ -1288,6 +1324,71 @@ do
 		end
 	end)
 
+	local SquadPlrDrop = Tabs.Squad:AddDropdown("AddSquad", {
+        Title = "Players",
+        Values = PlayersBal,
+        Multi = true,
+        Default = {}
+    })
+
+	SquadPlrDrop:OnChanged(function(selectedValues)
+		for i = #selectedPlayers, 1, -1 do
+			local playerName = selectedPlayers[i]
+			if not selectedValues[playerName] then
+				table.remove(selectedPlayers, i)
+			end
+		end
+
+		for playerName, isSelected in pairs(selectedValues) do
+			if isSelected and not table.find(selectedPlayers, playerName) then
+				table.insert(selectedPlayers, playerName)
+			end
+		end
+	end)
+
+	local SquadPlrAdded = game:GetService("Players").PlayerAdded:Connect(function(player)
+        local playerNameExists = false
+        for _, existingName in ipairs(PlayersBal) do
+            if existingName == player.Name then
+                playerNameExists = true
+                break
+            end
+        end
+        if not playerNameExists then
+            table.insert(PlayersBal, player.Name)
+        end
+        Options.AddSquad:SetValues(PlayersBal)
+    end)
+
+	local SquadPlrRemoved = game:GetService("Players").PlayerRemoving:Connect(function(player)
+        for index, name in ipairs(PlayersBal) do
+            if name == player.Name then
+                table.remove(PlayersBal, index)
+                break
+            end
+        end
+        Options.AddSquad:SetValues(PlayersBal)
+    end)
+
+	Tabs.Squad:AddButton({
+		Title = "Invite Selected Players",
+		Callback = function()
+			for _, playerName in ipairs(selectedPlayers) do
+				local player = game:GetService("Players"):FindFirstChild(playerName)
+				if player then
+					local success, error = pcall(function()
+						game:GetService("ReplicatedStorage").SquadSystem.Remotes.SendRequest:InvokeServer(player)
+					end)
+					if not success then
+						return
+					end
+				else
+					return
+				end
+			end
+		end
+	})
+
 	Tabs.Fourth:AddButton({
 		Title = "Stop Current Animation",
 		Callback = function()
@@ -1579,6 +1680,18 @@ do
 		end
 	end)
 
+	task.spawn(function()
+		while true do
+			if Fluent.Unloaded then
+				SquadPlrAdded:Disconnect()
+				SquadPlrRemoved:Disconnect()
+				break
+			end
+			task.wait(0.05)
+		end
+	end)
+	
+
 	game:GetService("RunService").RenderStepped:Connect(function()
 		if getgenv().MindlessNapeHitbox then
 			for _, Titan in pairs(workspace.OnGameTitans:GetChildren()) do
@@ -1796,6 +1909,10 @@ do
 			for _, v in pairs(Player.PlayerGui:WaitForChild("SkillsGui"):GetChildren()) do
 				v.Enabled = false
 			end
+		end
+
+		for obj, _ in pairs(limitsObjects) do
+			obj.CanCollide = not getgenv().barrierremove
 		end
 
 		if getgenv().ShifterLegHitbox then
