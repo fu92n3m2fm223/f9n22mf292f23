@@ -748,7 +748,7 @@ do
 		getgenv().barrierremove = Options.barrierremove.Value
 	end)
 	
-	local function returnstable()
+	--[[local function returnstable()
 		for _, Object in pairs(workspace:GetDescendants()) do
 			if Object.Name == "Stable" then
 				return Object:WaitForChild("CarriageSpawns"):WaitForChild("CarriageSpawn")
@@ -762,7 +762,7 @@ do
 		[3] = -math.huge
 	}
 
-	game:GetService("ReplicatedStorage"):WaitForChild("DeployEvent"):FireServer(unpack(args))
+	game:GetService("ReplicatedStorage"):WaitForChild("DeployEvent"):FireServer(unpack(args))]]
 
 	--[[local Input = Tabs.Misc:AddInput("GP", {
 		Title = "GP Addon",
