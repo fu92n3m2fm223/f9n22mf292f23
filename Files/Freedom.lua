@@ -742,6 +742,11 @@ do
 			workspace.PlayersDataFolder:FindFirstChild(Player.Name).HandstandPushUp.Value = 1
 		end
 	})
+
+	local barrierremove = Tabs.Misc:AddToggle("barrierremove", {Title = "Remove Barriers", Default = false, Description = "☉ removes any barriers on maps"})
+	barrierremove:OnChanged(function()
+		getgenv().barrierremove = Options.barrierremove.Value
+	end)
 	
 	local function returnstable()
 		for _, Object in pairs(workspace:GetDescendants()) do
