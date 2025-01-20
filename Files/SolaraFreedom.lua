@@ -822,7 +822,7 @@ do
 		end
 	})
 
-	local barrierremove = Tabs.Misc:AddToggle("barrierremove", {Title = "Remove Barriers", Default = true, Description = "☉ removes any barriers on maps"})
+	local barrierremove = Tabs.Misc:AddToggle("barrierremove", {Title = "Remove Barriers", Default = false, Description = "☉ removes any barriers on maps"})
 	barrierremove:OnChanged(function()
 		getgenv().barrierremove = Options.barrierremove.Value
 	end)
