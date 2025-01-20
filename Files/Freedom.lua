@@ -98,6 +98,9 @@ local currentAnimationTracks = {}
 local CartInstances = {}
 local TitanInstances = {}
 local limitsObjects = {}
+local PlayersBal = {}
+local SquadList = {}
+local selectedPlayers = {}
 
 for _, descendant in pairs(workspace:GetDescendants()) do
     if descendant.Name == "Limits" and descendant:IsA("BasePart") and descendant.Color == Color3.fromRGB(151, 0, 0) then
@@ -242,6 +245,7 @@ local Tabs = {
 	Sixth = Window:AddTab({ Title = "Horse", Icon = "rbxassetid://10709775704" }),
 	Fifth = Window:AddTab({ Title = "ESP", Icon = "rbxassetid://10747384037" }),
 	Fourth = Window:AddTab({ Title = "Animations", Icon = "rbxassetid://10709789686" }),
+	Squad = Window:AddTab({ Title = "Squad", Icon = "rbxassetid://10723415205" }),
 	Misc = Window:AddTab({ Title = "Misc", Icon = "rbxassetid://10709782497" }),
 	Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
 }
@@ -1476,6 +1480,71 @@ do
 			BurnBool.Name = "Burning"
 		end
 	end)
+
+	local SquadPlrDrop = Tabs.Squad:AddDropdown("AddSquad", {
+        Title = "Players",
+        Values = PlayersBal,
+        Multi = true,
+        Default = {}
+    })
+
+	SquadPlrDrop:OnChanged(function(selectedValues)
+		for i = #selectedPlayers, 1, -1 do
+			local playerName = selectedPlayers[i]
+			if not selectedValues[playerName] then
+				table.remove(selectedPlayers, i)
+			end
+		end
+
+		for playerName, isSelected in pairs(selectedValues) do
+			if isSelected and not table.find(selectedPlayers, playerName) then
+				table.insert(selectedPlayers, playerName)
+			end
+		end
+	end)
+
+	local SquadPlrAdded = game:GetService("Players").PlayerAdded:Connect(function(player)
+        local playerNameExists = false
+        for _, existingName in ipairs(PlayersBal) do
+            if existingName == player.Name then
+                playerNameExists = true
+                break
+            end
+        end
+        if not playerNameExists then
+            table.insert(PlayersBal, player.Name)
+        end
+        Options.AddSquad:SetValues(PlayersBal)
+    end)
+
+	local SquadPlrRemoved = game:GetService("Players").PlayerRemoving:Connect(function(player)
+        for index, name in ipairs(PlayersBal) do
+            if name == player.Name then
+                table.remove(PlayersBal, index)
+                break
+            end
+        end
+        Options.AddSquad:SetValues(PlayersBal)
+    end)
+
+	Tabs.Squad:AddButton({
+		Title = "Invite Selected Players",
+		Callback = function()
+			for _, playerName in ipairs(selectedPlayers) do
+				local player = game:GetService("Players"):FindFirstChild(playerName)
+				if player then
+					local success, error = pcall(function()
+						game:GetService("ReplicatedStorage").SquadSystem.Remotes.SendRequest:InvokeServer(player)
+					end)
+					if not success then
+						return
+					end
+				else
+					return
+				end
+			end
+		end
+	})
 
 	Tabs.Fourth:AddButton({
 		Title = "Stop Animation",
