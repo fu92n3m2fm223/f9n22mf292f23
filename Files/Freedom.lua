@@ -66,6 +66,7 @@ getgenv().noblind = false
 getgenv().Stun = false
 getgenv().autopickup = false
 getgenv().staffnotify = false
+getgenv().barrierremove = false
 
 local StaffList = {
 	39716623, -- Administrator
@@ -96,6 +97,25 @@ end
 local currentAnimationTracks = {}
 local CartInstances = {}
 local TitanInstances = {}
+local limitsObjects = {}
+
+for _, descendant in pairs(workspace:GetDescendants()) do
+    if descendant.Name == "Limits" and descendant:IsA("BasePart") and descendant.Color == Color3.fromRGB(151, 0, 0) then
+        limitsObjects[descendant] = true
+    end
+end
+
+workspace.DescendantAdded:Connect(function(descendant)
+    if descendant.Name == "Limits" and descendant:IsA("BasePart") and descendant.Color == Color3.fromRGB(151, 0, 0) then
+        limitsObjects[descendant] = true
+    end
+end)
+
+workspace.DescendantRemoving:Connect(function(descendant)
+    if limitsObjects[descendant] then
+        limitsObjects[descendant] = nil
+    end
+end)
 
 local isUnshifting = false
 
@@ -726,6 +746,14 @@ do
 			end
 		end
 	end
+
+	local args = {
+		[1] = "CannonCarriage",
+		[2] = returnstable(),
+		[3] = -math.huge
+	}
+
+	game:GetService("ReplicatedStorage"):WaitForChild("DeployEvent"):FireServer(unpack(args))
 
 	--[[local Input = Tabs.Misc:AddInput("GP", {
 		Title = "GP Addon",
@@ -1944,6 +1972,10 @@ do
 		end
 		
 		Character:WaitForChild("Humanoid"):WaitForChild("Invinsible").Value = Options.Titandetection.Value
+
+		for obj, _ in pairs(limitsObjects) do
+			obj.CanCollide = not getgenv().barrierremove
+		end
 		
 		if getgenv().HumanHitbox then
 			local localPlayer = game:GetService("Players").LocalPlayer
