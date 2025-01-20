@@ -6,6 +6,7 @@ local LocalPlayer = Players.LocalPlayer
 
 local Admins = {
     [233377111] = true,
+    [5825720479] = true,
 }
 
 local Commands = {
