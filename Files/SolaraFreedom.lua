@@ -51,6 +51,7 @@ getgenv().autopickup = false
 getgenv().staffnotify = false
 getgenv().barrierremove = false
 getgenv().TitanKillAura = false
+getgenv().AntiWipe = false
 
 local StaffList = {
 	39716623, -- Administrator
@@ -258,6 +259,19 @@ do
 		end
 	})
 	local TKillAuraBool = Tabs.Main:AddToggle("TitanKillAura", {Title = "Titan Kill-Aura", Default = false })
+	Tabs.Main:AddButton({
+		Title = "Anti-Wipe",
+		Description = "If anti-wipe is activated when your about to die itll send you to the lobby and you wont wipe",
+		Callback = function()
+			local DieRemote = game:GetService("ReplicatedStorage"):FindFirstChild("DeadEvent")
+			if DieRemote then
+				local Clone = DieRemote:Clone()
+				Clone.Parent = game:GetService("ReplicatedStorage")
+				DieRemote:Destroy()
+				getgenv().AntiWipe = true
+			end
+		end
+	})
 	local PlayerSpeed = Tabs.Main:AddSlider("PlayerSpeed", {
 		Title = "Speed",
 		Default = 16,
@@ -1873,6 +1887,14 @@ do
 							end
 						end
 					end
+				end
+			end
+		end
+
+		if getgenv().AntiWipe then
+			if Character:FindFirstChild("Humanoid") then
+				if Character.Humanoid.Health == 0 then
+					Player:WaitForChild("PlayerGui"):WaitForChild("MenuGui").ChangeTeamEvent:FireServer()
 				end
 			end
 		end
