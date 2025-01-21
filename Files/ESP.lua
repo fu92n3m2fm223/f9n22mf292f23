@@ -291,6 +291,10 @@ function EspObject:Render()
 	local options = self.options;
 	local corners = self.corners;
 
+	if not corners or not corners.topLeft or not corners.topRight or not corners.bottomRight or not corners.bottomLeft then
+		return
+	end
+
 	visible.box.Visible = enabled and onScreen and options.box;
 	visible.boxOutline.Visible = visible.box.Visible and options.boxOutline;
 	if visible.box.Visible then
