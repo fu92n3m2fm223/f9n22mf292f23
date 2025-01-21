@@ -67,6 +67,7 @@ getgenv().Stun = false
 getgenv().autopickup = false
 getgenv().staffnotify = false
 getgenv().barrierremove = false
+getgenv().TitanKillAura = false
 
 local StaffList = {
 	39716623, -- Administrator
@@ -322,6 +323,7 @@ do
 
 		end
 	})
+	local TKillAuraBool = Tabs.Main:AddToggle("TitanKillAura", {Title = "Titan Kill-Aura", Default = false })
 	local PlayerSpeed = Tabs.Main:AddSlider("PlayerSpeed", {
 		Title = "Speed",
 		Default = 16,
@@ -1453,6 +1455,10 @@ do
 		getgenv().hoodkey = Options.HoodKey.Value
 	end)
 
+	TKillAuraBool:OnChanged(function()
+		getgenv().TitanKillAura = Options.TitanKillAura.Value
+	end)
+
 	game:GetService("UserInputService").InputBegan:Connect(function(Input, GPE)
 		if not GPE and getgenv().hoodkey == true and Input.KeyCode == Enum.KeyCode[HoodKeybind.Value] then
 			if Character:FindFirstChild("Humanoid") and workspace:WaitForChild("PlayersDataFolder")[Player.Name].Cloak.Value == 1 then
@@ -1949,6 +1955,20 @@ do
 									Descendant:FireServer(true)
 									break
 								end
+							end
+						end
+					end
+				end
+			end
+		end
+
+		if getgenv().TitanKillAura then
+			for _, titan in pairs(workspace:WaitForChild("OnGameTitans"):GetChildren()) do
+				if titan:IsA("Model") then
+					if titan:FindFirstChild("Nape") then
+						if titan:FindFirstChild("Humanoid").Health ~= 0 then
+							if Character:FindFirstChild("Gear") then
+								Character:FindFirstChild("Gear"):WaitForChild("Events").HitEvent:FireServer(titan.Nape, 670, "591872138111")
 							end
 						end
 					end
