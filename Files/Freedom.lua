@@ -68,6 +68,7 @@ getgenv().autopickup = false
 getgenv().staffnotify = false
 getgenv().barrierremove = false
 getgenv().TitanKillAura = false
+getgenv().AntiWipe = false
 
 local StaffList = {
 	39716623, -- Administrator
@@ -324,6 +325,7 @@ do
 		end
 	})
 	local TKillAuraBool = Tabs.Main:AddToggle("TitanKillAura", {Title = "Titan Kill-Aura", Default = false })
+	local AntiWipeBool = Tabs.Main:AddToggle("AntiWipe", {Title = "Anti-Wipe", Default = false, Description = "If anti-wipe is activated when your about to die itll send you to the lobby and you wont wipe" })
 	local PlayerSpeed = Tabs.Main:AddSlider("PlayerSpeed", {
 		Title = "Speed",
 		Default = 16,
@@ -1459,6 +1461,10 @@ do
 		getgenv().TitanKillAura = Options.TitanKillAura.Value
 	end)
 
+	AntiWipeBool:OnChanged(function()
+		getgenv().AntiWipe = Options.AntiWipe.Value
+	end)
+
 	game:GetService("UserInputService").InputBegan:Connect(function(Input, GPE)
 		if not GPE and getgenv().hoodkey == true and Input.KeyCode == Enum.KeyCode[HoodKeybind.Value] then
 			if Character:FindFirstChild("Humanoid") and workspace:WaitForChild("PlayersDataFolder")[Player.Name].Cloak.Value == 1 then
@@ -1793,6 +1799,14 @@ do
 			return TitanDmgHook(self, ...)
 		end
 	end)
+
+	local wipehook; wipehook = hookmetamethod(game, "__namecall", function(self, ...)
+    	local method = getnamecallmethod()
+    	if (method == "FireServer" or method == "InvokeServer") and (self.Name == "OnDeadEvent" or self.Name == "DeadEvent") and getgenv().AntiWipe then
+        	return
+    	end
+    	return wipehook(self, ...)
+	end)
 	
 	--local HorseGod = Tabs.Sixth:AddToggle("HorseGod", {Title = "Horse God Mode", Default = false, })
 
@@ -1972,6 +1986,14 @@ do
 							end
 						end
 					end
+				end
+			end
+		end
+
+		if getgenv().AntiWipe then
+			if Character:FindFirstChild("Humanoid") then
+				if Character.Humanoid.Health == 0 then
+					Player:WaitForChild("PlayerGui"):WaitForChild("MenuGui").ChangeTeamEvent:FireServer()
 				end
 			end
 		end
