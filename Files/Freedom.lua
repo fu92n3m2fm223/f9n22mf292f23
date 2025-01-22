@@ -790,7 +790,7 @@ do
 		getgenv().staffnotify = Options.staffnotif.Value
 	end)
 	
-	if fireproximityprompt then
+	--[[if fireproximityprompt then
 		local PickupBool = Tabs.Misc:AddToggle("autopick", {Title = "Auto-Pickup Gifts", Default = false, })
 
 		PickupBool:OnChanged(function()
@@ -844,7 +844,7 @@ do
 				end
 			end
 		end)
-	end
+	end]]
 
 	local TeamDropdown = Tabs.Misc:AddDropdown("Team Change", {
 		Title = "Change Team",
