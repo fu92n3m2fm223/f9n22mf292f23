@@ -1890,10 +1890,18 @@ do
 	game:GetService("RunService").RenderStepped:Connect(function()
 		if getgenv().MindlessNapeHitbox then
 			for _, Titan in pairs(workspace.OnGameTitans:GetChildren()) do
-				if Titan:FindFirstChild("Nape") then
-					Titan.Nape.Size = Vector3.new(napex, napey, napez)
-					Titan.Nape.Transparency = trans1
-					Titan.Nape.BrickColor = BrickColor.new("Institutional white")
+				if Titan:FindFirstChild("Humanoid") then
+					if Titan:FindFirstChild("Nape") then
+						if Titan.Humanoid.Health ~= 0 then
+							Titan.Nape.Size = Vector3.new(napex, napey, napez)
+							Titan.Nape.Transparency = trans1
+							Titan.Nape.BrickColor = BrickColor.new("Institutional white")
+						else
+							Titan.Nape.Size = Vector3.new(1.762, 1.481, 0.648)
+							Titan.Nape.Transparency = 1
+							Titan.Nape.BrickColor = BrickColor.new("Institutional white")
+						end
+					end
 				end
 			end
 		end
@@ -1901,12 +1909,23 @@ do
 		if getgenv().MindlessLegHitbox then
 			for _, Titan in pairs(workspace.OnGameTitans:GetChildren()) do
 				if Titan:FindFirstChild("TendonsLeft") and Titan:FindFirstChild("TendonsRight") then
-					Titan.TendonsLeft.Size = Vector3.new(legx, legy, legz)
-					Titan.TendonsLeft.Transparency = trans3
-					Titan.TendonsLeft.BrickColor = BrickColor.new("Institutional white")
-					Titan.TendonsRight.Size = Vector3.new(legx, legy, legz)
-					Titan.TendonsRight.Transparency = trans3
-					Titan.TendonsRight.BrickColor = BrickColor.new("Institutional white")
+					if Titan:FindFirstChild("Humanoid") then
+						if Titan.Humanoid.Health ~= 0 then
+							Titan.TendonsLeft.Size = Vector3.new(legx, legy, legz)
+							Titan.TendonsLeft.Transparency = trans3
+							Titan.TendonsLeft.BrickColor = BrickColor.new("Institutional white")
+							Titan.TendonsRight.Size = Vector3.new(legx, legy, legz)
+							Titan.TendonsRight.Transparency = trans3
+							Titan.TendonsRight.BrickColor = BrickColor.new("Institutional white")
+						else
+							Titan.TendonsLeft.Size = Vector3.new(2.865738868713379, 3.403064727783203, 1.9776231050491333)
+							Titan.TendonsLeft.Transparency = 1
+							Titan.TendonsLeft.BrickColor = BrickColor.new("Institutional white")
+							Titan.TendonsRight.Size = Vector3.new(2.865738868713379, 3.403064727783203, 1.9776231050491333)
+							Titan.TendonsRight.Transparency = 1
+							Titan.TendonsRight.BrickColor = BrickColor.new("Institutional white")
+						end
+					end
 				end
 			end
 		end
@@ -2009,12 +2028,21 @@ do
 					if TitanS:FindFirstChild("RLegTendons") and TitanS:FindFirstChild("LLegTendons") then
 						if not (TitanS.Name == "ArmoredTitan" and TitanS.LLegTendons:FindFirstChild("Armored") and TitanS.LLegTendons:WaitForChild("Armored").Value == true) and not (TitanS.Name == "ColossalTitan") then
 							if Player.Team.Name ~= Team or Player.Team.Name == "Rogue" or Team == "Rogue" then
-								TitanS.RLegTendons.Size = Vector3.new(shifterlegx, shifterlegy, shifterlegz)
-								TitanS.RLegTendons.Transparency = trans4
-								TitanS.RLegTendons.BrickColor = BrickColor.new("Institutional white")
-								TitanS.LLegTendons.Size = Vector3.new(shifterlegx, shifterlegy, shifterlegz)
-								TitanS.LLegTendons.Transparency = trans4
-								TitanS.LLegTendons.BrickColor = BrickColor.new("Institutional white")
+								if ShifterPlr then
+									TitanS.RLegTendons.Size = Vector3.new(shifterlegx, shifterlegy, shifterlegz)
+									TitanS.RLegTendons.Transparency = trans4
+									TitanS.RLegTendons.BrickColor = BrickColor.new("Institutional white")
+									TitanS.LLegTendons.Size = Vector3.new(shifterlegx, shifterlegy, shifterlegz)
+									TitanS.LLegTendons.Transparency = trans4
+									TitanS.LLegTendons.BrickColor = BrickColor.new("Institutional white")
+								elseif ShifterPlr == nil then
+									TitanS.RLegTendons.Size = Vector3.new(3.469383478164673, 3.469383478164673, 2.4444448947906494)
+									TitanS.RLegTendons.Transparency = 1
+									TitanS.RLegTendons.BrickColor = BrickColor.new("Institutional white")
+									TitanS.LLegTendons.Size = Vector3.new(3.469383478164673, 3.469383478164673, 2.4444448947906494)
+									TitanS.LLegTendons.Transparency = 1
+									TitanS.LLegTendons.BrickColor = BrickColor.new("Institutional white")
+								end
 							end
 						end
 					end
@@ -2136,9 +2164,15 @@ do
 					local ShifterPlr = game:GetService("Players"):GetPlayerFromCharacter(TitanS)
 					local Team = TitanS:WaitForChild("ShifterHolder").TrueTeam.Value
 					if Player.Team.Name ~= Team or Player.Team.Name == "Rogue" or Team == "Rogue" then
-						if TitanS:FindFirstChild("SNape") then
-							TitanS.SNape.Size = Vector3.new(shifterx, shiftery, shifterz)
-							TitanS.SNape.Transparency = trans2
+						if ShifterPlr then
+							if TitanS:FindFirstChild("SNape") then
+								TitanS.SNape.Size = Vector3.new(shifterx, shiftery, shifterz)
+								TitanS.SNape.Transparency = trans2
+								TitanS.SNape.BrickColor = BrickColor.new("Institutional white")
+							end
+						elseif ShifterPlr == nil then
+							TitanS.SNape.Size = Vector3.new(1.762, 1.481, 0.648)
+							TitanS.SNape.Transparency = 1
 							TitanS.SNape.BrickColor = BrickColor.new("Institutional white")
 						end
 					end
