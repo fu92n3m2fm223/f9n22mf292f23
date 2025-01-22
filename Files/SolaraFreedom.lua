@@ -1313,21 +1313,23 @@ do
 	game:GetService("UserInputService").InputBegan:Connect(function(Input, GPE)
 		if not GPE and getgenv().hoodkey == true and Input.KeyCode == Enum.KeyCode[HoodKeybind.Value] then
 			if Character:FindFirstChild("Humanoid") and workspace:WaitForChild("PlayersDataFolder")[Player.Name].Cloak.Value == 1 then
-				if Character:FindFirstChild("Humanoid"):WaitForChild("Hood").Value == false then
-					local ohString1 = "Hood"
-					local ohNil2 = nil
-					local ohBoolean3 = true
-
-					Player:WaitForChild("PlayerGui"):WaitForChild("MenuGui").ClothesChange:InvokeServer(ohString1, ohNil2, ohBoolean3)
+				if Player.Team ~= game:GetService("Teams")["Interior Police"] then
+					if Character:FindFirstChild("Humanoid"):WaitForChild("Hood").Value == false then
+						local ohString1 = "Hood"
+						local ohNil2 = nil
+						local ohBoolean3 = true
+	
+						Player:WaitForChild("PlayerGui"):WaitForChild("MenuGui").ClothesChange:InvokeServer(ohString1, ohNil2, ohBoolean3)
+					else
+						local ohString1 = "Hood"
+						local ohNil2 = nil
+						local ohBoolean3 = false
+	
+						Player:WaitForChild("PlayerGui"):WaitForChild("MenuGui").ClothesChange:InvokeServer(ohString1, ohNil2, ohBoolean3)
+					end
 				else
-					local ohString1 = "Hood"
-					local ohNil2 = nil
-					local ohBoolean3 = false
-
-					Player:WaitForChild("PlayerGui"):WaitForChild("MenuGui").ClothesChange:InvokeServer(ohString1, ohNil2, ohBoolean3)
+					return
 				end
-			else
-				return
 			end
 		end
 	end)
