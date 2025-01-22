@@ -771,7 +771,7 @@ do
 
 	local NoGear = Tabs.Misc:AddToggle("gear", {Title = "No Gear", Default = false, Description = "☉ Removes some gear off your character" })
 	
-	if fireproximityprompt then
+	--[[if fireproximityprompt then
 		local PickupBool = Tabs.Misc:AddToggle("autopick", {Title = "Auto-Pickup Gifts", Default = false, })
 
 		PickupBool:OnChanged(function()
@@ -825,7 +825,7 @@ do
 				end
 			end
 		end)
-	end
+	end]]
 
 	Tabs.Misc:AddButton({
 		Title = "Unlock Emotes",
