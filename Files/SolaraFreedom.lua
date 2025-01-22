@@ -1878,12 +1878,13 @@ do
 		end
 
 		if getgenv().TitanKillAura then
-			for _, titan in pairs(workspace:WaitForChild("OnGameTitans"):GetChildren()) do
-				if titan:IsA("Model") then
-					if titan:FindFirstChild("Nape") then
-						if titan:FindFirstChild("Humanoid").Health ~= 0 then
-							if Character:FindFirstChild("Gear") then
-								Character:FindFirstChild("Gear"):WaitForChild("Events").HitEvent:FireServer(titan.Nape, 670, "591872138111")
+			for _, titan in ipairs(workspace:WaitForChild("OnGameTitans"):GetChildren()) do
+				if titan:IsA("Model") and titan:FindFirstChild("Nape") and titan:FindFirstChild("Humanoid") then
+					if titan.Humanoid.Health > 0 then
+						local distance = (titan.Nape.Position - Character:WaitForChild("HumanoidRootPart").Position).Magnitude
+						if distance <= 20 then
+							if character:FindFirstChild("Gear") then
+								Character.Gear:WaitForChild("Events"):WaitForChild("HitEvent"):FireServer(titan.Nape, 670, "591872138111")
 							end
 						end
 					end
