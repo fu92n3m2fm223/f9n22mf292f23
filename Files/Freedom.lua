@@ -2146,14 +2146,14 @@ do
 							end
 						end
 
-						if (Victim.Team.Name ~= Player.Team.Name or Player.Team.Name == "Rogue" or Victim.Team.Name == "Rogue") and (not isLocalPlayerWarrior or not isVictimWarrior) then
+						if (Victim.Team.Name ~= Player.Team.Name or Player.Team.Name == "Rogue" or Victim.Team.Name == "Rogue") and not isLocalPlayerWarrior and isVictimWarrior then
 							Hitbox.Size = Vector3.new(humanhitbox, humanhitbox, humanhitbox)
 							Hitbox.Transparency = humantrans
 							Hitbox.BrickColor = BrickColor.new("Institutional white")
 							Hitbox.Shape = Enum.PartType.Ball
 						end
-
-						if ((Victim.Team.Name == Player.Team.Name and Hitbox.Transparency ~= humantrans and Player.Team.Name ~= "Rogue") or Victim.Team.Name == "Rogue") and not isLocalPlayerWarrior and not isVictimWarrior then
+						
+						if ((Victim.Team.Name == Player.Team.Name and Hitbox.Transparency ~= humantrans and Player.Team.Name ~= "Rogue") or Victim.Team.Name == "Rogue") and (not isVictimWarrior or isLocalPlayerWarrior) then
 							Hitbox.Size = Vector3.new(3, 3, 2)
 							Hitbox.Transparency = 1
 							Hitbox.BrickColor = BrickColor.new("Institutional white")
