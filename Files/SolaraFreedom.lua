@@ -1764,29 +1764,28 @@ do
 		Character:WaitForChild("Humanoid"):WaitForChild("Invinsible").Value = Options.Titandetection.Value
 		
 		if getgenv().HumanHitbox then
-			local localPlayer = game:GetService("Players").LocalPlayer
 			local isLocalPlayerWarrior = false
 
-			for _, v in pairs(workspace.PlayersDataFolder:GetChildren()) do
-				if v.Name == localPlayer.Name and v:FindFirstChild("Warrior") and v.Warrior.Value == true then
+			for _, v in pairs(workspace:WaitForChild("PlayersDataFolder"):GetChildren()) do
+				if v.Name == Player.Name and v:FindFirstChild("Warrior") and v.Warrior.Value == true then
 					isLocalPlayerWarrior = true
 					break
 				end
 			end
 
 			for _, Victim in pairs(game:GetService("Players"):GetPlayers()) do
-				if Victim ~= localPlayer and Victim.Character and not Victim.Character:FindFirstChild("Shifter") then
+				if Victim ~= Player and Victim.Character and not Victim.Character:FindFirstChild("Shifter") then
 					local Hitbox = Victim.Character:WaitForChild("HumanoidRootPart"):FindFirstChild("BulletsHitbox")
 					if Hitbox then
 						local isVictimWarrior = false
-						for _, v in pairs(workspace.PlayersDataFolder:GetChildren()) do
+						for _, v in pairs(workspace:WaitForChild("PlayersDataFolder"):GetChildren()) do
 							if v.Name == Victim.Name and v:FindFirstChild("Warrior") and v.Warrior.Value == true then
 								isVictimWarrior = true
 								break
 							end
 						end
 
-						if (Victim.Team.Name ~= localPlayer.Team.Name or localPlayer.Team.Name == "Rogue" or Victim.Team.Name == "Rogue") and 
+						if (Victim.Team.Name ~= Player.Team.Name or Player.Team.Name == "Rogue" or Victim.Team.Name == "Rogue") and 
 							(not isLocalPlayerWarrior or not isVictimWarrior) then
 							Hitbox.Size = Vector3.new(humanhitbox, humanhitbox, humanhitbox)
 							Hitbox.Transparency = humantrans
