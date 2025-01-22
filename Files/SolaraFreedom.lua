@@ -1809,9 +1809,7 @@ do
 							Hitbox.Transparency = humantrans
 							Hitbox.BrickColor = BrickColor.new("Institutional white")
 							Hitbox.Shape = Enum.PartType.Ball
-						end
-
-						if ((Victim.Team.Name == Player.Team.Name and Hitbox.Transparency ~= humantrans and Player.Team.Name ~= "Rogue") or Victim.Team.Name == "Rogue") and not isLocalPlayerWarrior and not isVictimWarrior then
+						else
 							Hitbox.Size = Vector3.new(3, 3, 2)
 							Hitbox.Transparency = 1
 							Hitbox.BrickColor = BrickColor.new("Institutional white")
