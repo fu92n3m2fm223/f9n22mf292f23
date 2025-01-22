@@ -1883,7 +1883,7 @@ do
 					if titan.Humanoid.Health > 0 then
 						local distance = (titan.Nape.Position - Character:WaitForChild("HumanoidRootPart").Position).Magnitude
 						if distance <= 20 then
-							if character:FindFirstChild("Gear") then
+							if Character:FindFirstChild("Gear") then
 								Character.Gear:WaitForChild("Events"):WaitForChild("HitEvent"):FireServer(titan.Nape, 670, "591872138111")
 							end
 						end
