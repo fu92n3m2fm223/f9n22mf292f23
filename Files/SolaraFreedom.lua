@@ -277,7 +277,7 @@ do
 		end
 	})
 	local PlayerSpeed = Tabs.Main:AddSlider("PlayerSpeed", {
-		Title = "Speed",
+		Title = "Walkspeed",
 		Default = 16,
 		Min = 16,
 		Max = 200,
@@ -290,18 +290,6 @@ do
 			end
 		end
 	})
-	
-	--[[local DamageSpoof = Tabs.Secondary:AddToggle("damage", {Title = "Damage Spoof", Default = false, Description = "☉ only works on titans | BUGGY" })
-	local Slider7 = Tabs.Secondary:AddSlider("Slider7", {
-		Title = "Damage",
-		Default = 670,
-		Min = 0,
-		Max = 1170,
-		Rounding = 1,
-		Callback = function(Value)
-
-		end
-	})]]
 
 	local MindlessHitbox = Tabs.Secondary:AddToggle("mindless", {Title = "Mindless Nape Hitbox", Default = false })
 	MindlessHitbox:OnChanged(function()
@@ -1825,7 +1813,10 @@ do
 							end
 						end
 			
-						if Humanoid:FindFirstChild("Grabbed") and Humanoid.Grabbed.Value == true then
+						local Humanoid = Victim.Character:FindFirstChild("Humanoid")
+						local Grabbed = Humanoid and Humanoid:FindFirstChild("Grabbed")
+						
+						if Humanoid and Grabbed and Grabbed:IsA("BoolValue") and Grabbed.Value == true then
 							Hitbox.Size = Vector3.new(3, 3, 2)
 							Hitbox.Transparency = 1
 							Hitbox.BrickColor = BrickColor.new("Institutional white")
@@ -1843,7 +1834,7 @@ do
 						end
 					end
 				end
-			end
+			end		
 		end
 
 		if ahspeed == 1 then
