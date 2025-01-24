@@ -470,7 +470,8 @@ do
 		if getgenv().ShifterNapeHitbox == false then
 			for _, TitanS in pairs(workspace:GetChildren()) do
 				local ShifterPlr = game:GetService("Players"):GetPlayerFromCharacter(TitanS)
-				if ShifterPlr and ShifterPlr.Team ~= Player.Team then
+				local Team = TitanS:WaitForChild("ShifterHolder").TrueTeam.Value
+				if ShifterPlr and Team ~= Player.Team then
 					if TitanS:FindFirstChild("Shifter") and not (TitanS.Name == "ArmoredTitan") and TitanS ~= Character then
 						if TitanS:FindFirstChild("SNape") then
 							TitanS.SNape.Size = Vector3.new(1.762, 1.481, 0.648)
@@ -528,7 +529,8 @@ do
 		if getgenv().ShifterLegHitbox == false then
 			for _, TitanS in pairs(workspace:GetChildren()) do
 				local ShifterPlr = game:GetService("Players"):GetPlayerFromCharacter(TitanS)
-				if ShifterPlr and ShifterPlr.Team ~= Player.Team then
+				local Team = TitanS:WaitForChild("ShifterHolder").TrueTeam.Value
+				if ShifterPlr and Team ~= Player.Team then
 					if TitanS:FindFirstChild("Shifter") and TitanS ~= Character then
 						if TitanS:FindFirstChild("RLegTendons") and TitanS:FindFirstChild("LLegTendons") then
 							local LLegTendons = TitanS:FindFirstChild("LLegTendons")
