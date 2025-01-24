@@ -528,7 +528,6 @@ do
 		end
 	})
 	local ShifterLegHitbox = Tabs.Secondary:AddToggle("shifterleg", {Title = "Shifter Leg Hitbox", Default = false })
-	local ShifterLegHitbox = Tabs.Secondary:AddToggle("shifterleg", {Title = "Shifter Leg Hitbox", Default = false })
 	ShifterLegHitbox:OnChanged(function()
 		getgenv().ShifterLegHitbox = Options.shifterleg.Value
 		if getgenv().ShifterLegHitbox == false then
