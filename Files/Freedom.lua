@@ -2153,7 +2153,10 @@ do
 							end
 						end
 			
-						if Victim.Character:WaitForChild("Humanoid"):FindFirstChild("Grabbed") and Humanoid.Grabbed.Value == true then
+						local Humanoid = Victim.Character:FindFirstChild("Humanoid")
+						local Grabbed = Humanoid and Humanoid:FindFirstChild("Grabbed")
+						
+						if Humanoid and Grabbed and Grabbed:IsA("BoolValue") and Grabbed.Value == true then
 							Hitbox.Size = Vector3.new(3, 3, 2)
 							Hitbox.Transparency = 1
 							Hitbox.BrickColor = BrickColor.new("Institutional white")
@@ -2171,7 +2174,7 @@ do
 						end
 					end
 				end
-			end
+			end		
 		end
 
 		if getgenv().ShifterNapeHitbox then
