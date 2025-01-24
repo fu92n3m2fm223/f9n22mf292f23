@@ -2153,7 +2153,7 @@ do
 							end
 						end
 			
-						if Humanoid:FindFirstChild("Grabbed") and Humanoid.Grabbed.Value == true then
+						if Character:FindFirstChild("Humanoid"):FindFirstChild("Grabbed") and Humanoid.Grabbed.Value == true then
 							Hitbox.Size = Vector3.new(3, 3, 2)
 							Hitbox.Transparency = 1
 							Hitbox.BrickColor = BrickColor.new("Institutional white")
