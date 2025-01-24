@@ -138,7 +138,11 @@ Player.CharacterAdded:Connect(function()
 	end
 	
 	if getgenv().hood then
-		Player:WaitForChild("PlayerGui"):WaitForChild("LowHealthGui").LoseHoodEvent:Destroy()
+		local LowHealthGui = Player:WaitForChild("PlayerGui"):WaitForChild("LowHealthGui")
+		local LoseHoodEvent = LowHealthGui:FindFirstChild("LoseHoodEvent")
+		if LoseHoodEvent then
+			LoseHoodEvent:Destroy()
+		end
 	end
 end)
 
