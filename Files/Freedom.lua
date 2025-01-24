@@ -10,6 +10,15 @@ local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2f
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/0n93f03f222n90/refs/heads/main/adbyp.lua"))()
 
+local Old;
+Old = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
+    local method = getnamecallmethod()
+    if method:lower() == "kick" and self == game:GetService("Players").LocalPlayer then
+        return
+    end
+    return Old(self, ...)
+end))
+
 task.wait(0.7)
 
 local Player = game:GetService("Players").LocalPlayer
@@ -24,14 +33,6 @@ local Options = Fluent.Options
 local function toggleTitanDetector()
 	Character:WaitForChild("Humanoid"):WaitForChild("Invinsible").Value = Options.Titandetection.Value
 end
-
-local originalKick = hookfunction(Player.Kick, function()
-	return nil
-end)
-
-local originalWarn = hookfunction(warn, function()
-	return nil
-end)
 
 getgenv().InfiniteGas = false
 getgenv().InfiniteBlades = false
@@ -281,7 +282,7 @@ do
 	local FireBool = Tabs.Main:AddToggle("Fire", {Title = "Anti-Burn", Default = false, })
 	local CannonBool = Tabs.Main:AddToggle("Cannon", {Title = "No Cooldown Cannon", Default = false, })
 	local BladeSpamBool = Tabs.Main:AddToggle("BladeSpam", {Title = "Blade Throw Spam", Default = false, Description = "☉ You need rage mode activated for this" })
-	--[[local HookSlider = Tabs.Main:AddSlider("Slider8", {
+	local HookSlider = Tabs.Main:AddSlider("Slider8", {
 		Title = "Hooks Range",
 		Default = 160,
 		Min = 100,
@@ -290,7 +291,7 @@ do
 		Callback = function(Value)
 
 		end
-	})]]
+	})
 	local InstantHookBool = Tabs.Main:AddToggle("InstantHook", {Title = "Instant Hook", Default = false })
 	InstantHookKeybind = Tabs.Main:AddKeybind("InstantHookKey", {
 		Title = "Instant Hook Keybind",
@@ -331,7 +332,7 @@ do
 	local TKillAuraBool = Tabs.Main:AddToggle("TitanKillAura", {Title = "Titan Kill-Aura", Default = false })
 	local AntiWipeBool = Tabs.Main:AddToggle("AntiWipe", {Title = "Anti-Wipe", Default = false, Description = "If anti-wipe is activated when your about to die itll send you to the lobby and you wont wipe" })
 	local PlayerSpeed = Tabs.Main:AddSlider("PlayerSpeed", {
-		Title = "Speed",
+		Title = "Walkspeed",
 		Default = 16,
 		Min = 16,
 		Max = 200,
@@ -344,17 +345,6 @@ do
 			end
 		end
 	})
-	--[[local DamageSpoof = Tabs.Secondary:AddToggle("damage", {Title = "Damage Spoof", Default = false, Description = "☉ only works on titans | BUGGY" })
-	local Slider7 = Tabs.Secondary:AddSlider("Slider7", {
-		Title = "Damage",
-		Default = 670,
-		Min = 0,
-		Max = 1170,
-		Rounding = 1,
-		Callback = function(Value)
-
-		end
-	})]]
 
 	local MindlessHitbox = Tabs.Secondary:AddToggle("mindless", {Title = "Mindless Nape Hitbox", Default = false })
 	MindlessHitbox:OnChanged(function()
@@ -664,7 +654,7 @@ do
 	local humantrans = Options.Size2.Value
 
 	local dmg = Options.TitanDmgSlid.Value
-	--local hooks = Options.Slider8.Value
+	local hooks = Options.Slider8.Value
 	local ahspeed = Options.Slider9.Value
 
 	Slider1:OnChanged(function(Value)
@@ -694,9 +684,9 @@ do
 	TitanDmgSlider:OnChanged(function(Value)
 		dmg = Options.TitanDmgSlid.Value
 	end)
-	--[[HookSlider:OnChanged(function(Value)
+	HookSlider:OnChanged(function(Value)
 		hooks = Options.Slider8.Value
-	end)]]
+	end)
 
 	Leg1:OnChanged(function(Value)
 		legx = Options.Leg1.Value
@@ -2108,18 +2098,23 @@ do
 			end
 		end
 		
-		--[[if not Character:FindFirstChild("Shifter") then
+		if not Character:FindFirstChild("Shifter") then
 			local humanoid = Character:WaitForChild("Humanoid")
-			local gear = humanoid:WaitForChild("Gear")
+
+			local gear = humanoid:FindFirstChild("Gear") or humanoid:FindFirstChild("APGear")
+			if not gear then
+				return
+			end
+		
 			local upgrades = gear:WaitForChild("Upgrades")
 			local hooksRange = upgrades:FindFirstChild("HooksRange")
-
+		
 			if hooksRange then
 				hooksRange.Value = hooks
 			else
 				return
 			end
-		end]]
+		end
 
 		if getgenv().InfiniteGas then
 			Character:WaitForChild("Humanoid"):WaitForChild("Gear"):WaitForChild("Gas").Value = 2000
