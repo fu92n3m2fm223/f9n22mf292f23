@@ -1189,21 +1189,6 @@ do
 		odmHookTwo = two
 	end)
 
-	local dashfunc
-	for i, func in pairs(getreg()) do
-		if type(func) ~= "function" then
-			local info = debug.getinfo(func)
-			if info.source:find("ATLocal") then
-				local upv = debug.getupvalues(func)
-				for up, value in pairs(upv) do
-					if value == game.Players.LocalPlayer then
-						dashfunc = func
-					end
-				end
-			end
-		end
-	end
-
 	InstantHookBool:OnChanged(function()
 		getgenv().instanthook = Options.InstantHook.Value
 		if odmHookFunction and odmHookOne and odmHookTwo then
