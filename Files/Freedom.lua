@@ -471,12 +471,14 @@ do
 			for _, TitanS in pairs(workspace:GetChildren()) do
 				local ShifterPlr = game:GetService("Players"):GetPlayerFromCharacter(TitanS)
 				local Team = TitanS:WaitForChild("ShifterHolder").TrueTeam.Value
-				if ShifterPlr and Team ~= Player.Team then
-					if TitanS:FindFirstChild("Shifter") and not (TitanS.Name == "ArmoredTitan") and TitanS ~= Character then
-						if TitanS:FindFirstChild("SNape") then
-							TitanS.SNape.Size = Vector3.new(1.762, 1.481, 0.648)
-							TitanS.SNape.Transparency = 1
-							TitanS.SNape.BrickColor = BrickColor.new("Institutional white")
+				if Team then
+					if ShifterPlr and Team ~= Player.Team then
+						if TitanS:FindFirstChild("Shifter") and not (TitanS.Name == "ArmoredTitan") and TitanS ~= Character then
+							if TitanS:FindFirstChild("SNape") then
+								TitanS.SNape.Size = Vector3.new(1.762, 1.481, 0.648)
+								TitanS.SNape.Transparency = 1
+								TitanS.SNape.BrickColor = BrickColor.new("Institutional white")
+							end
 						end
 					end
 				end
@@ -530,17 +532,19 @@ do
 			for _, TitanS in pairs(workspace:GetChildren()) do
 				local ShifterPlr = game:GetService("Players"):GetPlayerFromCharacter(TitanS)
 				local Team = TitanS:WaitForChild("ShifterHolder").TrueTeam.Value
-				if ShifterPlr and Team ~= Player.Team then
-					if TitanS:FindFirstChild("Shifter") and TitanS ~= Character then
-						if TitanS:FindFirstChild("RLegTendons") and TitanS:FindFirstChild("LLegTendons") then
-							local LLegTendons = TitanS:FindFirstChild("LLegTendons")
-							if not (TitanS.Name == "ArmoredTitan" and LLegTendons:FindFirstChild("Armored") and LLegTendons:WaitForChild("Armored").Value == true) then
-								TitanS.RLegTendons.Size = Vector3.new(3.469383478164673, 3.469383478164673, 2.4444448947906494)
-								TitanS.RLegTendons.Transparency = 1
-								TitanS.RLegTendons.BrickColor = BrickColor.new("Institutional white")
-								TitanS.LLegTendons.Size = Vector3.new(3.469383478164673, 3.469383478164673, 2.4444448947906494)
-								TitanS.LLegTendons.Transparency = 1
-								TitanS.LLegTendons.BrickColor = BrickColor.new("Institutional white")
+				if Team then
+					if ShifterPlr and Team ~= Player.Team then
+						if TitanS:FindFirstChild("Shifter") and TitanS ~= Character then
+							if TitanS:FindFirstChild("RLegTendons") and TitanS:FindFirstChild("LLegTendons") then
+								local LLegTendons = TitanS:FindFirstChild("LLegTendons")
+								if not (TitanS.Name == "ArmoredTitan" and LLegTendons:FindFirstChild("Armored") and LLegTendons:WaitForChild("Armored").Value == true) then
+									TitanS.RLegTendons.Size = Vector3.new(3.469383478164673, 3.469383478164673, 2.4444448947906494)
+									TitanS.RLegTendons.Transparency = 1
+									TitanS.RLegTendons.BrickColor = BrickColor.new("Institutional white")
+									TitanS.LLegTendons.Size = Vector3.new(3.469383478164673, 3.469383478164673, 2.4444448947906494)
+									TitanS.LLegTendons.Transparency = 1
+									TitanS.LLegTendons.BrickColor = BrickColor.new("Institutional white")
+								end
 							end
 						end
 					end
