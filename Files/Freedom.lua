@@ -1189,6 +1189,21 @@ do
 		odmHookTwo = two
 	end)
 
+	local dashfunc
+	for i, func in pairs(getreg()) do
+		if type(func) ~= "function" then
+			local info = debug.getinfo(func)
+			if info.source:find("ATLocal") then
+				local upv = debug.getupvalues(func)
+				for up, value in pairs(upv) do
+					if value == game.Players.LocalPlayer then
+						dashfunc = func
+					end
+				end
+			end
+		end
+	end
+
 	InstantHookBool:OnChanged(function()
 		getgenv().instanthook = Options.InstantHook.Value
 		if odmHookFunction and odmHookOne and odmHookTwo then
@@ -2158,7 +2173,12 @@ do
 							end
 						end
 			
-						if (Victim.Team.Name ~= Player.Team.Name or Player.Team.Name == "Rogue" or Victim.Team.Name == "Rogue") and (not isLocalPlayerWarrior or not isVictimWarrior) then
+						if Humanoid:FindFirstChild("Grabbed") and Humanoid.Grabbed.Value == true then
+							Hitbox.Size = Vector3.new(3, 3, 2)
+							Hitbox.Transparency = 1
+							Hitbox.BrickColor = BrickColor.new("Institutional white")
+							Hitbox.Shape = Enum.PartType.Block
+						elseif (Victim.Team.Name ~= Player.Team.Name or Player.Team.Name == "Rogue" or Victim.Team.Name == "Rogue") and (not isLocalPlayerWarrior or not isVictimWarrior) then
 							Hitbox.Size = Vector3.new(humanhitbox, humanhitbox, humanhitbox)
 							Hitbox.Transparency = humantrans
 							Hitbox.BrickColor = BrickColor.new("Institutional white")
