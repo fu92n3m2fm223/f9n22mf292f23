@@ -870,39 +870,38 @@ do
 				local Female = nil
 				local Armored = nil
 				local Colossal = nil
-
-				for _, Plr in pairs(game:GetService("Players"):GetPlayers()) do
-					if Plr.Character:FindFirstChild("FELocal") then
-						Female = "Female: " .. Plr.Name
+				
+				for _, Shifters in pairs(workspace:WaitForChild("WarriorsCandidatesFolder").ShifterHolders:GetChildren()) do
+					if Shifters.Name == "Female" and Shifters.Value ~= "Dead" then
+						Female = "Female: " .. tostring(Shifters.Value)
 					end
-
-					if Plr.Character:FindFirstChild("ARLocal") then
-						Armored = "Armored: " .. Plr.Name
+				
+					if Shifters.Name == "Armored" and Shifters.Value ~= "Dead" then
+						Armored = "Armored: " .. tostring(Shifters.Value)
 					end
-
-					if Plr.Character:FindFirstChild("COLocal") then
-						Colossal = "Colossal: " .. Plr.Name
+				
+					if Shifters.Name == "Colossal" and Shifters.Value ~= "Dead" then
+						Colossal = "Colossal: " .. tostring(Shifters.Value)
 					end
 				end
-
+				
 				local function Content()
-					local content = ""
-
+					local content = {}
 					if Female then
-						content = content .. Female .. "\n"
+						table.insert(content, Female)
 					end
-
+				
 					if Armored then
-						content = content .. Armored .. "\n"
+						table.insert(content, Armored)
 					end
-
+				
 					if Colossal then
-						content = content .. Colossal .. "\n"
+						table.insert(content, Colossal)
 					end
-
-					return content ~= "" and content or "No shifters found"
+				
+					return #content > 0 and table.concat(content, "\n") or "No shifters found"
 				end
-
+				
 				Fluent:Notify({
 					Title = "Tear",
 					Content = Content(),
@@ -1104,7 +1103,6 @@ do
 			end)
 		end
 	})
-
 	
 	local ShifterSpeed = Tabs.Third:AddSlider("ShifterSpeed", {
 		Title = "Speed",
