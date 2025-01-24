@@ -470,8 +470,10 @@ do
 		if getgenv().ShifterNapeHitbox == false then
 			for _, TitanS in pairs(workspace:GetChildren()) do
 				local ShifterPlr = game:GetService("Players"):GetPlayerFromCharacter(TitanS)
-				local Team = TitanS:WaitForChild("ShifterHolder").TrueTeam.Value
-				if Team then
+				local ShifterHolder = TitanS:FindFirstChild("ShifterHolder")
+				
+				if ShifterHolder and ShifterHolder:FindFirstChild("TrueTeam") then
+					local Team = ShifterHolder.TrueTeam.Value
 					if ShifterPlr and Team ~= Player.Team then
 						if TitanS:FindFirstChild("Shifter") and not (TitanS.Name == "ArmoredTitan") and TitanS ~= Character then
 							if TitanS:FindFirstChild("SNape") then
@@ -484,7 +486,7 @@ do
 				end
 			end
 		end
-	end)
+	end)	
 	local Slider4 = Tabs.Secondary:AddSlider("Slider4", {
 		Title = "X",
 		Default = 1.762,
@@ -526,13 +528,15 @@ do
 		end
 	})
 	local ShifterLegHitbox = Tabs.Secondary:AddToggle("shifterleg", {Title = "Shifter Leg Hitbox", Default = false })
+	local ShifterLegHitbox = Tabs.Secondary:AddToggle("shifterleg", {Title = "Shifter Leg Hitbox", Default = false })
 	ShifterLegHitbox:OnChanged(function()
 		getgenv().ShifterLegHitbox = Options.shifterleg.Value
 		if getgenv().ShifterLegHitbox == false then
 			for _, TitanS in pairs(workspace:GetChildren()) do
 				local ShifterPlr = game:GetService("Players"):GetPlayerFromCharacter(TitanS)
-				local Team = TitanS:WaitForChild("ShifterHolder").TrueTeam.Value
-				if Team then
+				local ShifterHolder = TitanS:FindFirstChild("ShifterHolder")
+				if ShifterHolder and ShifterHolder:FindFirstChild("TrueTeam") then
+					local Team = ShifterHolder.TrueTeam.Value
 					if ShifterPlr and Team ~= Player.Team then
 						if TitanS:FindFirstChild("Shifter") and TitanS ~= Character then
 							if TitanS:FindFirstChild("RLegTendons") and TitanS:FindFirstChild("LLegTendons") then
