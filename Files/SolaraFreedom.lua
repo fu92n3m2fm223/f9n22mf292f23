@@ -1810,7 +1810,8 @@ do
 
 			for _, Victim in pairs(game:GetService("Players"):GetPlayers()) do
 				if Victim ~= Player and Victim.Character and not Victim.Character:FindFirstChild("Shifter") then
-					local Hitbox = Victim.Character:WaitForChild("HumanoidRootPart"):FindFirstChild("BulletsHitbox")
+					local HumanoidRootPart = Victim.Character:FindFirstChild("HumanoidRootPart")
+					local Hitbox = HumanoidRootPart and HumanoidRootPart:FindFirstChild("BulletsHitbox")
 					if Hitbox then
 						local isVictimWarrior = false
 						for _, v in pairs(workspace:WaitForChild("PlayersDataFolder"):GetChildren()) do
@@ -1819,7 +1820,7 @@ do
 								break
 							end
 						end
-
+			
 						if (Victim.Team.Name ~= Player.Team.Name or Player.Team.Name == "Rogue" or Victim.Team.Name == "Rogue") and (not isLocalPlayerWarrior or not isVictimWarrior) then
 							Hitbox.Size = Vector3.new(humanhitbox, humanhitbox, humanhitbox)
 							Hitbox.Transparency = humantrans
