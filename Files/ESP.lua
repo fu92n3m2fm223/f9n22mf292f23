@@ -292,7 +292,7 @@ function EspObject:Render()
 	local corners = self.corners;
 
 	while not (corners and corners.topLeft and corners.topRight and corners.bottomRight and corners.bottomLeft) do
-    		task.wait()
+    		return
 	end
 
 	visible.box.Visible = enabled and onScreen and options.box;
