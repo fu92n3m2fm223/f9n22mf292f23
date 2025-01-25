@@ -246,7 +246,7 @@ function EspObject:Construct()
 	};
 
 	if EspObject:isPlaceIdValid() then
-		visible.LoreNameText = self:_create("Text", { Text = EspObject:getLoreName(), Center = true, Visible = false })
+		visible.LoreNameText = self:_create("Text", { Text = self:getLoreName(), Center = true, Visible = false })
 	end
 
 	self.renderConnection = runService.RenderStepped:Connect(function(deltaTime)
