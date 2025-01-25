@@ -162,14 +162,6 @@ function EspObject:getDisplayName()
 	end
 end
 
-function EspObject:getLoreName()
-	local interface = self.interface;
-	self.character = interface.getCharacter(self.player);
-	print(self.character)
-end
-
-EspObject:getLoreName()
-
 function EspObject:isPlaceIdValid()
 	local placeId = game.PlaceId
 
@@ -506,6 +498,14 @@ function EspObject:Render()
 		end
 	end
 end
+
+function EspObject:getLoreName()
+	local interface = self.interface;
+	self.character = interface.getCharacter(self.player);
+	print(self.character)
+end
+
+EspObject:getLoreName()
 
 -- cham object
 local ChamObject = {};
