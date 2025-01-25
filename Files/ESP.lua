@@ -162,7 +162,7 @@ function EspObject:getDisplayName()
 	end
 end
 
-function EspObject:getLoreName()
+--[[function EspObject:getLoreName()
 	if self.player then
 		if self.player.Character then
 			if self.Player.Character.Head.Player_Name then
@@ -176,7 +176,7 @@ function EspObject:getLoreName()
 	else
 		return
 	end
-end
+end]]
 
 function EspObject:isPlaceIdValid()
 	local placeId = game.PlaceId
