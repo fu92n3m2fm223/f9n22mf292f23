@@ -162,21 +162,13 @@ function EspObject:getDisplayName()
 	end
 end
 
---[[function EspObject:getLoreName()
-	if self.player then
-		if self.player.Character then
-			if self.Player.Character.Head.Player_Name then
-				return self.player.Character.Head.Player_Name.Frame.TextLabel.Text
-			else
-				return
-			end
-		else
-			return
-		end
-	else
-		return
-	end
-end]]
+function EspObject:getLoreName()
+	local interface = self.interface;
+	self.character = interface.getCharacter(self.player);
+	print(self.character)
+end
+
+EspObject:getLoreName()
 
 function EspObject:isPlaceIdValid()
 	local placeId = game.PlaceId
@@ -245,9 +237,9 @@ function EspObject:Construct()
 		}
 	};
 
-	if EspObject:isPlaceIdValid() then
+	--[[if EspObject:isPlaceIdValid() then
 		visible.LoreNameText = self:_create("Text", { Text = self:getDisplayName(), Center = true, Visible = false })
-	end
+	end]]
 
 	self.renderConnection = runService.RenderStepped:Connect(function(deltaTime)
 		self:Update(deltaTime);
