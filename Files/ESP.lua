@@ -229,9 +229,9 @@ function EspObject:Construct()
 		}
 	};
 
-	--[[if EspObject:isPlaceIdValid() then
+	if EspObject:isPlaceIdValid() then
 		visible.LoreNameText = self:_create("Text", { Text = self:getDisplayName(), Center = true, Visible = false })
-	end]]
+	end
 
 	self.renderConnection = runService.RenderStepped:Connect(function(deltaTime)
 		self:Update(deltaTime);
@@ -498,14 +498,6 @@ function EspObject:Render()
 		end
 	end
 end
-
-function EspObject:getLoreName()
-	local interface = self.interface;
-	self.character = interface.getCharacter(self.player);
-	print(self.character)
-end
-
-EspObject:getLoreName()
 
 -- cham object
 local ChamObject = {};
