@@ -1,6 +1,3 @@
---!nolint
---!nocheck
-
 -- services
 local runService = game:GetService("RunService");
 local players = game:GetService("Players");
@@ -162,27 +159,6 @@ function EspObject:getDisplayName()
 	end
 end
 
-function EspObject:isPlaceIdValid()
-	local placeId = game.PlaceId
-
-	if game:GetService("ReplicatedStorage"):FindFirstChild("Modules") then
-		if game:GetService("ReplicatedStorage"):FindFirstChild("Modules"):FindFirstChild("Information") then
-			local Info = require(game:GetService("ReplicatedStorage"):FindFirstChild("Modules"):FindFirstChild("Information"))
-			for _, placeData in pairs(Info.Maps) do
-				if placeData.PlaceId == placeId then
-					return true
-				end
-			end
-		else
-			return false
-		end
-	else
-		return false
-	end
-
-    return false
-end
-
 function EspObject:Construct()
 	self.charCache = {};
 	self.childCount = 0;
@@ -228,10 +204,6 @@ function EspObject:Construct()
 			arrow = self:_create("Triangle", { Filled = true, Visible = false })
 		}
 	};
-
-	if EspObject:isPlaceIdValid() then
-		visible.LoreNameText = self:_create("Text", { Text = self:getDisplayName(), Center = true, Visible = false })
-	end
 
 	self.renderConnection = runService.RenderStepped:Connect(function(deltaTime)
 		self:Update(deltaTime);
