@@ -163,9 +163,13 @@ function EspObject:getDisplayName()
 end
 
 function EspObject:getLoreName()
-	if self.player.Character then
-		if self.Player.Character.Head.Player_Name then
-			return self.player.Character.Head.Player_Name.Frame.TextLabel.Text
+	if self.player then
+		if self.player.Character then
+			if self.Player.Character.Head.Player_Name then
+				return self.player.Character.Head.Player_Name.Frame.TextLabel.Text
+			else
+				return
+			end
 		else
 			return
 		end
