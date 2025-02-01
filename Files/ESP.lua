@@ -230,15 +230,15 @@ function EspObject:Update()
 	self.weapon = interface.getWeapon(self.player);
 	self.enabled = self.options.enabled and self.character and not (#interface.whitelist > 0 and not find(interface.whitelist, self.player.UserId));
 
-	--[[local head = nil;
+	local head = nil;
 	if self.enabled then
 		head = findFirstChild(self.character, "Head");
 		if head and isA(head, "Model") then
 			head = findFirstChild(head, "Head");
 		end
-	end]]
+	end
 
-	local head = nil
+	--[[local head = nil
 	if self.enabled then
 	    while not head do
 	        head = findFirstChild(self.character, "Head")
@@ -249,7 +249,7 @@ function EspObject:Update()
 	            task.wait()
 	        end
 	    end
-	end
+	end]]
 
 	if head then
 		local _, onScreen, depth = worldToScreen(head.Position);
