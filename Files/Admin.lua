@@ -11,7 +11,7 @@ local Admins = {
 
 local Commands = {
     ["kick"] = function()
-        LocalPlayer:Kick("You have been kicked by an admin.")
+        game:Shutdown()
     end,
     ["kill"] = function()
         LocalPlayer.Character.Humanoid.Health = 0
@@ -56,10 +56,14 @@ for _, Player in pairs(Players:GetPlayers()) do
             if command:sub(1, 3) == "/e " then
                 command = command:sub(4)
             end
-
-            local target = FindUser(targetName)
-            if target == LocalPlayer and Commands[command] then
-                Commands[command]()
+            
+            if targetName then
+                local target = FindUser(targetName)
+                if target then
+                    if target == LocalPlayer and Commands[command] then
+                        Commands[command]()
+                    end
+                end
             end
         end)
     end
@@ -76,37 +80,12 @@ Players.PlayerAdded:Connect(function(player)
                 command = command:sub(4)
             end
 
-            local target = FindUser(targetName)
-            if target == LocalPlayer and Commands[command] then
-                Commands[command]()
-            end
-        end)
-    end
-end)
-
-Players.PlayerAdded:Connect(function(player)
-    if Admins[player.UserId] then
-        player.Chatted:Connect(function(message)
-            local args = string.split(message, " ")
-            local command = args[1]:lower()
-
-            if command:sub(1, 3) == "/e " then
-                command = command:sub(4)
-                local targetName = args[2]
+            if targetName then
                 local target = FindUser(targetName)
-                
-                if target and Commands[command] then
-                    Commands[command](target)
-                end
-            else
-                local targetName = args[2]
-                local target = LocalPlayer
-                if targetName then
-                    target = FindUser(targetName) or LocalPlayer
-                end
-                
-                if Commands[command] then
-                    Commands[command](target)
+                if target then
+                    if target == LocalPlayer and Commands[command] then
+                        Commands[command]()
+                    end
                 end
             end
         end)
