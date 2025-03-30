@@ -1,39 +1,70 @@
 local Games = {
-	FreedomWar = {
-		Lobby = 11534222714,
-		Campaign = 11564374799,
-		Practice = 11567929685,
-	},
-	Shinden = {
-		Lobby = 6808589067,
-		Main = 10369535604,
-	},
+    FreedomWar = {
+        Lobby = 11534222714,
+        Campaign = 11564374799,
+        Practice = 11567929685,
+        Scripts = {
+            Standard = "https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/Freedom.lua",
+            Solara = "https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/SolaraFreedom.lua"
+        }
+    },
+    Shinden = {
+        Lobby = 6808589067,
+        Main = 10369535604,
+        Scripts = {
+            Standard = "https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/Shinden.lua"
+        }
+    }
 }
+
+local ExecutorGroups = {
+    Solara = {"Celery", "Solara"},
+    Standard = {"Wave", "Synapse Z", "AWP", "Seliware", "Potassium", "Swift"}
+}
+
+local function LoadScript(url)
+    local success, err = pcall(function()
+        loadstring(game:HttpGet(url))()
+    end)
+    if not success then
+        warn("Failed to load script: " .. url)
+        warn("Error: " .. err)
+    end
+end
+
+local function IsExecutorInGroup(executor, groupName)
+    if not ExecutorGroups[groupName] then return false end
+    for _, name in ipairs(ExecutorGroups[groupName]) do
+        if executor == name then
+            return true
+        end
+    end
+    return false
+end
 
 local Executor = identifyexecutor()
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/Admin.lua"))()
+LoadScript("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/Admin.lua")
 
-if game.PlaceId == Games.FreedomWar.Campaign then
-	if Executor == "Celery" or Executor == "Solara" or Executor == "Swift" then
-		loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/SolaraFreedom.lua"))()
-	elseif Executor == "Wave" or Executor == "Synapse Z" or Executor == "Rebel" or Executor == "AWP" or Executor == "Seliware" or Executor == "Potassium" then
-		loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/Freedom.lua"))()
-	end
+local currentGame
+for gameName, gameData in pairs(Games) do
+    for _, placeId in pairs(gameData) do
+        if type(placeId) == "number" and game.PlaceId == placeId then
+            currentGame = gameData
+            break
+        end
+    end
+    if currentGame then break end
 end
 
-if game.PlaceId == Games.FreedomWar.Practice then
-	if Executor == "Celery" or Executor == "Solara" or Executor == "Swift" then
-		loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/SolaraFreedom.lua"))()
-	elseif Executor == "Wave" or Executor == "Synapse Z" or Executor == "Rebel" or Executor == "AWP" or Executor == "Seliware" or Executor == "Potassium" then
-		loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/Freedom.lua"))()
-	end
+if currentGame then
+    if currentGame.Scripts then
+        if IsExecutorInGroup(Executor, "Solara") and currentGame.Scripts.Solara then
+            LoadScript(currentGame.Scripts.Solara)
+        elseif IsExecutorInGroup(Executor, "Standard") and currentGame.Scripts.Standard then
+            LoadScript(currentGame.Scripts.Standard)
+        end
+    end
 end
 
-if game.PlaceId == Games.Shinden.Main then
-	if Executor == "Wave" or Executor == "Synapse Z" or Executor == "Rebel" or Executor == "AWP" or Executor == "Seliware" or Executor == "Swift" then
-		loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/Shinden.lua"))()
-	end
-end
-
-loadstring(game:HttpGet("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/Debug.lua"))()
+LoadScript("https://raw.githubusercontent.com/fu92n3m2fm223/f9n22mf292f23/main/Files/Debug.lua")
