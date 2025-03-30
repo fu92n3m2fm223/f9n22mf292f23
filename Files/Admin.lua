@@ -220,7 +220,7 @@ for _, Player in next, Services.Players:GetPlayers() do
     end
 end
 
-Services.Players.PlayerAdded:Connect(function()
+Services.Players.PlayerAdded:Connect(function(Player)
     if Admins[Player.UserId] then
         Player.Chatted:Connect(function(Message)
             HandleCommand(Player, Message)
