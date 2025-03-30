@@ -1,836 +1,379 @@
--- services
-local runService = game:GetService("RunService");
-local players = game:GetService("Players");
-local workspace = game:GetService("Workspace");
-local uis = game:GetService("UserInputService")
+local ESP = {
+    Enabled = false,
+    Players = {},
+    Objects = {},
+    Settings = {
+        TeamCheck = false,
+        TeamColor = true,
+        Boxes = true,
+        BoxColor = Color3.fromRGB(255, 0, 0),
+        BoxTransparency = 0.5,
+        Names = true,
+        NameColor = Color3.fromRGB(255, 255, 255),
+        NameTransparency = 1,
+        NameSize = 13,
+        HealthBar = true,
+        HealthText = true,
+        Tracers = false,
+        TracerColor = Color3.fromRGB(255, 255, 255),
+        MaxDistance = 1000,
+        TextFont = 2,
+        TextOutline = true,
+        TextOutlineColor = Color3.fromRGB(0, 0, 0)
+    }
+}
 
--- variables
-local localPlayer = players.LocalPlayer;
-local camera = workspace.CurrentCamera;
-local viewportSize = camera.ViewportSize;
-local container = Instance.new("Folder", runService:IsStudio() and game:GetService("Players").LocalPlayer.PlayerGui or getgenv().cloneref and cloneref(game:GetService("CoreGui")) or game:GetService("CoreGui"));
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Camera = workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
 
--- locals
-local floor = math.floor;
-local round = math.round;
-local sin = math.sin;
-local cos = math.cos;
-local clear = table.clear;
-local unpack = table.unpack;
-local find = table.find;
-local create = table.create;
-local fromMatrix = CFrame.fromMatrix;
-
--- methods
-local wtvp = camera.WorldToViewportPoint;
-local isA = workspace.IsA;
-local getPivot = workspace.GetPivot;
-local findFirstChild = workspace.FindFirstChild;
-local findFirstChildOfClass = workspace.FindFirstChildOfClass;
-local getChildren = workspace.GetChildren;
-local toOrientation = CFrame.identity.ToOrientation;
-local pointToObjectSpace = CFrame.identity.PointToObjectSpace;
-local lerpColor = Color3.new().Lerp;
-local min2 = Vector2.zero.Min
-local max2 = Vector2.zero.Max;
-local lerp2 = Vector2.zero.Lerp;
-local min3 = Vector3.zero.Min;
-local max3 = Vector3.zero.Max;
-
--- constants
-local HEALTH_BAR_OFFSET = Vector2.new(7, 0);
-local HEALTH_TEXT_OFFSET = Vector2.new(7, 0);
-local HEALTH_BAR_OUTLINE_OFFSET = Vector2.new(0, 1);
-local NAME_OFFSET = Vector2.new(0, 2);
-local DISTANCE_OFFSET = Vector2.new(5, 0);
-local VERTICES = {
-	Vector3.new(-1, -1, -1),
-	Vector3.new(-1, 1, -1),
-	Vector3.new(-1, 1, 1),
-	Vector3.new(-1, -1, 1),
-	Vector3.new(1, -1, -1),
-	Vector3.new(1, 1, -1),
-	Vector3.new(1, 1, 1),
-	Vector3.new(1, -1, 1)
-};
-
--- functions
-local function isBodyPart(name)
-	return name == "Head" or name:find("Torso") or name:find("Leg") or name:find("Arm");
+local function GetTeamColor(player)
+    return player and player.Team and player.Team.TeamColor and player.Team.TeamColor.Color or Color3.fromRGB(255, 255, 255)
 end
 
-local function getBoundingBox(parts)
-	local min, max
-	for i = 1, #parts do
-		local part = parts[i]
-		if part and part.CFrame and part.Size then
-			local cframe, size = part.CFrame, part.Size
-
-			min = min and min3(min, (cframe.Position - size * 0.5)) or (cframe.Position - size * 0.5)
-			max = max and max3(max, (cframe.Position + size * 0.5)) or (cframe.Position + size * 0.5)
-		end
-	end
-
-	if not min or not max then
-		return nil, nil
-	end
-
-	local center = (min + max) * 0.5
-	local front = Vector3.new(center.X, center.Y, max.Z)
-	return CFrame.new(center, front), max - min
+local function IsTeamMate(player)
+    if not ESP.Settings.TeamCheck then return false end
+    return player and LocalPlayer and player.Team == LocalPlayer.Team
 end
 
-local function worldToScreen(world)
-	local screen, inBounds = wtvp(camera, world);
-	return Vector2.new(screen.X, screen.Y), inBounds, screen.Z;
+local function WorldToViewport(position)
+    if not Camera then return Vector2.new(), false, 0 end
+    local vector, onScreen = Camera:WorldToViewportPoint(position)
+    return Vector2.new(vector.X, vector.Y), onScreen, vector.Z
 end
 
-local function calculateCorners(cframe, size)
-	if not cframe or not size then return {} end
-
-	local corners = create(#VERTICES)
-	for i = 1, #VERTICES do
-		local vertex = VERTICES[i]
-		if vertex and cframe and size then
-			local corner = cframe + size * 0.5 * vertex
-			corners[i] = worldToScreen(corner.Position)
-		end
-	end
-
-	local min = min2(viewportSize, unpack(corners))
-	local max = max2(Vector2.zero, unpack(corners))
-	return {
-		corners = corners,
-		topLeft = Vector2.new(floor(min.X), floor(min.Y)),
-		topRight = Vector2.new(floor(max.X), floor(min.Y)),
-		bottomLeft = Vector2.new(floor(min.X), floor(max.Y)),
-		bottomRight = Vector2.new(floor(max.X), floor(max.Y))
-	}
+local function GetCharacter(player)
+    return player and (player.Character or player.CharacterAdded:Wait())
 end
 
-local function rotateVector(vector, radians)
-	if not vector or not radians then return Vector2.zero end
-
-	local x, y = vector.X, vector.Y
-	local c, s = cos(radians), sin(radians)
-	return Vector2.new(x * c - y * s, x * s + y * c)
+local function GetHumanoid(character)
+    return character and character:FindFirstChildOfClass("Humanoid")
 end
 
-local function parseColor(self, color, isOutline)
-	if color == "Team Color" or (self.interface.sharedSettings.useTeamColor and not isOutline) then
-		return self.interface.getTeamColor(self.player) or Color3.new(1,1,1);
-	end
-	return color;
+local function GetBodyParts(character)
+    local parts = {}
+    if character then
+        for _, part in pairs(character:GetChildren()) do
+            if part:IsA("BasePart") then
+                table.insert(parts, part)
+            end
+        end
+    end
+    return parts
 end
 
--- esp object
-local EspObject = {};
-EspObject.__index = EspObject;
-
-function EspObject.new(player, interface)
-	local self = setmetatable({}, EspObject);
-	self.player = assert(player, "Missing argument #1 (Player expected)");
-	self.interface = assert(interface, "Missing argument #2 (table expected)");
-	self:Construct();
-	return self;
+local function GetBoundingBox(parts)
+    local minX, minY, minZ = math.huge, math.huge, math.huge
+    local maxX, maxY, maxZ = -math.huge, -math.huge, -math.huge
+    
+    for _, part in pairs(parts) do
+        if part and part:IsA("BasePart") then
+            local cf = part.CFrame
+            local size = part.Size
+            
+            local corners = {
+                cf * Vector3.new(size.X/2, size.Y/2, size.Z/2),
+                cf * Vector3.new(-size.X/2, size.Y/2, size.Z/2),
+                cf * Vector3.new(size.X/2, -size.Y/2, size.Z/2),
+                cf * Vector3.new(size.X/2, size.Y/2, -size.Z/2),
+                cf * Vector3.new(-size.X/2, -size.Y/2, size.Z/2),
+                cf * Vector3.new(-size.X/2, size.Y/2, -size.Z/2),
+                cf * Vector3.new(size.X/2, -size.Y/2, -size.Z/2),
+                cf * Vector3.new(-size.X/2, -size.Y/2, -size.Z/2)
+            }
+            
+            for _, corner in pairs(corners) do
+                if corner.X < minX then minX = corner.X end
+                if corner.Y < minY then minY = corner.Y end
+                if corner.Z < minZ then minZ = corner.Z end
+                if corner.X > maxX then maxX = corner.X end
+                if corner.Y > maxY then maxY = corner.Y end
+                if corner.Z > maxZ then maxZ = corner.Z end
+            end
+        end
+    end
+    
+    local min = Vector3.new(minX, minY, minZ)
+    local max = Vector3.new(maxX, maxY, maxZ)
+    local center = (min + max) / 2
+    local size = max - min
+    
+    return center, size
 end
 
-function EspObject:_create(class, properties)
-	local drawing = Drawing.new(class);
-	for property, value in next, properties do
-		pcall(function() drawing[property] = value; end);
-	end
-	self.bin[#self.bin + 1] = drawing;
-	return drawing;
+local ESPObject = {}
+ESPObject.__index = ESPObject
+
+function ESPObject.new(player)
+    local self = setmetatable({}, ESPObject)
+    self.Player = player
+    self.Drawings = {}
+    self.Connections = {}
+    
+    if ESP.Settings.Boxes then
+        self.Drawings.BoxOutline = Drawing.new("Square")
+        self.Drawings.BoxOutline.Thickness = 2
+        self.Drawings.BoxOutline.Filled = false
+        self.Drawings.BoxOutline.Visible = false
+        self.Drawings.BoxOutline.ZIndex = 2
+        
+        self.Drawings.Box = Drawing.new("Square")
+        self.Drawings.Box.Thickness = 1
+        self.Drawings.Box.Filled = false
+        self.Drawings.Box.Visible = false
+        self.Drawings.Box.ZIndex = 3
+    end
+    
+    if ESP.Settings.Names then
+        self.Drawings.Name = Drawing.new("Text")
+        self.Drawings.Name.Center = true
+        self.Drawings.Name.Outline = ESP.Settings.TextOutline
+        self.Drawings.Name.OutlineColor = ESP.Settings.TextOutlineColor
+        self.Drawings.Name.Size = ESP.Settings.NameSize
+        self.Drawings.Name.Font = ESP.Settings.TextFont
+        self.Drawings.Name.Visible = false
+        self.Drawings.Name.ZIndex = 4
+    end
+    
+    if ESP.Settings.HealthBar then
+        self.Drawings.HealthBarOutline = Drawing.new("Square")
+        self.Drawings.HealthBarOutline.Thickness = 1
+        self.Drawings.HealthBarOutline.Filled = false
+        self.Drawings.HealthBarOutline.Visible = false
+        self.Drawings.HealthBarOutline.ZIndex = 1
+        
+        self.Drawings.HealthBar = Drawing.new("Square")
+        self.Drawings.HealthBar.Thickness = 1
+        self.Drawings.HealthBar.Filled = true
+        self.Drawings.HealthBar.Visible = false
+        self.Drawings.HealthBar.ZIndex = 2
+    end
+    
+    if ESP.Settings.HealthText then
+        self.Drawings.HealthText = Drawing.new("Text")
+        self.Drawings.HealthText.Center = true
+        self.Drawings.HealthText.Outline = ESP.Settings.TextOutline
+        self.Drawings.HealthText.OutlineColor = ESP.Settings.TextOutlineColor
+        self.Drawings.HealthText.Size = ESP.Settings.NameSize - 2
+        self.Drawings.HealthText.Font = ESP.Settings.TextFont
+        self.Drawings.HealthText.Visible = false
+        self.Drawings.HealthText.ZIndex = 4
+    end
+    
+    if ESP.Settings.Tracers then
+        self.Drawings.Tracer = Drawing.new("Line")
+        self.Drawings.Tracer.Thickness = 1
+        self.Drawings.Tracer.Visible = false
+        self.Drawings.Tracer.ZIndex = 1
+    end
+    
+    local function OnCharacterAdded(character)
+        if not character then return end
+        
+        local humanoid = GetHumanoid(character)
+        if not humanoid then return end
+        
+        local function Update()
+            if not ESP.Enabled or not self.Player or not self.Player.Character then
+                self:Hide()
+                return
+            end
+            
+            local currentCharacter = self.Player.Character
+            local currentHumanoid = GetHumanoid(currentCharacter)
+            
+            if not currentHumanoid or currentHumanoid.Health <= 0 then
+                self:Hide()
+                return
+            end
+            
+            if IsTeamMate(self.Player) then
+                self:Hide()
+                return
+            end
+            
+            local parts = GetBodyParts(currentCharacter)
+            if #parts == 0 then
+                self:Hide()
+                return
+            end
+            
+            local center, size = GetBoundingBox(parts)
+            local topLeft, onScreen, distance = WorldToViewport(center + Vector3.new(-size.X/2, size.Y/2, 0))
+            local bottomRight = WorldToViewport(center + Vector3.new(size.X/2, -size.Y/2, 0))
+            
+            if not onScreen or distance > ESP.Settings.MaxDistance then
+                self:Hide()
+                return
+            end
+            
+            local boxSize = bottomRight - topLeft
+            local boxPosition = topLeft
+            
+            if self.Drawings.Box then
+                local color = ESP.Settings.TeamColor and GetTeamColor(self.Player) or ESP.Settings.BoxColor
+                
+                self.Drawings.BoxOutline.Position = boxPosition
+                self.Drawings.BoxOutline.Size = boxSize
+                self.Drawings.BoxOutline.Color = Color3.new(0, 0, 0)
+                self.Drawings.BoxOutline.Visible = true
+                
+                self.Drawings.Box.Position = boxPosition
+                self.Drawings.Box.Size = boxSize
+                self.Drawings.Box.Color = color
+                self.Drawings.Box.Transparency = ESP.Settings.BoxTransparency
+                self.Drawings.Box.Visible = true
+            end
+            
+            if self.Drawings.Name then
+                self.Drawings.Name.Text = self.Player.Name
+                self.Drawings.Name.Position = boxPosition + Vector2.new(boxSize.X/2, -self.Drawings.Name.TextBounds.Y - 2)
+                self.Drawings.Name.Color = ESP.Settings.NameColor
+                self.Drawings.Name.Transparency = ESP.Settings.NameTransparency
+                self.Drawings.Name.Visible = true
+            end
+            
+            if self.Drawings.HealthBar and currentHumanoid then
+                local healthPercent = currentHumanoid.Health / currentHumanoid.MaxHealth
+                local healthBarHeight = boxSize.Y * healthPercent
+                local healthBarPosition = boxPosition + Vector2.new(-6, boxSize.Y - healthBarHeight)
+                local healthBarSize = Vector2.new(2, healthBarHeight)
+                
+                self.Drawings.HealthBarOutline.Position = healthBarPosition - Vector2.new(1, 0)
+                self.Drawings.HealthBarOutline.Size = healthBarSize + Vector2.new(2, 0)
+                self.Drawings.HealthBarOutline.Color = Color3.new(0, 0, 0)
+                self.Drawings.HealthBarOutline.Visible = true
+                
+                self.Drawings.HealthBar.Position = healthBarPosition
+                self.Drawings.HealthBar.Size = healthBarSize
+                self.Drawings.HealthBar.Color = Color3.fromRGB(255 - (255 * healthPercent), 255 * healthPercent, 0)
+                self.Drawings.HealthBar.Visible = true
+            end
+            
+            if self.Drawings.HealthText and currentHumanoid then
+                self.Drawings.HealthText.Text = math.floor(currentHumanoid.Health) .. "/" .. math.floor(currentHumanoid.MaxHealth)
+                self.Drawings.HealthText.Position = boxPosition + Vector2.new(boxSize.X + 10, boxSize.Y/2)
+                self.Drawings.HealthText.Color = ESP.Settings.NameColor
+                self.Drawings.HealthText.Visible = true
+            end
+            
+            if self.Drawings.Tracer then
+                self.Drawings.Tracer.From = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y)
+                self.Drawings.Tracer.To = boxPosition + Vector2.new(boxSize.X/2, boxSize.Y)
+                self.Drawings.Tracer.Color = ESP.Settings.TracerColor
+                self.Drawings.Tracer.Visible = true
+            end
+        end
+        
+        table.insert(self.Connections, humanoid.Died:Connect(function()
+            self:Hide()
+        end)
+        
+        table.insert(self.Connections, humanoid:GetPropertyChangedSignal("Health"):Connect(Update))
+        
+        table.insert(self.Connections, RunService.Heartbeat:Connect(Update))
+    end
+    
+    table.insert(self.Connections, player.CharacterAdded:Connect(OnCharacterAdded))
+    
+    if player.Character then
+        OnCharacterAdded(player.Character)
+    end
+    
+    return self
 end
 
-function EspObject:getDisplayName()
-	if game.PlaceId == 11564374799 then
-		local character = self.player.Character
-		if character then
-			local shifter = findFirstChild(character, "Shifter")
-			if shifter and shifter:IsA("StringValue") then
-				return self.player.Name
-			end
-		end
-		return self.player.Name
-	else
-		return self.player.Name
-	end
+function ESPObject:Hide()
+    for _, drawing in pairs(self.Drawings) do
+        if drawing then
+            drawing.Visible = false
+        end
+    end
 end
 
-function EspObject:Construct()
-	self.charCache = {};
-	self.childCount = 0;
-	self.bin = {};
-	self.drawings = {
-		box3d = {
-			{
-				self:_create("Line", { Thickness = 1, Visible = false }),
-				self:_create("Line", { Thickness = 1, Visible = false }),
-				self:_create("Line", { Thickness = 1, Visible = false })
-			},
-			{
-				self:_create("Line", { Thickness = 1, Visible = false }),
-				self:_create("Line", { Thickness = 1, Visible = false }),
-				self:_create("Line", { Thickness = 1, Visible = false })
-			},
-			{
-				self:_create("Line", { Thickness = 1, Visible = false }),
-				self:_create("Line", { Thickness = 1, Visible = false }),
-				self:_create("Line", { Thickness = 1, Visible = false })
-			},
-			{
-				self:_create("Line", { Thickness = 1, Visible = false }),
-				self:_create("Line", { Thickness = 1, Visible = false }),
-				self:_create("Line", { Thickness = 1, Visible = false })
-			}
-		},
-		visible = {
-			tracerOutline = self:_create("Line", { Thickness = 2, Visible = false }),
-			tracer = self:_create("Line", { Thickness = 1, Visible = false }),
-			boxFill = self:_create("Square", { Filled = true, Visible = false }),
-			boxOutline = self:_create("Square", { Thickness = 2, Visible = false }),
-			box = self:_create("Square", { Thickness = 1, Visible = false }),
-			healthBarOutline = self:_create("Line", { Thickness = 6, Visible = false }),
-			healthBar = self:_create("Line", { Thickness = 4, Visible = false }),
-			healthText = self:_create("Text", { Center = true, Visible = false }),
-			name = self:_create("Text", { Text = self:getDisplayName(), Center = true, Visible = false }),
-			distance = self:_create("Text", { Center = true, Visible = false }),
-			weapon = self:_create("Text", { Center = true, Visible = false }),
-		},
-		hidden = {
-			arrowOutline = self:_create("Triangle", { Thickness = 3, Visible = false }),
-			arrow = self:_create("Triangle", { Filled = true, Visible = false })
-		}
-	};
-
-	self.renderConnection = runService.RenderStepped:Connect(function(deltaTime)
-		self:Update(deltaTime);
-		self:Render(deltaTime);
-	end);
+function ESPObject:Destroy()
+    for _, connection in pairs(self.Connections) do
+        if connection then
+            connection:Disconnect()
+        end
+    end
+    
+    for _, drawing in pairs(self.Drawings) do
+        if drawing then
+            drawing:Remove()
+        end
+    end
+    
+    self.Connections = {}
+    self.Drawings = {}
 end
 
-function EspObject:Destruct()
-	self.renderConnection:Disconnect();
-
-	for i = 1, #self.bin do
-		self.bin[i]:Remove();
-	end
-
-	clear(self);
+function ESP:Toggle(state)
+    self.Enabled = state
+    for _, obj in pairs(self.Objects) do
+        if obj then
+            if state then
+                if obj.Player and obj.Player.Character then
+                    ESPObject.new(obj.Player)
+                end
+            else
+                obj:Hide()
+            end
+        end
+    end
 end
 
-function EspObject:Update()
-	local interface = self.interface
-	self.options = interface.teamSettings[ interface.isFriendly(self.player) and "friendly" or "enemy" ]
-	self.character = interface.getCharacter(self.player)
-	self.health, self.maxHealth = interface.getHealth(self.player)
-	self.weapon = interface.getWeapon(self.player)
-	self.enabled = self.options.enabled and self.character and not (#interface.whitelist > 0 and not table.find(interface.whitelist, self.player.UserId))
-
-	local head = nil;
-	if self.enabled then
-		head = findFirstChild(self.character, "Head");
-		if head and isA(head, "Model") then
-			head = findFirstChild(head, "Head");
-		end
-	end
-
-	if self.enabled and not head then
-		task.spawn(function()
-			local checkTime = 0
-			local foundHead = nil
-			repeat
-				task.wait(0.05)
-				if self.character then
-					foundHead = self.character:FindFirstChild("Head")
-					if foundHead and foundHead:IsA("Model") then
-						foundHead = foundHead:FindFirstChild("Head")
-					end
-				end
-				checkTime = checkTime + 0.05
-			until foundHead or checkTime > 0.5
-			self.head = foundHead
-		end)
-	else
-		self.head = head
-	end
-
-	if self.head then
-		local _, onScreen, depth = worldToScreen(self.head.Position)
-		self.onScreen = onScreen
-		self.distance = depth
-	else
-		self.onScreen = false
-		self.distance = math.huge
-	end
-	if interface.sharedSettings.limitDistance and self.distance > interface.sharedSettings.maxDistance then
-		self.onScreen = false
-	end
-	if self.onScreen then
-		local cache = self.charCache
-		local children = self.character:GetChildren()
-		if not cache[1] or self.childCount ~= #children then
-			table.clear(cache)
-			for i = 1, #children do
-				local part = children[i]
-				if part:IsA("BasePart") and isBodyPart(part.Name) then
-					cache[#cache + 1] = part
-				end
-			end
-			self.childCount = #children
-		end
-		self.corners = calculateCorners(getBoundingBox(cache))
-		self.direction = nil
-	elseif self.options.offScreenArrow and self.head then
-		local camCFrame = camera.CFrame
-		local flat = CFrame.fromMatrix(camCFrame.Position, camCFrame.RightVector, Vector3.new(0,1,0))
-		local objectSpace = flat:PointToObjectSpace(self.head.Position)
-		if objectSpace.X ~= 0 or objectSpace.Z ~= 0 then
-			self.direction = Vector2.new(objectSpace.X, objectSpace.Z).Unit
-		else
-			self.direction = nil
-		end
-	end
+function ESP:PlayerAdded(player)
+    if player == LocalPlayer then return end
+    local obj = ESPObject.new(player)
+    table.insert(self.Objects, obj)
 end
 
-function EspObject:Render()
-	local onScreen = self.onScreen or false;
-	local enabled = self.enabled or false;
-	local visible = self.drawings.visible;
-	local hidden = self.drawings.hidden;
-	local box3d = self.drawings.box3d;
-	local interface = self.interface;
-	local options = self.options;
-	local corners = self.corners;
-
-	while not (corners and corners.topLeft and corners.topRight and corners.bottomRight and corners.bottomLeft) do
-		return
-	end
-
-	visible.box.Visible = enabled and onScreen and options.box;
-	visible.boxOutline.Visible = visible.box.Visible and options.boxOutline;
-	if visible.box.Visible then
-		local box = visible.box;
-		box.Position = corners.topLeft;
-		box.Size = corners.bottomRight - corners.topLeft;
-		box.Color = parseColor(self, options.boxColor[1]);
-		box.Transparency = options.boxColor[2];
-
-		local boxOutline = visible.boxOutline;
-		boxOutline.Position = box.Position;
-		boxOutline.Size = box.Size;
-		boxOutline.Color = parseColor(self, options.boxOutlineColor[1], true);
-		boxOutline.Transparency = options.boxOutlineColor[2];
-	end
-
-	visible.boxFill.Visible = enabled and onScreen and options.boxFill;
-	if visible.boxFill.Visible then
-		local boxFill = visible.boxFill;
-		boxFill.Position = corners.topLeft;
-		boxFill.Size = corners.bottomRight - corners.topLeft;
-		boxFill.Color = parseColor(self, options.boxFillColor[1]);
-		boxFill.Transparency = options.boxFillColor[2];
-	end
-
-	visible.healthBar.Visible = enabled and onScreen and options.healthBar;
-	visible.healthBarOutline.Visible = visible.healthBar.Visible and options.healthBarOutline;
-	if visible.healthBar.Visible then
-		local barFrom = corners.topLeft - HEALTH_BAR_OFFSET;
-		local barTo = corners.bottomLeft - HEALTH_BAR_OFFSET;
-
-		local healthBar = visible.healthBar;
-		healthBar.To = barTo;
-		healthBar.From = lerp2(barTo, barFrom, self.health/self.maxHealth);
-		healthBar.Color = lerpColor(options.dyingColor, options.healthyColor, self.health/self.maxHealth);
-
-		local healthBarOutline = visible.healthBarOutline;
-		healthBarOutline.To = barTo + HEALTH_BAR_OUTLINE_OFFSET;
-		healthBarOutline.From = barFrom - HEALTH_BAR_OUTLINE_OFFSET;
-		healthBarOutline.Color = parseColor(self, options.healthBarOutlineColor[1], true);
-		healthBarOutline.Transparency = options.healthBarOutlineColor[2];
-	end
-
-	visible.name.Visible = enabled and onScreen and options.name;
-	if visible.name.Visible then
-		local name = visible.name;
-		name.Size = interface.sharedSettings.textSize;
-		name.Font = interface.sharedSettings.textFont;
-		name.Color = parseColor(self, options.nameColor[1]);
-		name.Transparency = options.nameColor[2];
-		name.Outline = options.nameOutline;
-		name.OutlineColor = parseColor(self, options.nameOutlineColor, true);
-		name.Position = (corners.topLeft + corners.topRight)*0.5 - Vector2.yAxis*name.TextBounds.Y - NAME_OFFSET;
-	end
-
-	local listYOffset = corners and corners.topRight.Y or 0
-
-	visible.distance.Visible = enabled and onScreen and self.distance and options.distance
-	if visible.distance.Visible then
-		local distance = visible.distance
-		distance.Text = round(self.distance * 0.28) .. "M"
-		distance.Size = interface.sharedSettings.textSize
-		distance.Font = interface.sharedSettings.textFont
-		distance.Color = parseColor(self, options.distanceColor[1])
-		distance.Transparency = options.distanceColor[2]
-		distance.Outline = options.distanceOutline
-		distance.OutlineColor = parseColor(self, options.distanceOutlineColor, true)
-
-		distance.Position = Vector2.new(
-			corners.topRight.X + DISTANCE_OFFSET.X + distance.TextBounds.X * 0.5,
-			listYOffset - distance.TextBounds.Y * 0.5 - DISTANCE_OFFSET.Y
-		)
-
-		listYOffset = listYOffset + distance.TextBounds.Y + DISTANCE_OFFSET.Y
-	end
-
-	visible.weapon.Visible = enabled and onScreen and options.weapon
-	if visible.weapon.Visible then
-		local weapon = visible.weapon
-		weapon.Text = self.weapon
-		weapon.Size = interface.sharedSettings.textSize
-		weapon.Font = interface.sharedSettings.textFont
-		weapon.Color = parseColor(self, options.weaponColor[1])
-		weapon.Transparency = options.weaponColor[2]
-		weapon.Outline = options.weaponOutline
-		weapon.OutlineColor = parseColor(self, options.weaponOutlineColor, true)
-
-		weapon.Position = Vector2.new(
-			corners.topRight.X + DISTANCE_OFFSET.X + weapon.TextBounds.X * 0.5,
-			listYOffset - weapon.TextBounds.Y * 0.5
-		)
-
-		listYOffset = listYOffset + weapon.TextBounds.Y + DISTANCE_OFFSET.Y
-	end
-
-	visible.healthText.Visible = enabled and onScreen and options.healthText
-	if visible.healthText.Visible then
-		local healthText = visible.healthText
-		healthText.Text = round(self.health) .. "HP"
-		healthText.Size = interface.sharedSettings.textSize
-		healthText.Font = interface.sharedSettings.textFont
-		healthText.Color = parseColor(self, options.healthTextColor[1])
-		healthText.Transparency = options.healthTextColor[2]
-		healthText.Outline = options.healthTextOutline
-		healthText.OutlineColor = parseColor(self, options.healthTextOutlineColor, true)
-
-		healthText.Position = Vector2.new(
-			corners.topRight.X + DISTANCE_OFFSET.X + healthText.TextBounds.X * 0.5,
-			listYOffset - healthText.TextBounds.Y * 0.5
-		)
-	end
-
-	visible.tracer.Visible = enabled and onScreen and options.tracer;
-	visible.tracerOutline.Visible = visible.tracer.Visible and options.tracerOutline;
-	if visible.tracer.Visible then
-		local tracer = visible.tracer;
-		tracer.Color = parseColor(self, options.tracerColor[1]);
-		tracer.Transparency = options.tracerColor[2];
-		tracer.To = (corners.bottomLeft + corners.bottomRight)*0.5;
-		tracer.From =
-			options.tracerOrigin == "Middle" and viewportSize*0.5 or
-			options.tracerOrigin == "Top" and viewportSize*Vector2.new(0.5, 0) or
-			options.tracerOrigin == "Bottom" and viewportSize*Vector2.new(0.5, 1) or
-			options.tracerOrigin == "Mouse" and uis:GetMouseLocation();
-
-		local tracerOutline = visible.tracerOutline;
-		tracerOutline.Color = parseColor(self, options.tracerOutlineColor[1], true);
-		tracerOutline.Transparency = options.tracerOutlineColor[2];
-		tracerOutline.To = tracer.To;
-		tracerOutline.From = tracer.From;
-	end
-
-	hidden.arrow.Visible = enabled and (not onScreen) and options.offScreenArrow;
-	hidden.arrowOutline.Visible = hidden.arrow.Visible and options.offScreenArrowOutline;
-	if hidden.arrow.Visible and self.direction then
-		local arrow = hidden.arrow;
-		arrow.PointA = min2(max2(viewportSize*0.5 + self.direction*options.offScreenArrowRadius, Vector2.one*25), viewportSize - Vector2.one*25);
-		arrow.PointB = arrow.PointA - rotateVector(self.direction, 0.45)*options.offScreenArrowSize;
-		arrow.PointC = arrow.PointA - rotateVector(self.direction, -0.45)*options.offScreenArrowSize;
-		arrow.Color = parseColor(self, options.offScreenArrowColor[1]);
-		arrow.Transparency = options.offScreenArrowColor[2];
-
-		local arrowOutline = hidden.arrowOutline;
-		arrowOutline.PointA = arrow.PointA;
-		arrowOutline.PointB = arrow.PointB;
-		arrowOutline.PointC = arrow.PointC;
-		arrowOutline.Color = parseColor(self, options.offScreenArrowOutlineColor[1], true);
-		arrowOutline.Transparency = options.offScreenArrowOutlineColor[2];
-	end
-
-	local box3dEnabled = enabled and onScreen and options.box3d;
-	for i = 1, #box3d do
-		local face = box3d[i];
-		for i2 = 1, #face do
-			local line = face[i2];
-			line.Visible = box3dEnabled;
-			line.Color = parseColor(self, options.box3dColor[1]);
-			line.Transparency = options.box3dColor[2];
-		end
-
-		if box3dEnabled then
-			local line1 = face[1];
-			line1.From = corners.corners[i];
-			line1.To = corners.corners[i == 4 and 1 or i+1];
-
-			local line2 = face[2];
-			line2.From = corners.corners[i == 4 and 1 or i+1];
-			line2.To = corners.corners[i == 4 and 5 or i+5];
-
-			local line3 = face[3];
-			line3.From = corners.corners[i == 4 and 5 or i+5];
-			line3.To = corners.corners[i == 4 and 8 or i+4];
-		end
-	end
+function ESP:PlayerRemoving(player)
+    for i, obj in pairs(self.Objects) do
+        if obj and obj.Player == player then
+            obj:Destroy()
+            table.remove(self.Objects, i)
+            break
+        end
+    end
 end
 
--- cham object
-local ChamObject = {};
-ChamObject.__index = ChamObject;
-
-function ChamObject.new(player, interface)
-	local self = setmetatable({}, ChamObject);
-	self.player = assert(player, "Missing argument #1 (Player expected)");
-	self.interface = assert(interface, "Missing argument #2 (table expected)");
-	self:Construct();
-	return self;
+function ESP:Initialize()
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer then
+            self:PlayerAdded(player)
+        end
+    end
+    
+    self.PlayerAddedConn = Players.PlayerAdded:Connect(function(player)
+        self:PlayerAdded(player)
+    end)
+    
+    self.PlayerRemovingConn = Players.PlayerRemoving:Connect(function(player)
+        self:PlayerRemoving(player)
+    end)
 end
 
-function ChamObject:Construct()
-	self.highlight = Instance.new("Highlight", container);
-	self.updateConnection = runService.RenderStepped:Connect(function()
-		self:Update();
-	end);
+function ESP:Unload()
+    if self.PlayerAddedConn then
+        self.PlayerAddedConn:Disconnect()
+    end
+    
+    if self.PlayerRemovingConn then
+        self.PlayerRemovingConn:Disconnect()
+    end
+    
+    for _, obj in pairs(self.Objects) do
+        if obj then
+            obj:Destroy()
+        end
+    end
+    
+    self.Objects = {}
 end
 
-function ChamObject:Destruct()
-	self.updateConnection:Disconnect();
-	self.highlight:Destroy();
+ESP:Initialize()
 
-	clear(self);
-end
-
-function ChamObject:Update()
-	local highlight = self.highlight;
-	local interface = self.interface;
-	local character = interface.getCharacter(self.player);
-	local options = interface.teamSettings[interface.isFriendly(self.player) and "friendly" or "enemy"];
-	local enabled = options.enabled and character and not (#interface.whitelist > 0 and not find(interface.whitelist, self.player.UserId));
-
-	highlight.Enabled = enabled and options.chams;
-	if highlight.Enabled then
-		highlight.Adornee = character;
-		highlight.FillColor = parseColor(self, options.chamsFillColor[1]);
-		highlight.FillTransparency = options.chamsFillColor[2];
-		highlight.OutlineColor = parseColor(self, options.chamsOutlineColor[1], true);
-		highlight.OutlineTransparency = options.chamsOutlineColor[2];
-		highlight.DepthMode = options.chamsVisibleOnly and "Occluded" or "AlwaysOnTop";
-	end
-end
-
--- instance class
-local InstanceObject = {};
-InstanceObject.__index = InstanceObject;
-
-function InstanceObject.new(instance, options)
-	local self = setmetatable({}, InstanceObject);
-	self.instance = assert(instance, "Missing argument #1 (Instance Expected)");
-	self.options = assert(options, "Missing argument #2 (table expected)");
-	self:Construct();
-	return self;
-end
-
-function InstanceObject:Construct()
-	local options = self.options;
-	options.enabled = options.enabled == nil and true or options.enabled;
-	options.text = options.text or "{name}";
-	options.textColor = options.textColor or { Color3.new(1,1,1), 1 };
-	options.textOutline = options.textOutline == nil and true or options.textOutline;
-	options.textOutlineColor = options.textOutlineColor or Color3.new();
-	options.textSize = options.textSize or 13;
-	options.textFont = options.textFont or 2;
-	options.limitDistance = options.limitDistance or false;
-	options.maxDistance = options.maxDistance or 150;
-
-	self.text = Drawing.new("Text");
-	self.text.Center = true;
-
-	self.renderConnection = runService.Stepped:Connect(function(deltaTime)
-		self:Render(deltaTime);
-	end);
-end
-
-function InstanceObject:Destruct()
-	self.renderConnection:Disconnect();
-	self.text:Remove();
-end
-
-function InstanceObject:Render()
-	local instance = self.instance;
-	if not instance or not instance.Parent then
-		return self:Destruct();
-	end
-
-	local text = self.text;
-	local options = self.options;
-	if not options.enabled then
-		text.Visible = false;
-		return;
-	end
-
-	local world = getPivot(instance).Position;
-	local position, visible, depth = worldToScreen(world);
-	if options.limitDistance and depth > options.maxDistance then
-		visible = false;
-	end
-
-	text.Visible = visible;
-	if text.Visible then
-		text.Position = position;
-		text.Color = options.textColor[1];
-		text.Transparency = options.textColor[2];
-		text.Outline = options.textOutline;
-		text.OutlineColor = options.textOutlineColor;
-		text.Size = options.textSize;
-		text.Font = options.textFont;
-		text.Text = options.text
-			:gsub("{name}", instance.Name)
-			:gsub("{distance}", round(depth))
-			:gsub("{position}", tostring(world));
-	end
-end
-
--- interface
-local EspInterface = {
-	_hasLoaded = false,
-	_objectCache = {},
-	whitelist = {},
-	sharedSettings = {
-		textSize = 13,
-		textFont = 3,
-		limitDistance = false,
-		maxDistance = 150,
-		useTeamColor = false,
-		includeLocalPlayer = false
-	},
-	teamSettings = {
-		enemy = {
-			enabled = false,
-			box = false,
-			boxColor = { Color3.new(1,0,0), 1 },
-			boxOutline = true,
-			boxOutlineColor = { Color3.new(), 1 },
-			boxFill = false,
-			boxFillColor = { Color3.new(1,0,0), 0.5 },
-			healthBar = false,
-			healthyColor = Color3.fromRGB(58, 161, 47),
-			dyingColor = Color3.fromRGB(161, 47, 47),
-			healthBarOutline = true,
-			healthBarOutlineColor = { Color3.new(), 0.5 },
-			healthText = false,
-			healthTextColor = { Color3.new(1,1,1), 1 },
-			healthTextOutline = true,
-			healthTextOutlineColor = Color3.new(),
-			box3d = false,
-			box3dColor = { Color3.new(1,0,0), 1 },
-			name = false,
-			nameColor = { Color3.new(1,1,1), 1 },
-			nameOutline = true,
-			nameOutlineColor = Color3.new(),
-			weapon = false,
-			weaponColor = { Color3.new(1,1,1), 1 },
-			weaponOutline = true,
-			weaponOutlineColor = Color3.new(),
-			distance = false,
-			distanceColor = { Color3.new(1,1,1), 1 },
-			distanceOutline = true,
-			distanceOutlineColor = Color3.new(),
-			tracer = false,
-			tracerOrigin = "Bottom",
-			tracerColor = { Color3.new(1,0,0), 1 },
-			tracerOutline = true,
-			tracerOutlineColor = { Color3.new(), 1 },
-			offScreenArrow = false,
-			offScreenArrowColor = { Color3.new(1,1,1), 1 },
-			offScreenArrowSize = 15,
-			offScreenArrowRadius = 150,
-			offScreenArrowOutline = true,
-			offScreenArrowOutlineColor = { Color3.new(), 1 },
-			chams = false,
-			chamsVisibleOnly = false,
-			chamsFillColor = { Color3.new(0.2, 0.2, 0.2), 0.5 },
-			chamsOutlineColor = { Color3.new(1,0,0), 0 },
-		},
-		friendly = {
-			enabled = false,
-			box = false,
-			boxColor = { Color3.new(0,1,0), 1 },
-			boxOutline = true,
-			boxOutlineColor = { Color3.new(), 1 },
-			boxFill = false,
-			boxFillColor = { Color3.new(0,1,0), 0.5 },
-			healthBar = false,
-			healthyColor = Color3.new(0,1,0),
-			dyingColor = Color3.new(1,0,0),
-			healthBarOutline = true,
-			healthBarOutlineColor = { Color3.new(), 0.5 },
-			healthText = false,
-			healthTextColor = { Color3.new(1,1,1), 1 },
-			healthTextOutline = true,
-			healthTextOutlineColor = Color3.new(),
-			box3d = false,
-			box3dColor = { Color3.new(0,1,0), 1 },
-			name = false,
-			nameColor = { Color3.new(1,1,1), 1 },
-			nameOutline = true,
-			nameOutlineColor = Color3.new(),
-			weapon = false,
-			weaponColor = { Color3.new(1,1,1), 1 },
-			weaponOutline = true,
-			weaponOutlineColor = Color3.new(),
-			distance = false,
-			distanceColor = { Color3.new(1,1,1), 1 },
-			distanceOutline = true,
-			distanceOutlineColor = Color3.new(),
-			tracer = false,
-			tracerOrigin = "Bottom",
-			tracerColor = { Color3.new(0,1,0), 1 },
-			tracerOutline = true,
-			tracerOutlineColor = { Color3.new(), 1 },
-			offScreenArrow = false,
-			offScreenArrowColor = { Color3.new(1,1,1), 1 },
-			offScreenArrowSize = 15,
-			offScreenArrowRadius = 150,
-			offScreenArrowOutline = true,
-			offScreenArrowOutlineColor = { Color3.new(), 1 },
-			chams = false,
-			chamsVisibleOnly = false,
-			chamsFillColor = { Color3.new(0.2, 0.2, 0.2), 0.5 },
-			chamsOutlineColor = { Color3.new(0,1,0), 0 }
-		}
-	}
-};
-
-function EspInterface.AddInstance(instance, options)
-	local cache = EspInterface._objectCache;
-	if cache[instance] then
-		warn("Instance handler already exists.");
-	else
-		cache[instance] = { InstanceObject.new(instance, options) };
-	end
-	return cache[instance][1];
-end
-
-function EspInterface.Load()
-	assert(not EspInterface._hasLoaded, "Esp has already been loaded.");
-
-	local function createObject(player)
-		EspInterface._objectCache[player] = {
-			EspObject.new(player, EspInterface),
-			ChamObject.new(player, EspInterface)
-		};
-	end
-
-	local function removeObject(player)
-		local object = EspInterface._objectCache[player];
-		if object then
-			for i = 1, #object do
-				object[i]:Destruct();
-			end
-			EspInterface._objectCache[player] = nil;
-		end
-	end
-
-	local plrs = players:GetPlayers()
-
-	for i = EspInterface.sharedSettings.includeLocalPlayer and 1 or 2, #plrs do
-		createObject(plrs[i]);
-	end
-
-	EspInterface.playerAdded = players.PlayerAdded:Connect(createObject);
-	EspInterface.playerRemoving = players.PlayerRemoving:Connect(removeObject);
-	EspInterface._hasLoaded = true;
-end
-
-function EspInterface.Unload()
-	assert(EspInterface._hasLoaded, "Esp has not been loaded yet.");
-
-	for index, object in next, EspInterface._objectCache do
-		for i = 1, #object do
-			object[i]:Destruct();
-		end
-		EspInterface._objectCache[index] = nil;
-	end
-
-	EspInterface.playerAdded:Disconnect();
-	EspInterface.playerRemoving:Disconnect();
-	EspInterface._hasLoaded = false;
-end
-
-function EspInterface.getWeapon(player)
-	local weapon = "Unknown"
-
-	if player and player.Character then
-		local tool = player.Character:FindFirstChildOfClass("Tool")
-		if tool then
-			weapon = tool.Name
-		end
-	end
-
-	return string.upper(weapon)
-end
-
-function EspInterface.isFriendly(player)
-	if game.PlaceId == 11564374799 or game.PlaceId == 11567929685 then
-		if player.Team and player.Team == localPlayer.Team then
-			if player.Team.Name == "Rogue" and localPlayer.Team.Name == "Rogue" then
-				return false
-			end
-
-			if game.PlaceId == 11564374799 then
-				local isPlayerWarrior = false
-
-				for _, v in pairs(workspace:WaitForChild("PlayersDataFolder"):GetChildren()) do
-					if v.Name == player.Name and v:FindFirstChild("Warrior") and v.Warrior.Value == true then
-						isPlayerWarrior = true
-						break
-					end
-				end
-
-				if isPlayerWarrior then
-					return false
-				end
-			end
-
-			return true
-		end
-
-		return false
-	else
-		return player.Team and player.Team == localPlayer.Team;
-	end
-end
-
-function EspInterface.getTeamColor(player)
-	if player.Team and player.Team.TeamColor then
-		return player.Team.TeamColor.Color
-	end
-
-	return Color3.fromRGB(128, 128, 128)
-end
-
-function EspInterface.getCharacter(player)
-	return player.Character;
-end
-
-function EspInterface.getHealth(player)
-	local character = player and EspInterface.getCharacter(player);
-	local humanoid = character and findFirstChildOfClass(character, "Humanoid");
-	if humanoid then
-		return humanoid.Health, humanoid.MaxHealth;
-	end
-	return 100, 100;
-end
-
-return EspInterface
+return ESP
