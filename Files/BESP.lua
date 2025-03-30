@@ -623,39 +623,13 @@ end
 
 function ESP:PlayerAdded(player)
     if player == LocalPlayer then return end
-    print(player.Name)
-    local function WaitForValidCharacter()
-        local character = player.Character
-        if not character then
-            character = player.CharacterAdded:Wait()
-        end
-        
-        local humanoid = character:FindFirstChildOfClass("Humanoid")
-        if not humanoid then
-            character.ChildAdded:Wait()
-            humanoid = character:FindFirstChildOfClass("Humanoid")
-        end
-        
-        local rootPart = character:FindFirstChild("HumanoidRootPart")
-        if not rootPart then
-            repeat
-                rootPart = character:FindFirstChild("HumanoidRootPart")
-                if not rootPart then
-                    RunService.Heartbeat:Wait()
-                end
-            until rootPart or not character.Parent
-        end
-        
-        return character, humanoid, rootPart
-    end
-    
-    local success, character, humanoid, rootPart = pcall(WaitForValidCharacter)
-    if not success or not character or not humanoid or not rootPart then
-        return
-    end
     
     local obj = ESPObject.new(player)
     table.insert(self.Objects, obj)
+    
+    if ESP.Enabled and obj.Update then
+        coroutine.wrap(obj.Update)()
+    end
 end
 
 function ESP:PlayerRemoving(player)
