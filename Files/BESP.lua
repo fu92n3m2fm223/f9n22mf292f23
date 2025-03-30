@@ -21,26 +21,16 @@ local ESP = {
         TextOutline = true,
         TextOutlineColor = Color3.fromRGB(0, 0, 0)
     },
-    _previousSettings = {}
+    _settingsVersion = 0
 }
 
+-- Services
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Camera = workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 
-local function DeepCopy(t)
-    local copy = {}
-    for k, v in pairs(t) do
-        if type(v) == "table" then
-            copy[k] = DeepCopy(v)
-        else
-            copy[k] = v
-        end
-    end
-    return copy
-end
-
+-- Helper functions
 local function GetTeamColor(player)
     return player and player.Team and player.Team.TeamColor and player.Team.TeamColor.Color or Color3.fromRGB(255, 255, 255)
 end
@@ -115,6 +105,7 @@ local function GetBoundingBox(parts)
     return center, size
 end
 
+-- ESP Object class
 local ESPObject = {}
 ESPObject.__index = ESPObject
 
@@ -124,6 +115,7 @@ function ESPObject.new(player)
     self.Drawings = {}
     self.Connections = {}
     self.Enabled = true
+    self.LastSettingsVersion = 0
     
     self:InitializeDrawings()
     
@@ -137,6 +129,12 @@ function ESPObject.new(player)
             if not ESP.Enabled or not self.Enabled or not self.Player or not self.Player.Character then
                 self:Hide()
                 return
+            end
+            
+            -- Check if settings changed
+            if self.LastSettingsVersion ~= ESP._settingsVersion then
+                self:UpdateDrawingsStructure()
+                self.LastSettingsVersion = ESP._settingsVersion
             end
             
             local currentCharacter = self.Player.Character
@@ -176,10 +174,7 @@ function ESPObject.new(player)
         
         table.insert(self.Connections, humanoid:GetPropertyChangedSignal("Health"):Connect(Update))
         
-        table.insert(self.Connections, RunService.Heartbeat:Connect(function()
-            Update()
-            self:CheckSettingsChanges()
-        end))
+        table.insert(self.Connections, RunService.Heartbeat:Connect(Update))
     end
     
     table.insert(self.Connections, player.CharacterAdded:Connect(OnCharacterAdded))
@@ -248,6 +243,18 @@ function ESPObject:InitializeDrawings()
         self.Drawings.Tracer.Visible = false
         self.Drawings.Tracer.ZIndex = 1
     end
+end
+
+function ESPObject:UpdateDrawingsStructure()
+    -- Clean up old drawings
+    for _, drawing in pairs(self.Drawings) do
+        if drawing then
+            drawing:Remove()
+        end
+    end
+    
+    self.Drawings = {}
+    self:InitializeDrawings()
 end
 
 function ESPObject:UpdateDrawings(topLeft, bottomRight, humanoid)
@@ -321,47 +328,6 @@ function ESPObject:UpdateDrawings(topLeft, bottomRight, humanoid)
     end
 end
 
-function ESPObject:CheckSettingsChanges()
-    if ESP.Settings.Boxes and not self.Drawings.Box then
-        self:InitializeDrawings()
-    elseif not ESP.Settings.Boxes and self.Drawings.Box then
-        self.Drawings.Box:Remove()
-        self.Drawings.BoxOutline:Remove()
-        self.Drawings.Box = nil
-        self.Drawings.BoxOutline = nil
-    end
-    
-    if ESP.Settings.Names and not self.Drawings.Name then
-        self:InitializeDrawings()
-    elseif not ESP.Settings.Names and self.Drawings.Name then
-        self.Drawings.Name:Remove()
-        self.Drawings.Name = nil
-    end
-    
-    if ESP.Settings.HealthBar and not self.Drawings.HealthBar then
-        self:InitializeDrawings()
-    elseif not ESP.Settings.HealthBar and self.Drawings.HealthBar then
-        self.Drawings.HealthBar:Remove()
-        self.Drawings.HealthBarOutline:Remove()
-        self.Drawings.HealthBar = nil
-        self.Drawings.HealthBarOutline = nil
-    end
-    
-    if ESP.Settings.HealthText and not self.Drawings.HealthText then
-        self:InitializeDrawings()
-    elseif not ESP.Settings.HealthText and self.Drawings.HealthText then
-        self.Drawings.HealthText:Remove()
-        self.Drawings.HealthText = nil
-    end
-    
-    if ESP.Settings.Tracers and not self.Drawings.Tracer then
-        self:InitializeDrawings()
-    elseif not ESP.Settings.Tracers and self.Drawings.Tracer then
-        self.Drawings.Tracer:Remove()
-        self.Drawings.Tracer = nil
-    end
-end
-
 function ESPObject:Hide()
     for _, drawing in pairs(self.Drawings) do
         if drawing then
@@ -415,9 +381,11 @@ function ESP:PlayerRemoving(player)
     end
 end
 
+function ESP:UpdateSettings()
+    self._settingsVersion = self._settingsVersion + 1
+end
+
 function ESP:Initialize()
-    self._previousSettings = DeepCopy(self.Settings)
-    
     for _, player in pairs(Players:GetPlayers()) do
         if player ~= LocalPlayer then
             self:PlayerAdded(player)
@@ -432,13 +400,15 @@ function ESP:Initialize()
         self:PlayerRemoving(player)
     end)
     
-    self.SettingsCheckConn = RunService.Heartbeat:Connect(function()
-        for _, obj in pairs(self.Objects) do
-            if obj then
-                obj:CheckSettingsChanges()
-            end
+    -- Create metatable for Settings to detect changes
+    local settingsMeta = {
+        __newindex = function(t, k, v)
+            rawset(t, k, v)
+            ESP:UpdateSettings()
         end
-    end)
+    }
+    
+    setmetatable(self.Settings, settingsMeta)
 end
 
 function ESP:Unload()
@@ -448,10 +418,6 @@ function ESP:Unload()
     
     if self.PlayerRemovingConn then
         self.PlayerRemovingConn:Disconnect()
-    end
-    
-    if self.SettingsCheckConn then
-        self.SettingsCheckConn:Disconnect()
     end
     
     for _, obj in pairs(self.Objects) do
