@@ -210,6 +210,12 @@ function ESPObject.new(player)
             return
         end
         
+        local rootPart = currentCharacter:FindFirstChild("HumanoidRootPart")
+        if not rootPart then
+            self:Hide()
+            return
+        end
+        
         local parts = GetBodyParts(currentCharacter)
         if #parts == 0 then
             self:Hide()
@@ -295,6 +301,16 @@ function ESPObject.new(player)
         local humanoid = GetHumanoid(character)
         if not humanoid then return end
         
+        local function WaitForRootPart()
+            while not character:FindFirstChild("HumanoidRootPart") and character.Parent do
+                RunService.Heartbeat:Wait()
+            end
+            return character:FindFirstChild("HumanoidRootPart")
+        end
+        
+        local rootPart = WaitForRootPart()
+        if not rootPart then return end
+        
         table.insert(self.Connections, humanoid.Died:Connect(function()
             self:Hide()
         end))
@@ -308,7 +324,7 @@ function ESPObject.new(player)
     table.insert(self.Connections, player.CharacterAdded:Connect(OnCharacterAdded))
     
     if player.Character then
-        OnCharacterAdded(player.Character)
+        coroutine.wrap(OnCharacterAdded)(player.Character)
     end
     
     return self
@@ -607,6 +623,37 @@ end
 
 function ESP:PlayerAdded(player)
     if player == LocalPlayer then return end
+    
+    local function WaitForValidCharacter()
+        local character = player.Character
+        if not character then
+            character = player.CharacterAdded:Wait()
+        end
+        
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        if not humanoid then
+            character.ChildAdded:Wait()
+            humanoid = character:FindFirstChildOfClass("Humanoid")
+        end
+        
+        local rootPart = character:FindFirstChild("HumanoidRootPart")
+        if not rootPart then
+            repeat
+                rootPart = character:FindFirstChild("HumanoidRootPart")
+                if not rootPart then
+                    RunService.Heartbeat:Wait()
+                end
+            until rootPart or not character.Parent
+        end
+        
+        return character, humanoid, rootPart
+    end
+    
+    local success, character, humanoid, rootPart = pcall(WaitForValidCharacter)
+    if not success or not character or not humanoid or not rootPart then
+        return
+    end
+    
     local obj = ESPObject.new(player)
     table.insert(self.Objects, obj)
 end
@@ -624,12 +671,16 @@ end
 function ESP:Initialize()
     for _, player in pairs(Players:GetPlayers()) do
         if player ~= LocalPlayer then
-            self:PlayerAdded(player)
+            coroutine.wrap(function()
+                self:PlayerAdded(player)
+            end)()
         end
     end
     
     self.PlayerAddedConn = Players.PlayerAdded:Connect(function(player)
-        self:PlayerAdded(player)
+        coroutine.wrap(function()
+            self:PlayerAdded(player)
+        end)()
     end)
     
     self.PlayerRemovingConn = Players.PlayerRemoving:Connect(function(player)
