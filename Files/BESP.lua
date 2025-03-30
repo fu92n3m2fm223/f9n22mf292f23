@@ -623,7 +623,7 @@ end
 
 function ESP:PlayerAdded(player)
     if player == LocalPlayer then return end
-    
+    print(player.Name)
     local function WaitForValidCharacter()
         local character = player.Character
         if not character then
