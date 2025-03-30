@@ -268,7 +268,7 @@ function ESPObject.new(player)
         
         table.insert(self.Connections, humanoid.Died:Connect(function()
             self:Hide()
-        end)
+        end))
         
         table.insert(self.Connections, humanoid:GetPropertyChangedSignal("Health"):Connect(Update))
         
