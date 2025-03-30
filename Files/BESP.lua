@@ -34,7 +34,8 @@ local ESP = {
         HealthBar = false,
         Tracers = false,
         TracerColor = Color3.fromRGB(255, 255, 255)
-    }
+    },
+    _settingsVersion = 0
 }
 
 local Players = game:GetService("Players")
@@ -124,74 +125,26 @@ function ESPObject.new(player)
     self.Player = player
     self.Drawings = {}
     self.Connections = {}
+    self.LastSettingsVersion = ESP._settingsVersion
     
-    if ESP.Settings.Boxes then
-        self.Drawings.BoxOutline = Drawing.new("Square")
-        self.Drawings.BoxOutline.Thickness = 2
-        self.Drawings.BoxOutline.Filled = false
-        self.Drawings.BoxOutline.Visible = false
-        self.Drawings.BoxOutline.ZIndex = 2
-        
-        self.Drawings.Box = Drawing.new("Square")
-        self.Drawings.Box.Thickness = 1
-        self.Drawings.Box.Filled = false
-        self.Drawings.Box.Visible = false
-        self.Drawings.Box.ZIndex = 3
-    end
-    
-    if ESP.Settings.Names then
-        self.Drawings.Name = Drawing.new("Text")
-        self.Drawings.Name.Center = true
-        self.Drawings.Name.Outline = ESP.Settings.TextOutline
-        self.Drawings.Name.OutlineColor = ESP.Settings.TextOutlineColor
-        self.Drawings.Name.Size = ESP.Settings.NameSize
-        self.Drawings.Name.Font = ESP.Settings.TextFont
-        self.Drawings.Name.Visible = false
-        self.Drawings.Name.ZIndex = 4
-    end
-    
-    if ESP.Settings.HealthBar then
-        self.Drawings.HealthBarOutline = Drawing.new("Square")
-        self.Drawings.HealthBarOutline.Thickness = 1
-        self.Drawings.HealthBarOutline.Filled = false
-        self.Drawings.HealthBarOutline.Visible = false
-        self.Drawings.HealthBarOutline.ZIndex = 1
-        
-        self.Drawings.HealthBar = Drawing.new("Square")
-        self.Drawings.HealthBar.Thickness = 1
-        self.Drawings.HealthBar.Filled = true
-        self.Drawings.HealthBar.Visible = false
-        self.Drawings.HealthBar.ZIndex = 2
-    end
-    
-    if ESP.Settings.HealthText then
-        self.Drawings.HealthText = Drawing.new("Text")
-        self.Drawings.HealthText.Center = true
-        self.Drawings.HealthText.Outline = ESP.Settings.TextOutline
-        self.Drawings.HealthText.OutlineColor = ESP.Settings.TextOutlineColor
-        self.Drawings.HealthText.Size = ESP.Settings.NameSize - 2
-        self.Drawings.HealthText.Font = ESP.Settings.TextFont
-        self.Drawings.HealthText.Visible = false
-        self.Drawings.HealthText.ZIndex = 4
-    end
-    
-    if ESP.Settings.Tracers then
-        self.Drawings.Tracer = Drawing.new("Line")
-        self.Drawings.Tracer.Thickness = 1
-        self.Drawings.Tracer.Visible = false
-        self.Drawings.Tracer.ZIndex = 1
-    end
-    
-    local function OnCharacterAdded(character)
-        if not character then return end
+    local function InitializeESP(character)
+        local humanoidRootPart = character:WaitForChild("HumanoidRootPart", 5)
+        if not humanoidRootPart then return end
         
         local humanoid = GetHumanoid(character)
         if not humanoid then return end
+        
+        self:InitializeDrawings()
         
         local function Update()
             if not ESP.Enabled or not self.Player or not self.Player.Character then
                 self:Hide()
                 return
+            end
+            
+            if self.LastSettingsVersion ~= ESP._settingsVersion then
+                self:UpdateDrawingsStructure()
+                self.LastSettingsVersion = ESP._settingsVersion
             end
             
             local currentCharacter = self.Player.Character
@@ -269,7 +222,7 @@ function ESPObject.new(player)
                 self.Drawings.HealthText.Text = math.floor(currentHumanoid.Health) .. "/" .. math.floor(currentHumanoid.MaxHealth)
                 self.Drawings.HealthText.Position = boxPosition + Vector2.new(boxSize.X + 10, boxSize.Y/2)
                 self.Drawings.HealthText.Color = ESP.Settings.NameColor
-                self.Drawings.HealthText.Visible = true
+                self.Drawings.HealthText.Visible = ESP.Settings.HealthText
             end
             
             if self.Drawings.Tracer then
@@ -289,26 +242,19 @@ function ESPObject.new(player)
         table.insert(self.Connections, RunService.Heartbeat:Connect(Update))
     end
     
-    table.insert(self.Connections, player.CharacterAdded:Connect(OnCharacterAdded))
+    table.insert(self.Connections, player.CharacterAdded:Connect(function(character)
+        InitializeESP(character)
+    end))
     
     if player.Character then
-        OnCharacterAdded(player.Character)
+        InitializeESP(player.Character)
     end
     
     return self
 end
 
-local CustomESPObject = {}
-CustomESPObject.__index = CustomESPObject
-
-function CustomESPObject.new(object, settings)
-    local self = setmetatable({}, CustomESPObject)
-    self.Object = object
-    self.Settings = settings or {}
-    self.Drawings = {}
-    self.Connections = {}
-    
-    if self.Settings.Boxes then
+function ESPObject:InitializeDrawings()
+    if ESP.Settings.Boxes then
         self.Drawings.BoxOutline = Drawing.new("Square")
         self.Drawings.BoxOutline.Thickness = 2
         self.Drawings.BoxOutline.Filled = false
@@ -322,19 +268,18 @@ function CustomESPObject.new(object, settings)
         self.Drawings.Box.ZIndex = 3
     end
     
-    if self.Settings.Name then
+    if ESP.Settings.Names then
         self.Drawings.Name = Drawing.new("Text")
         self.Drawings.Name.Center = true
         self.Drawings.Name.Outline = ESP.Settings.TextOutline
         self.Drawings.Name.OutlineColor = ESP.Settings.TextOutlineColor
-        self.Drawings.Name.Size = self.Settings.NameSize or ESP.Settings.NameSize
+        self.Drawings.Name.Size = ESP.Settings.NameSize
         self.Drawings.Name.Font = ESP.Settings.TextFont
         self.Drawings.Name.Visible = false
         self.Drawings.Name.ZIndex = 4
     end
     
-    local humanoid = object:IsA("Model") and object:FindFirstChildOfClass("Humanoid")
-    if (humanoid and self.Settings.HealthBar ~= false) or self.Settings.HealthBar then
+    if ESP.Settings.HealthBar then
         self.Drawings.HealthBarOutline = Drawing.new("Square")
         self.Drawings.HealthBarOutline.Thickness = 1
         self.Drawings.HealthBarOutline.Filled = false
@@ -348,28 +293,83 @@ function CustomESPObject.new(object, settings)
         self.Drawings.HealthBar.ZIndex = 2
     end
     
-    if self.Settings.ShowDistance then
-        self.Drawings.Distance = Drawing.new("Text")
-        self.Drawings.Distance.Center = true
-        self.Drawings.Distance.Outline = ESP.Settings.TextOutline
-        self.Drawings.Distance.OutlineColor = ESP.Settings.TextOutlineColor
-        self.Drawings.Distance.Size = (self.Settings.NameSize or ESP.Settings.NameSize) - 2
-        self.Drawings.Distance.Font = ESP.Settings.TextFont
-        self.Drawings.Distance.Visible = false
-        self.Drawings.Distance.ZIndex = 4
+    if ESP.Settings.HealthText then
+        self.Drawings.HealthText = Drawing.new("Text")
+        self.Drawings.HealthText.Center = true
+        self.Drawings.HealthText.Outline = ESP.Settings.TextOutline
+        self.Drawings.HealthText.OutlineColor = ESP.Settings.TextOutlineColor
+        self.Drawings.HealthText.Size = ESP.Settings.NameSize - 2
+        self.Drawings.HealthText.Font = ESP.Settings.TextFont
+        self.Drawings.HealthText.Visible = false
+        self.Drawings.HealthText.ZIndex = 4
     end
     
-    if self.Settings.Tracers then
+    if ESP.Settings.Tracers then
         self.Drawings.Tracer = Drawing.new("Line")
         self.Drawings.Tracer.Thickness = 1
         self.Drawings.Tracer.Visible = false
         self.Drawings.Tracer.ZIndex = 1
     end
+end
+
+function ESPObject:UpdateDrawingsStructure()
+    for _, drawing in pairs(self.Drawings) do
+        if drawing then
+            drawing:Remove()
+        end
+    end
+    
+    self.Drawings = {}
+    self:InitializeDrawings()
+end
+
+function ESPObject:Hide()
+    for _, drawing in pairs(self.Drawings) do
+        if drawing then
+            drawing.Visible = false
+        end
+    end
+end
+
+function ESPObject:Destroy()
+    for _, connection in pairs(self.Connections) do
+        if connection then
+            connection:Disconnect()
+        end
+    end
+    
+    for _, drawing in pairs(self.Drawings) do
+        if drawing then
+            drawing:Remove()
+        end
+    end
+    
+    self.Connections = {}
+    self.Drawings = {}
+end
+
+local CustomESPObject = {}
+CustomESPObject.__index = CustomESPObject
+
+function CustomESPObject.new(object, settings)
+    local self = setmetatable({}, CustomESPObject)
+    self.Object = object
+    self.Settings = settings or {}
+    self.Drawings = {}
+    self.Connections = {}
+    self.LastSettingsVersion = ESP._settingsVersion
+    
+    self:InitializeDrawings()
     
     table.insert(self.Connections, RunService.Heartbeat:Connect(function()
         if not ESP.Enabled or not self.Object or not self.Object.Parent then
             self:Hide()
             return
+        end
+        
+        if self.LastSettingsVersion ~= ESP._settingsVersion then
+            self:UpdateDrawingsStructure()
+            self.LastSettingsVersion = ESP._settingsVersion
         end
         
         local position
@@ -474,6 +474,77 @@ function CustomESPObject.new(object, settings)
     return self
 end
 
+function CustomESPObject:InitializeDrawings()
+    if self.Settings.Boxes then
+        self.Drawings.BoxOutline = Drawing.new("Square")
+        self.Drawings.BoxOutline.Thickness = 2
+        self.Drawings.BoxOutline.Filled = false
+        self.Drawings.BoxOutline.Visible = false
+        self.Drawings.BoxOutline.ZIndex = 2
+        
+        self.Drawings.Box = Drawing.new("Square")
+        self.Drawings.Box.Thickness = 1
+        self.Drawings.Box.Filled = false
+        self.Drawings.Box.Visible = false
+        self.Drawings.Box.ZIndex = 3
+    end
+    
+    if self.Settings.Name then
+        self.Drawings.Name = Drawing.new("Text")
+        self.Drawings.Name.Center = true
+        self.Drawings.Name.Outline = ESP.Settings.TextOutline
+        self.Drawings.Name.OutlineColor = ESP.Settings.TextOutlineColor
+        self.Drawings.Name.Size = self.Settings.NameSize or ESP.Settings.NameSize
+        self.Drawings.Name.Font = ESP.Settings.TextFont
+        self.Drawings.Name.Visible = false
+        self.Drawings.Name.ZIndex = 4
+    end
+    
+    local humanoid = self.Object:IsA("Model") and self.Object:FindFirstChildOfClass("Humanoid")
+    if (humanoid and self.Settings.HealthBar ~= false) or self.Settings.HealthBar then
+        self.Drawings.HealthBarOutline = Drawing.new("Square")
+        self.Drawings.HealthBarOutline.Thickness = 1
+        self.Drawings.HealthBarOutline.Filled = false
+        self.Drawings.HealthBarOutline.Visible = false
+        self.Drawings.HealthBarOutline.ZIndex = 1
+        
+        self.Drawings.HealthBar = Drawing.new("Square")
+        self.Drawings.HealthBar.Thickness = 1
+        self.Drawings.HealthBar.Filled = true
+        self.Drawings.HealthBar.Visible = false
+        self.Drawings.HealthBar.ZIndex = 2
+    end
+    
+    if self.Settings.ShowDistance then
+        self.Drawings.Distance = Drawing.new("Text")
+        self.Drawings.Distance.Center = true
+        self.Drawings.Distance.Outline = ESP.Settings.TextOutline
+        self.Drawings.Distance.OutlineColor = ESP.Settings.TextOutlineColor
+        self.Drawings.Distance.Size = (self.Settings.NameSize or ESP.Settings.NameSize) - 2
+        self.Drawings.Distance.Font = ESP.Settings.TextFont
+        self.Drawings.Distance.Visible = false
+        self.Drawings.Distance.ZIndex = 4
+    end
+    
+    if self.Settings.Tracers then
+        self.Drawings.Tracer = Drawing.new("Line")
+        self.Drawings.Tracer.Thickness = 1
+        self.Drawings.Tracer.Visible = false
+        self.Drawings.Tracer.ZIndex = 1
+    end
+end
+
+function CustomESPObject:UpdateDrawingsStructure()
+    for _, drawing in pairs(self.Drawings) do
+        if drawing then
+            drawing:Remove()
+        end
+    end
+    
+    self.Drawings = {}
+    self:InitializeDrawings()
+end
+
 function CustomESPObject:Hide()
     for _, drawing in pairs(self.Drawings) do
         if drawing then
@@ -501,31 +572,6 @@ function CustomESPObject:Destroy()
             break
         end
     end
-end
-
-function ESPObject:Hide()
-    for _, drawing in pairs(self.Drawings) do
-        if drawing then
-            drawing.Visible = false
-        end
-    end
-end
-
-function ESPObject:Destroy()
-    for _, connection in pairs(self.Connections) do
-        if connection then
-            connection:Disconnect()
-        end
-    end
-    
-    for _, drawing in pairs(self.Drawings) do
-        if drawing then
-            drawing:Remove()
-        end
-    end
-    
-    self.Connections = {}
-    self.Drawings = {}
 end
 
 function ESP:AddObjectListener(object, settings)
@@ -562,9 +608,8 @@ function ESP:Toggle(state)
     end
     for _, obj in pairs(self.CustomObjects) do
         if obj then
-            if state then
-                obj:Hide()
-            else
+            obj.Enabled = state
+            if not state then
                 obj:Hide()
             end
         end
@@ -587,7 +632,19 @@ function ESP:PlayerRemoving(player)
     end
 end
 
+function ESP:UpdateSettings()
+    self._settingsVersion = self._settingsVersion + 1
+end
+
 function ESP:Initialize()
+    local settingsMeta = {
+        __newindex = function(t, k, v)
+            rawset(t, k, v)
+            ESP:UpdateSettings()
+        end
+    }
+    setmetatable(self.Settings, settingsMeta)
+    
     for _, player in pairs(Players:GetPlayers()) do
         if player ~= LocalPlayer then
             self:PlayerAdded(player)
