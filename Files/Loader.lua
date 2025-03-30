@@ -27,8 +27,7 @@ local function LoadScript(url)
         loadstring(game:HttpGet(url))()
     end)
     if not success then
-        warn("Failed to load script: " .. url)
-        warn("Error: " .. err)
+        return
     end
 end
 
