@@ -69,8 +69,7 @@ if AvatarRequest.StatusCode == 200 then
         ImageUrl = Data.data[1].imageUrl
     end
 end
-
-local embed = {
+--[[local embed = {
     title = "Tear Execution",
     color = 0x2f5bc7,
     footer = {
@@ -86,11 +85,49 @@ local embed = {
     },
     fields = {
         {
+            name = "Username",
+            value = "```\n" .. LocalPlayer.Name .. "\n```",
+            inline = true
+        },
+        {
+            name = "User ID",
+            value = "```lua\n" .. LocalPlayer.UserId .. "\n```",
+            inline = true
+        },
+        {
+            name = "Executor Name",
+            value = "```\n" .. identifyexecutor() .."\n```",
+            inline = true
+        },
+        {
+            name = "Place Information",
+            value = "```\n" .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name .. " | " .. game.PlaceId .."\n```",
+            inline = true
+        },
+    }
+}]]
+
+local embed = {
+    title = "Tear Execution",
+    color = 0x2f5bc7,
+    thumbnail = {
+        url = ImageUrl
+    },
+    author = {
+        name = "Click here to view profile",
+        url = "https://www.roblox.com/users/" .. LocalPlayer.UserId .. "/profile",
+        icon_url = ""
+    },
+    fields = {
+        {
             name = "👤 User Details",
             value = string.format(
-                "**Username** ```%s```\n**User ID** ```lua\n%d```",
+                "**Username:** ```%s```\n" ..
+                "**User ID:** ```lua\n%d```\n" ..
+                "**HWID:** ```lua\n%s```",
                 LocalPlayer.Name,
-                LocalPlayer.UserId
+                LocalPlayer.UserId,
+                game:GetService("RbxAnalyticsService"):GetClientId()
             ),
             inline = true
         },
