@@ -3,6 +3,7 @@ local ESP = {
     Players = {},
     Objects = {},
     CustomObjects = {},
+    Connections = {}, -- Added this line to fix the error
     CustomSettings = {
         Boxes = true,
         BoxColor = Color3.fromRGB(255, 255, 0),
@@ -603,6 +604,9 @@ function ESP:Toggle(state)
 end
 
 function ESP:Initialize()
+    -- Initialize the connections table if not already done
+    self.Connections = self.Connections or {}
+    
     -- Heartbeat-based player management
     table.insert(self.Connections, RunService.Heartbeat:Connect(function()
         if not ESP.Enabled then return end
@@ -640,6 +644,9 @@ function ESP:Initialize()
 end
 
 function ESP:Unload()
+    -- Make sure connections table exists
+    self.Connections = self.Connections or {}
+    
     for _, connection in pairs(self.Connections) do
         if connection then
             connection:Disconnect()
