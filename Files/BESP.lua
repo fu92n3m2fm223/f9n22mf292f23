@@ -84,6 +84,10 @@ local function GetHumanoid(character)
     return character and character:FindFirstChildOfClass("Humanoid")
 end
 
+local function GetRootPart(character)
+    return character and character:FindFirstChild("HumanoidRootPart")
+end
+
 local function GetBodyParts(character)
     local parts = {}
     if character then
@@ -199,19 +203,15 @@ function ESPObject.new(player)
         
         local currentCharacter = self.Player.Character
         local currentHumanoid = GetHumanoid(currentCharacter)
+        local rootPart = GetRootPart(currentCharacter)
         
-        if not currentHumanoid or currentHumanoid.Health <= 0 then
+        -- Check for valid character components
+        if not currentHumanoid or currentHumanoid.Health <= 0 or not rootPart then
             self:Hide()
             return
         end
         
         if IsTeamMate(self.Player) then
-            self:Hide()
-            return
-        end
-        
-        local rootPart = currentCharacter:FindFirstChild("HumanoidRootPart")
-        if not rootPart then
             self:Hide()
             return
         end
@@ -295,37 +295,18 @@ function ESPObject.new(player)
     
     self.Update = Update
     
-    local function OnCharacterAdded(character)
-        if not character then return end
-        
-        local humanoid = GetHumanoid(character)
-        if not humanoid then return end
-        
-        local function WaitForRootPart()
-            while not character:FindFirstChild("HumanoidRootPart") and character.Parent do
-                RunService.Heartbeat:Wait()
-            end
-            return character:FindFirstChild("HumanoidRootPart")
-        end
-        
-        local rootPart = WaitForRootPart()
-        if not rootPart then return end
-        
-        table.insert(self.Connections, humanoid.Died:Connect(function()
+    -- Heartbeat-based update instead of character events
+    table.insert(self.Connections, RunService.Heartbeat:Connect(function()
+        -- Only update if ESP is enabled
+        if ESP.Enabled then
+            Update()
+        else
             self:Hide()
-        end))
-        
-        table.insert(self.Connections, humanoid:GetPropertyChangedSignal("Health"):Connect(Update))
-        table.insert(self.Connections, RunService.Heartbeat:Connect(Update))
-        
-        Update()
-    end
+        end
+    end))
     
-    table.insert(self.Connections, player.CharacterAdded:Connect(OnCharacterAdded))
-    
-    if player.Character then
-        coroutine.wrap(OnCharacterAdded)(player.Character)
-    end
+    -- Initial update
+    Update()
     
     return self
 end
@@ -621,54 +602,48 @@ function ESP:Toggle(state)
     end
 end
 
-function ESP:PlayerAdded(player)
-    if player == LocalPlayer then return end
-    
-    local obj = ESPObject.new(player)
-    table.insert(self.Objects, obj)
-    
-    if ESP.Enabled and obj.Update then
-        coroutine.wrap(obj.Update)()
-    end
-end
-
-function ESP:PlayerRemoving(player)
-    for i, obj in pairs(self.Objects) do
-        if obj and obj.Player == player then
-            obj:Destroy()
-            table.remove(self.Objects, i)
-            break
-        end
-    end
-end
-
 function ESP:Initialize()
-    for _, player in pairs(Players:GetPlayers()) do
-        if player ~= LocalPlayer then
-            coroutine.wrap(function()
-                self:PlayerAdded(player)
-            end)()
+    -- Heartbeat-based player management
+    table.insert(self.Connections, RunService.Heartbeat:Connect(function()
+        if not ESP.Enabled then return end
+        
+        -- Get current players
+        local currentPlayers = Players:GetPlayers()
+        local currentPlayerMap = {}
+        
+        -- Create map of current players for quick lookup
+        for _, player in ipairs(currentPlayers) do
+            if player ~= LocalPlayer then
+                currentPlayerMap[player] = true
+            end
         end
-    end
-    
-    self.PlayerAddedConn = Players.PlayerAdded:Connect(function(player)
-        coroutine.wrap(function()
-            self:PlayerAdded(player)
-        end)()
-    end)
-    
-    self.PlayerRemovingConn = Players.PlayerRemoving:Connect(function(player)
-        self:PlayerRemoving(player)
-    end)
+        
+        -- Add ESP for new players
+        for _, player in ipairs(currentPlayers) do
+            if player ~= LocalPlayer and not self.Objects[player] then
+                local obj = ESPObject.new(player)
+                self.Objects[player] = obj
+                if obj.Update then
+                    coroutine.wrap(obj.Update)()
+                end
+            end
+        end
+        
+        -- Remove ESP for players who left
+        for player, obj in pairs(self.Objects) do
+            if not currentPlayerMap[player] then
+                obj:Destroy()
+                self.Objects[player] = nil
+            end
+        end
+    end))
 end
 
 function ESP:Unload()
-    if self.PlayerAddedConn then
-        self.PlayerAddedConn:Disconnect()
-    end
-    
-    if self.PlayerRemovingConn then
-        self.PlayerRemovingConn:Disconnect()
+    for _, connection in pairs(self.Connections) do
+        if connection then
+            connection:Disconnect()
+        end
     end
     
     for _, obj in pairs(self.Objects) do
@@ -685,6 +660,7 @@ function ESP:Unload()
     
     self.Objects = {}
     self.CustomObjects = {}
+    self.Connections = {}
 end
 
 ESP:Initialize()
