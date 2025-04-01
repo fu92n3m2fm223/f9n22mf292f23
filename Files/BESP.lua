@@ -3,7 +3,18 @@ local ESP = {
     Players = {},
     Objects = {},
     CustomObjects = {},
-    Connections = {}, -- Added this line to fix the error
+    Connections = {},
+
+    -- Team-related functions (can be overwritten)
+    GetTeamColor = function(player)
+        return player and player.Team and player.Team.TeamColor and player.Team.TeamColor.Color or Color3.fromRGB(255, 255, 255)
+    end,
+
+    IsTeamMate = function(player)
+        if not ESP.Settings.TeamCheck then return false end
+        return player and ESP.LocalPlayer and player.Team == ESP.LocalPlayer.Team
+    end,
+
     CustomSettings = {
         Boxes = true,
         BoxColor = Color3.fromRGB(255, 255, 0),
@@ -54,22 +65,14 @@ ESP.Settings = setmetatable({
     MaxDistance = 1000,
     TextFont = 2,
     TextOutline = true,
-    TextOutlineColor = Color3.fromRGB(0, 0, 0)
+    TextOutlineColor = Color3.fromRGB(0, 0, 0),
+    Distance = true
 }, settingsMetatable)
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Camera = workspace.CurrentCamera
-local LocalPlayer = Players.LocalPlayer
-
-local function GetTeamColor(player)
-    return player and player.Team and player.Team.TeamColor and player.Team.TeamColor.Color or Color3.fromRGB(255, 255, 255)
-end
-
-local function IsTeamMate(player)
-    if not ESP.Settings.TeamCheck then return false end
-    return player and LocalPlayer and player.Team == LocalPlayer.Team
-end
+ESP.LocalPlayer = Players.LocalPlayer
 
 local function WorldToViewport(position)
     if not Camera then return Vector2.new(), false, 0 end
@@ -196,6 +199,15 @@ function ESPObject.new(player)
     self.Drawings.Tracer.Visible = false
     self.Drawings.Tracer.ZIndex = 1
     
+    self.Drawings.Distance = Drawing.new("Text")
+    self.Drawings.Distance.Center = true
+    self.Drawings.Distance.Outline = ESP.Settings.TextOutline
+    self.Drawings.Distance.OutlineColor = ESP.Settings.TextOutlineColor
+    self.Drawings.Distance.Size = ESP.Settings.NameSize - 2
+    self.Drawings.Distance.Font = ESP.Settings.TextFont
+    self.Drawings.Distance.Visible = false
+    self.Drawings.Distance.ZIndex = 4
+    
     local function Update()
         if not ESP.Enabled or not self.Player or not self.Player.Character then
             self:Hide()
@@ -206,13 +218,12 @@ function ESPObject.new(player)
         local currentHumanoid = GetHumanoid(currentCharacter)
         local rootPart = GetRootPart(currentCharacter)
         
-        -- Check for valid character components
         if not currentHumanoid or currentHumanoid.Health <= 0 or not rootPart then
             self:Hide()
             return
         end
         
-        if IsTeamMate(self.Player) then
+        if ESP.IsTeamMate(self.Player) then
             self:Hide()
             return
         end
@@ -239,7 +250,7 @@ function ESPObject.new(player)
         self.Drawings.BoxOutline.Visible = showBox
         self.Drawings.Box.Visible = showBox
         if showBox then
-            local color = ESP.Settings.TeamColor and GetTeamColor(self.Player) or ESP.Settings.BoxColor
+            local color = ESP.Settings.TeamColor and ESP.GetTeamColor(self.Player) or ESP.Settings.BoxColor
             self.Drawings.BoxOutline.Position = boxPosition
             self.Drawings.BoxOutline.Size = boxSize
             self.Drawings.BoxOutline.Color = Color3.new(0, 0, 0)
@@ -292,13 +303,23 @@ function ESPObject.new(player)
             self.Drawings.Tracer.To = boxPosition + Vector2.new(boxSize.X/2, boxSize.Y)
             self.Drawings.Tracer.Color = ESP.Settings.TracerColor
         end
+        
+        local showDistance = ESP.Settings.Distance
+        self.Drawings.Distance.Visible = showDistance
+        if showDistance then
+            local localRoot = ESP.LocalPlayer.Character and ESP.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+            if localRoot then
+                local dist = (rootPart.Position - localRoot.Position).Magnitude
+                self.Drawings.Distance.Text = string.format("%.1f", dist) .. "m"
+                self.Drawings.Distance.Position = boxPosition + Vector2.new(boxSize.X/2, boxSize.Y + 5)
+                self.Drawings.Distance.Color = ESP.Settings.NameColor
+            end
+        end
     end
     
     self.Update = Update
     
-    -- Heartbeat-based update instead of character events
     table.insert(self.Connections, RunService.Heartbeat:Connect(function()
-        -- Only update if ESP is enabled
         if ESP.Enabled then
             Update()
         else
@@ -306,7 +327,6 @@ function ESPObject.new(player)
         end
     end))
     
-    -- Initial update
     Update()
     
     return self
@@ -604,27 +624,20 @@ function ESP:Toggle(state)
 end
 
 function ESP:Initialize()
-    -- Initialize the connections table if not already done
-    self.Connections = self.Connections or {}
-    
-    -- Heartbeat-based player management
     table.insert(self.Connections, RunService.Heartbeat:Connect(function()
         if not ESP.Enabled then return end
         
-        -- Get current players
         local currentPlayers = Players:GetPlayers()
         local currentPlayerMap = {}
         
-        -- Create map of current players for quick lookup
         for _, player in ipairs(currentPlayers) do
-            if player ~= LocalPlayer then
+            if player ~= ESP.LocalPlayer then
                 currentPlayerMap[player] = true
             end
         end
         
-        -- Add ESP for new players
         for _, player in ipairs(currentPlayers) do
-            if player ~= LocalPlayer and not self.Objects[player] then
+            if player ~= ESP.LocalPlayer and not self.Objects[player] then
                 local obj = ESPObject.new(player)
                 self.Objects[player] = obj
                 if obj.Update then
@@ -633,7 +646,6 @@ function ESP:Initialize()
             end
         end
         
-        -- Remove ESP for players who left
         for player, obj in pairs(self.Objects) do
             if not currentPlayerMap[player] then
                 obj:Destroy()
@@ -644,9 +656,6 @@ function ESP:Initialize()
 end
 
 function ESP:Unload()
-    -- Make sure connections table exists
-    self.Connections = self.Connections or {}
-    
     for _, connection in pairs(self.Connections) do
         if connection then
             connection:Disconnect()
