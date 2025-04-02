@@ -631,7 +631,7 @@ function ESP:Initialize()
 end
 
 function ESP:Unload()
-    for _, connection in pairs(self.Connections) do
+    for _, connection in pairs(self.Connections or {}) do
         if connection then
             connection:Disconnect()
         end
