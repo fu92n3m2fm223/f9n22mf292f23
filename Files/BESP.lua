@@ -599,22 +599,18 @@ function ESP:Toggle(state)
 end
 
 function ESP:Initialize()
-    -- Heartbeat-based player management
     table.insert(self.Connections or {}, RunService.Heartbeat:Connect(function()
         if not ESP.Enabled then return end
         
-        -- Get current players
         local currentPlayers = Players:GetPlayers()
         local currentPlayerMap = {}
         
-        -- Create map of current players for quick lookup
         for _, player in ipairs(currentPlayers) do
             if player ~= LocalPlayer then
                 currentPlayerMap[player] = true
             end
         end
-        
-        -- Add ESP for new players
+
         for _, player in ipairs(currentPlayers) do
             if player ~= LocalPlayer and not self.Objects[player] then
                 local obj = ESPObject.new(player)
@@ -624,8 +620,7 @@ function ESP:Initialize()
                 end
             end
         end
-        
-        -- Remove ESP for players who left
+
         for player, obj in pairs(self.Objects) do
             if not currentPlayerMap[player] then
                 obj:Destroy()
