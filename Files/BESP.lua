@@ -600,7 +600,7 @@ end
 
 function ESP:Initialize()
     -- Heartbeat-based player management
-    table.insert(self.Connections, RunService.Heartbeat:Connect(function()
+    table.insert(self.Connections or {}, RunService.Heartbeat:Connect(function()
         if not ESP.Enabled then return end
         
         -- Get current players
