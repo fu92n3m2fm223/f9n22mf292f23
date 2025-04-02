@@ -3,6 +3,8 @@ local ESP = {
     Players = {},
     Objects = {},
     CustomObjects = {},
+    Connections = {},
+
     CustomSettings = {
         Boxes = true,
         BoxColor = Color3.fromRGB(255, 255, 0),
@@ -11,7 +13,7 @@ local ESP = {
         NameColor = Color3.fromRGB(255, 255, 255),
         NameTransparency = 1,
         NameSize = 13,
-        Distance = true,
+        ShowDistance = true,
         HealthBar = false,
         Tracers = false,
         TracerColor = Color3.fromRGB(255, 255, 255)
@@ -21,18 +23,19 @@ local ESP = {
 local settingsMetatable = {
     __newindex = function(self, key, value)
         rawset(self, key, value)
-        if ESP.Enabled then
-            for _, obj in pairs(ESP.Objects) do
-                if obj and obj.Update then
-                    coroutine.wrap(obj.Update)()
-                end
-            end
-            for _, obj in pairs(ESP.CustomObjects) do
-                if obj and obj.Update then
-                    coroutine.wrap(obj.Update)()
-                end
+        for _, obj in pairs(ESP.Objects) do
+            if obj and obj.Update then
+                coroutine.wrap(obj.Update)()
             end
         end
+        for _, obj in pairs(ESP.CustomObjects) do
+            if obj and obj.Update then
+                coroutine.wrap(obj.Update)()
+            end
+        end
+    end,
+    __index = function(self, key)
+        return rawget(self, key)
     end
 }
 
@@ -50,17 +53,23 @@ ESP.Settings = setmetatable({
     HealthText = true,
     Tracers = false,
     TracerColor = Color3.fromRGB(255, 255, 255),
-    Distance = true,
     MaxDistance = 1000,
     TextFont = 2,
     TextOutline = true,
-    TextOutlineColor = Color3.fromRGB(0, 0, 0)
+    TextOutlineColor = Color3.fromRGB(0, 0, 0),
+    Distance = true
 }, settingsMetatable)
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Camera = workspace.CurrentCamera
-local LocalPlayer = Players.LocalPlayer
+ESP.LocalPlayer = Players.LocalPlayer
+
+local function WorldToViewport(position)
+    if not Camera then return Vector2.new(), false, 0 end
+    local vector, onScreen = Camera:WorldToViewportPoint(position)
+    return Vector2.new(vector.X, vector.Y), onScreen, vector.Z
+end
 
 ESP.GetTeamColor = function(player)
     return player and player.Team and player.Team.TeamColor and player.Team.TeamColor.Color or Color3.fromRGB(255, 255, 255)
@@ -68,13 +77,7 @@ end
 
 ESP.IsTeamMate = function(player)
     if not ESP.Settings.TeamCheck then return false end
-    return player and LocalPlayer and player.Team == LocalPlayer.Team
-end
-
-local function WorldToViewport(position)
-    if not Camera then return Vector2.new(), false, 0 end
-    local vector, onScreen = Camera:WorldToViewportPoint(position)
-    return Vector2.new(vector.X, vector.Y), onScreen, vector.Z
+    return player and ESP.LocalPlayer and player.Team == ESP.LocalPlayer.Team
 end
 
 local function GetHumanoid(character)
@@ -192,6 +195,15 @@ function ESPObject.new(player)
     self.Drawings.Tracer.Visible = false
     self.Drawings.Tracer.ZIndex = 1
     
+    self.Drawings.Distance = Drawing.new("Text")
+    self.Drawings.Distance.Center = true
+    self.Drawings.Distance.Outline = ESP.Settings.TextOutline
+    self.Drawings.Distance.OutlineColor = ESP.Settings.TextOutlineColor
+    self.Drawings.Distance.Size = ESP.Settings.NameSize - 2
+    self.Drawings.Distance.Font = ESP.Settings.TextFont
+    self.Drawings.Distance.Visible = false
+    self.Drawings.Distance.ZIndex = 4
+    
     local function Update()
         if not ESP.Enabled or not self.Player or not self.Player.Character then
             self:Hide()
@@ -202,7 +214,6 @@ function ESPObject.new(player)
         local currentHumanoid = GetHumanoid(currentCharacter)
         local rootPart = GetRootPart(currentCharacter)
         
-        -- Check for valid character components
         if not currentHumanoid or currentHumanoid.Health <= 0 or not rootPart then
             self:Hide()
             return
@@ -287,6 +298,18 @@ function ESPObject.new(player)
             self.Drawings.Tracer.From = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y)
             self.Drawings.Tracer.To = boxPosition + Vector2.new(boxSize.X/2, boxSize.Y)
             self.Drawings.Tracer.Color = ESP.Settings.TracerColor
+        end
+        
+        local showDistance = ESP.Settings.Distance
+        self.Drawings.Distance.Visible = showDistance
+        if showDistance then
+            local localRoot = ESP.LocalPlayer.Character and ESP.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+            if localRoot then
+                local dist = (rootPart.Position - localRoot.Position).Magnitude
+                self.Drawings.Distance.Text = string.format("%.1f", dist) .. "m"
+                self.Drawings.Distance.Position = boxPosition + Vector2.new(boxSize.X/2, boxSize.Y + 5)
+                self.Drawings.Distance.Color = ESP.Settings.NameColor
+            end
         end
     end
     
@@ -380,7 +403,7 @@ function CustomESPObject.new(object, settings)
         self.Drawings.HealthBar.ZIndex = 2
     end
     
-    if self.Settings.Distance then
+    if self.Settings.ShowDistance then
         self.Drawings.Distance = Drawing.new("Text")
         self.Drawings.Distance.Center = true
         self.Drawings.Distance.Outline = ESP.Settings.TextOutline
@@ -488,7 +511,7 @@ function CustomESPObject.new(object, settings)
             if self.Drawings.HealthBar then self.Drawings.HealthBar.Visible = false end
         end
         
-        if self.Drawings.Distance and self.Settings.Distance then
+        if self.Drawings.Distance and self.Settings.ShowDistance then
             self.Drawings.Distance.Visible = true
             self.Drawings.Distance.Text = string.format("%.1f", distance) .. "m"
             self.Drawings.Distance.Position = boxPosition + Vector2.new(boxSize.X/2, boxSize.Y + 5)
@@ -597,20 +620,20 @@ function ESP:Toggle(state)
 end
 
 function ESP:Initialize()
-    table.insert(self.Connections or {}, RunService.Heartbeat:Connect(function()
+    table.insert(self.Connections, RunService.Heartbeat:Connect(function()
         if not ESP.Enabled then return end
         
         local currentPlayers = Players:GetPlayers()
         local currentPlayerMap = {}
         
         for _, player in ipairs(currentPlayers) do
-            if player ~= LocalPlayer then
+            if player ~= ESP.LocalPlayer then
                 currentPlayerMap[player] = true
             end
         end
-
+        
         for _, player in ipairs(currentPlayers) do
-            if player ~= LocalPlayer and not self.Objects[player] then
+            if player ~= ESP.LocalPlayer and not self.Objects[player] then
                 local obj = ESPObject.new(player)
                 self.Objects[player] = obj
                 if obj.Update then
@@ -618,7 +641,7 @@ function ESP:Initialize()
                 end
             end
         end
-
+        
         for player, obj in pairs(self.Objects) do
             if not currentPlayerMap[player] then
                 obj:Destroy()
