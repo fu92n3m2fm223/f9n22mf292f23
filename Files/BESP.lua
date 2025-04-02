@@ -61,11 +61,11 @@ local RunService = game:GetService("RunService")
 local Camera = workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 
-local function GetTeamColor(player)
+ESP.GetTeamColor = function(player)
     return player and player.Team and player.Team.TeamColor and player.Team.TeamColor.Color or Color3.fromRGB(255, 255, 255)
 end
 
-local function IsTeamMate(player)
+ESP.IsTeamMate = function(player)
     if not ESP.Settings.TeamCheck then return false end
     return player and LocalPlayer and player.Team == LocalPlayer.Team
 end
@@ -74,10 +74,6 @@ local function WorldToViewport(position)
     if not Camera then return Vector2.new(), false, 0 end
     local vector, onScreen = Camera:WorldToViewportPoint(position)
     return Vector2.new(vector.X, vector.Y), onScreen, vector.Z
-end
-
-local function GetCharacter(player)
-    return player and (player.Character or player.CharacterAdded:Wait())
 end
 
 local function GetHumanoid(character)
@@ -211,7 +207,7 @@ function ESPObject.new(player)
             return
         end
         
-        if IsTeamMate(self.Player) then
+        if ESP.IsTeamMate(self.Player) then
             self:Hide()
             return
         end
@@ -238,7 +234,7 @@ function ESPObject.new(player)
         self.Drawings.BoxOutline.Visible = showBox
         self.Drawings.Box.Visible = showBox
         if showBox then
-            local color = ESP.Settings.TeamColor and GetTeamColor(self.Player) or ESP.Settings.BoxColor
+            local color = ESP.Settings.TeamColor and ESP.GetTeamColor(self.Player) or ESP.Settings.BoxColor
             self.Drawings.BoxOutline.Position = boxPosition
             self.Drawings.BoxOutline.Size = boxSize
             self.Drawings.BoxOutline.Color = Color3.new(0, 0, 0)
