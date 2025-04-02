@@ -11,7 +11,7 @@ local ESP = {
         NameColor = Color3.fromRGB(255, 255, 255),
         NameTransparency = 1,
         NameSize = 13,
-        ShowDistance = true,
+        Distance = true,
         HealthBar = false,
         Tracers = false,
         TracerColor = Color3.fromRGB(255, 255, 255)
@@ -50,6 +50,7 @@ ESP.Settings = setmetatable({
     HealthText = true,
     Tracers = false,
     TracerColor = Color3.fromRGB(255, 255, 255),
+    Distance = true,
     MaxDistance = 1000,
     TextFont = 2,
     TextOutline = true,
@@ -291,9 +292,7 @@ function ESPObject.new(player)
     
     self.Update = Update
     
-    -- Heartbeat-based update instead of character events
     table.insert(self.Connections, RunService.Heartbeat:Connect(function()
-        -- Only update if ESP is enabled
         if ESP.Enabled then
             Update()
         else
@@ -301,7 +300,6 @@ function ESPObject.new(player)
         end
     end))
     
-    -- Initial update
     Update()
     
     return self
@@ -382,7 +380,7 @@ function CustomESPObject.new(object, settings)
         self.Drawings.HealthBar.ZIndex = 2
     end
     
-    if self.Settings.ShowDistance then
+    if self.Settings.Distance then
         self.Drawings.Distance = Drawing.new("Text")
         self.Drawings.Distance.Center = true
         self.Drawings.Distance.Outline = ESP.Settings.TextOutline
@@ -490,7 +488,7 @@ function CustomESPObject.new(object, settings)
             if self.Drawings.HealthBar then self.Drawings.HealthBar.Visible = false end
         end
         
-        if self.Drawings.Distance and self.Settings.ShowDistance then
+        if self.Drawings.Distance and self.Settings.Distance then
             self.Drawings.Distance.Visible = true
             self.Drawings.Distance.Text = string.format("%.1f", distance) .. "m"
             self.Drawings.Distance.Position = boxPosition + Vector2.new(boxSize.X/2, boxSize.Y + 5)
@@ -631,7 +629,7 @@ function ESP:Initialize()
 end
 
 function ESP:Unload()
-    for _, connection in pairs(self.Connections or {}) do
+    for _, connection in pairs(self.Connections) do
         if connection then
             connection:Disconnect()
         end
