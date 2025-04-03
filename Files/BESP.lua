@@ -16,7 +16,9 @@ local ESP = {
         ShowDistance = true,
         HealthBar = false,
         Tracers = false,
-        TracerColor = Color3.fromRGB(255, 255, 255)
+        TracerColor = Color3.fromRGB(255, 255, 255),
+        Chams = false,
+        ChamsColor = Color3.fromRGB(255, 0, 0)
     }
 }
 
@@ -57,7 +59,9 @@ ESP.Settings = setmetatable({
     TextFont = 2,
     TextOutline = true,
     TextOutlineColor = Color3.fromRGB(0, 0, 0),
-    Distance = true
+    Distance = true,
+    Chams = false,
+    ChamsColor = Color3.fromRGB(255, 0, 0)
 }, settingsMetatable)
 
 local Players = game:GetService("Players")
@@ -147,6 +151,7 @@ function ESPObject.new(player)
     self.Player = player
     self.Drawings = {}
     self.Connections = {}
+    self.Highlight = nil
     
     self.Drawings.BoxOutline = Drawing.new("Square")
     self.Drawings.BoxOutline.Thickness = 2
@@ -203,6 +208,37 @@ function ESPObject.new(player)
     self.Drawings.Distance.Font = ESP.Settings.TextFont
     self.Drawings.Distance.Visible = false
     self.Drawings.Distance.ZIndex = 4
+    
+    local function UpdateChams()
+        if not ESP.Settings.Chams or not self.Player or not self.Player.Character then
+            if self.Highlight then
+                self.Highlight:Destroy()
+                self.Highlight = nil
+            end
+            return
+        end
+        
+        if ESP.IsTeamMate(self.Player) then
+            if self.Highlight then
+                self.Highlight:Destroy()
+                self.Highlight = nil
+            end
+            return
+        end
+        
+        if not self.Highlight then
+            self.Highlight = Instance.new("Highlight")
+            self.Highlight.Parent = self.Player.Character
+            self.Highlight.Adornee = self.Player.Character
+            self.Highlight.FillColor = ESP.Settings.ChamsColor
+            self.Highlight.OutlineColor = ESP.Settings.ChamsColor
+            self.Highlight.FillTransparency = 0.5
+            self.Highlight.OutlineTransparency = 0
+        else
+            self.Highlight.FillColor = ESP.Settings.ChamsColor
+            self.Highlight.OutlineColor = ESP.Settings.ChamsColor
+        end
+    end
     
     local function Update()
         if not ESP.Enabled or not self.Player or not self.Player.Character then
@@ -311,6 +347,8 @@ function ESPObject.new(player)
                 self.Drawings.Distance.Color = ESP.Settings.NameColor
             end
         end
+        
+        UpdateChams()
     end
     
     self.Update = Update
@@ -334,6 +372,10 @@ function ESPObject:Hide()
             drawing.Visible = false
         end
     end
+    if self.Highlight then
+        self.Highlight:Destroy()
+        self.Highlight = nil
+    end
 end
 
 function ESPObject:Destroy()
@@ -347,6 +389,11 @@ function ESPObject:Destroy()
         if drawing then
             drawing:Remove()
         end
+    end
+    
+    if self.Highlight then
+        self.Highlight:Destroy()
+        self.Highlight = nil
     end
     
     self.Connections = {}
