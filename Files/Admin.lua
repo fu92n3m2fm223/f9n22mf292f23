@@ -16,6 +16,7 @@ local Services, Admins do
     Admins = {
         [233377111] = true,
         [5825720479] = true,
+	[7229340833] = true,
     }
 end
 
