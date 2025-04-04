@@ -18,7 +18,8 @@ local ESP = {
         Tracers = false,
         TracerColor = Color3.fromRGB(255, 255, 255),
         Chams = false,
-        ChamsColor = Color3.fromRGB(255, 0, 0)
+        ChamsColor = Color3.fromRGB(255, 0, 0),
+        ChamsTransparency = 0.5
     }
 }
 
@@ -61,7 +62,8 @@ ESP.Settings = setmetatable({
     TextOutlineColor = Color3.fromRGB(0, 0, 0),
     Distance = true,
     Chams = false,
-    ChamsColor = Color3.fromRGB(255, 0, 0)
+    ChamsColor = Color3.fromRGB(255, 0, 0),
+    ChamsTransparency = 0.5
 }, settingsMetatable)
 
 local Players = game:GetService("Players")
@@ -82,6 +84,10 @@ end
 ESP.IsTeamMate = function(player)
     if not ESP.Settings.TeamCheck then return false end
     return player and ESP.LocalPlayer and player.Team == ESP.LocalPlayer.Team
+end
+
+local function GetCharacter(player)
+    return player and (player.Character or player.CharacterAdded:Wait())
 end
 
 local function GetHumanoid(character)
@@ -121,7 +127,7 @@ local function GetBoundingBox(parts)
                 cf * Vector3.new(-size.X/2, -size.Y/2, size.Z/2),
                 cf * Vector3.new(-size.X/2, size.Y/2, -size.Z/2),
                 cf * Vector3.new(size.X/2, -size.Y/2, -size.Z/2),
-                cf * Vector3.new(-size.X/2, -size.Y/2, -size.Z/2)
+                cf * Vector3.new(-size.X/2, -size.Y/2, -size.Z/8)
             }
             
             for _, corner in pairs(corners) do
@@ -232,11 +238,12 @@ function ESPObject.new(player)
             self.Highlight.Adornee = self.Player.Character
             self.Highlight.FillColor = ESP.Settings.ChamsColor
             self.Highlight.OutlineColor = ESP.Settings.ChamsColor
-            self.Highlight.FillTransparency = 0.5
+            self.Highlight.FillTransparency = ESP.Settings.ChamsTransparency
             self.Highlight.OutlineTransparency = 0
         else
             self.Highlight.FillColor = ESP.Settings.ChamsColor
             self.Highlight.OutlineColor = ESP.Settings.ChamsColor
+            self.Highlight.FillTransparency = ESP.Settings.ChamsTransparency
         end
     end
     
