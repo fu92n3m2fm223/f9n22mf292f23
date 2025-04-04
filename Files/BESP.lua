@@ -86,10 +86,6 @@ ESP.IsTeamMate = function(player)
     return player and ESP.LocalPlayer and player.Team == ESP.LocalPlayer.Team
 end
 
-local function GetCharacter(player)
-    return player and (player.Character or player.CharacterAdded:Wait())
-end
-
 local function GetHumanoid(character)
     return character and character:FindFirstChildOfClass("Humanoid")
 end
