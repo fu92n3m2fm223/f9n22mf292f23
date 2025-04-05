@@ -3254,7 +3254,7 @@ TitanVisual:AddToggle("TitanVisualEnable", {
 
 	Mode = "Toggle",
 
-	Text = "Player ESP",
+	Text = "Titan ESP",
 	NoUI = false,
 
 	Callback = function(Value)
@@ -3327,7 +3327,7 @@ CartVisual:AddToggle("CartVisualEnable", {
 
 	Mode = "Toggle",
 
-	Text = "Player ESP",
+	Text = "Cart ESP",
 	NoUI = false,
 
 	Callback = function(Value)
