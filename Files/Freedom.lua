@@ -2762,24 +2762,26 @@ ShifterHitBox:AddToggle("ShifterEye", {
                 for _, TitanS in pairs(workspace:GetChildren()) do
                     if TitanS:FindFirstChild("Shifter") and TitanS ~= Character then
                         local ShifterPlr = Services.Players:GetPlayerFromCharacter(TitanS)
-                        if TitanS:WaitForChild("ShifterHolder").TrueTeam then
-                            local Team = TitanS:WaitForChild("ShifterHolder").TrueTeam.Value
-                            if TitanS:FindFirstChild("SEyes") then
-                                if LocalPlayer.Team.Name ~= Team or LocalPlayer.Team.Name == "Rogue" or Team == "Rogue" then
-                                    if ShifterPlr then
-                                        if TitanS:FindFirstChild("SEyes") and TitanS.SEyes:FindFirstChild("Armored") and not TitanS.SEyes.Armored.Value then
-                                            TitanS.SEyes.Size = Vector3.new(Options.ShifterEyeX.Value, Options.ShifterEyeY.Value, Options.ShifterEyeZ.Value)
-                                            TitanS.SEyes.Transparency = Options.ShifterEyeTransparency.Value
-                                            TitanS.SEyes.BrickColor = BrickColor.new("Institutional white")
-                                        else
+                        if TitanS:FindFirstChild("ShifterHolder") then
+                            if TitanS:FindFirstChild("ShifterHolder"):FindFirstChild("TrueTeam") then
+                                local Team = TitanS:WaitForChild("ShifterHolder").TrueTeam.Value
+                                if TitanS:FindFirstChild("SEyes") then
+                                    if LocalPlayer.Team.Name ~= Team or LocalPlayer.Team.Name == "Rogue" or Team == "Rogue" then
+                                        if ShifterPlr then
+                                            if TitanS:FindFirstChild("SEyes") and TitanS.SEyes:FindFirstChild("Armored") and not TitanS.SEyes.Armored.Value then
+                                                TitanS.SEyes.Size = Vector3.new(Options.ShifterEyeX.Value, Options.ShifterEyeY.Value, Options.ShifterEyeZ.Value)
+                                                TitanS.SEyes.Transparency = Options.ShifterEyeTransparency.Value
+                                                TitanS.SEyes.BrickColor = BrickColor.new("Institutional white")
+                                            else
+                                                TitanS.SEyes.Size = Vector3.new(3.207543134689331, 2.0697107315063477, 2.1226646900177)
+                                                TitanS.SEyes.Transparency = 1
+                                                TitanS.SEyes.BrickColor = BrickColor.new("Institutional white")
+                                            end
+                                        elseif ShifterPlr == nil then
                                             TitanS.SEyes.Size = Vector3.new(3.207543134689331, 2.0697107315063477, 2.1226646900177)
                                             TitanS.SEyes.Transparency = 1
                                             TitanS.SEyes.BrickColor = BrickColor.new("Institutional white")
                                         end
-                                    elseif ShifterPlr == nil then
-                                        TitanS.SEyes.Size = Vector3.new(3.207543134689331, 2.0697107315063477, 2.1226646900177)
-                                        TitanS.SEyes.Transparency = 1
-                                        TitanS.SEyes.BrickColor = BrickColor.new("Institutional white")
                                     end
                                 end
                             end
@@ -2791,13 +2793,15 @@ ShifterHitBox:AddToggle("ShifterEye", {
         else
             for _, TitanS in pairs(workspace:GetChildren()) do
                 if TitanS:FindFirstChild("Shifter") and TitanS ~= Character then
-                    if TitanS:WaitForChild("ShifterHolder").TrueTeam then
-                        local Team = TitanS:WaitForChild("ShifterHolder").TrueTeam.Value
-                        if TitanS:FindFirstChild("SEyes") then
-                            if LocalPlayer.Team.Name ~= Team or LocalPlayer.Team.Name == "Rogue" or Team == "Rogue" then
-                                TitanS.SEyes.Size = Vector3.new(3.207543134689331, 2.0697107315063477, 2.1226646900177)
-                                TitanS.SEyes.Transparency = 1
-                                TitanS.SEyes.BrickColor = BrickColor.new("Institutional white")
+                    if TitanS:FindFirstChild("ShifterHolder") then
+                        if TitanS:FindFirstChild("ShifterHolder"):FindFirstChild("TrueTeam") then
+                            local Team = TitanS:WaitForChild("ShifterHolder").TrueTeam.Value
+                            if TitanS:FindFirstChild("SEyes") then
+                                if LocalPlayer.Team.Name ~= Team or LocalPlayer.Team.Name == "Rogue" or Team == "Rogue" then
+                                    TitanS.SEyes.Size = Vector3.new(3.207543134689331, 2.0697107315063477, 2.1226646900177)
+                                    TitanS.SEyes.Transparency = 1
+                                    TitanS.SEyes.BrickColor = BrickColor.new("Institutional white")
+                                end
                             end
                         end
                     end
@@ -3332,29 +3336,6 @@ CartVisual:AddToggle("CartVisualEnable", {
 
 	ChangedCallback = function(New)
 
-	end,
-})
-
-CartVisual:AddDivider()
-
-PlayerVisual:AddCheckbox("CartVisualNamesColor", {
-	Text = "Names",
-
-	Default = false,
-	Disabled = false,
-	Visible = true,
-	Risky = false,
-
-	Callback = function(Value)
-        CartSettings.Names = Value
-	end,
-}):AddColorPicker("PlayerVisualBoxesColor", {
-	Default = Color3.fromRGB(255, 255, 255),
-	Title = "Color",
-	Transparency = 0,
-
-	Callback = function(Value)
-        CartSettings.NameColor = Value
 	end,
 })
 
