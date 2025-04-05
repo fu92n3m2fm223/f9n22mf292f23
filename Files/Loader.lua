@@ -19,7 +19,7 @@ local Games = {
 
 local ExecutorGroups = {
     Solara = {"Celery", "Solara"},
-    Standard = {"Wave", "Synapse Z", "AWP", "Seliware", "Potassium", "Swift"}
+    Standard = {"Wave", "Synapse Z", "AWP", "Seliware", "Potassium", "Swift", "Velocity"}
 }
 
 local function LoadScript(url)
