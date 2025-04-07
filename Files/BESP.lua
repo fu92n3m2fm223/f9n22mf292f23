@@ -13,7 +13,7 @@ local ESP = {
         NameColor = Color3.fromRGB(255, 255, 255),
         NameTransparency = 1,
         NameSize = 13,
-        ShowDistance = true,
+        Distance = true,
         HealthBar = false,
         Tracers = false,
         TracerColor = Color3.fromRGB(255, 255, 255),
@@ -93,6 +93,8 @@ end
 local function GetRootPart(character)
     return character and character:FindFirstChild("HumanoidRootPart")
 end
+
+local lerpColor = Color3.new().Lerp;
 
 local function GetBodyParts(character)
     local parts = {}
@@ -320,15 +322,15 @@ function ESPObject.new(player)
             
             self.Drawings.HealthBar.Position = healthBarPosition
             self.Drawings.HealthBar.Size = healthBarSize
-            self.Drawings.HealthBar.Color = Color3.fromRGB(255 - (255 * healthPercent), 255 * healthPercent, 0)
+            self.Drawings.HealthBar.Color = lerpColor(Color3.fromRGB(161, 47, 47), Color3.fromRGB(58, 161, 47), currentHumanoid.Health / currentHumanoid.MaxHealth)
         end
         
         local showHealthText = ESP.Settings.HealthText
         self.Drawings.HealthText.Visible = showHealthText
         if showHealthText and currentHumanoid then
-            self.Drawings.HealthText.Text = math.floor(currentHumanoid.Health) .. "/" .. math.floor(currentHumanoid.MaxHealth)
-            self.Drawings.HealthText.Position = boxPosition + Vector2.new(boxSize.X + 10, boxSize.Y/2)
-            self.Drawings.HealthText.Color = ESP.Settings.NameColor
+            self.Drawings.HealthText.Text = math.floor(currentHumanoid.Health) .. "HP"
+            self.Drawings.HealthText.Position = boxPosition + Vector2.new(boxSize.X + 5, boxSize.Y/2 - 15)
+            self.Drawings.HealthText.Color = lerpColor(Color3.fromRGB(161, 47, 47), Color3.fromRGB(58, 161, 47), currentHumanoid.Health / currentHumanoid.MaxHealth)
         end
         
         local showTracer = ESP.Settings.Tracers
@@ -339,14 +341,14 @@ function ESPObject.new(player)
             self.Drawings.Tracer.Color = ESP.Settings.TracerColor
         end
         
-        local showDistance = ESP.Settings.Distance
-        self.Drawings.Distance.Visible = showDistance
-        if showDistance then
+        local Distance = ESP.Settings.Distance
+        self.Drawings.Distance.Visible = Distance
+        if Distance then
             local localRoot = ESP.LocalPlayer.Character and ESP.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
             if localRoot then
                 local dist = (rootPart.Position - localRoot.Position).Magnitude
-                self.Drawings.Distance.Text = string.format("%.1f", dist) .. "m"
-                self.Drawings.Distance.Position = boxPosition + Vector2.new(boxSize.X/2, boxSize.Y + 5)
+                self.Drawings.Distance.Text = string.format("%.0f", dist) .. "M"
+                self.Drawings.Distance.Position = boxPosition + Vector2.new(boxSize.X + 5, boxSize.Y/2)
                 self.Drawings.Distance.Color = ESP.Settings.NameColor
             end
         end
@@ -409,67 +411,30 @@ CustomESPObject.__index = CustomESPObject
 function CustomESPObject.new(object, settings)
     local self = setmetatable({}, CustomESPObject)
     self.Object = object
-    self.Settings = settings or {}
+    
+    self.Settings = setmetatable({}, {
+        __newindex = function(t, key, value)
+            rawset(t, key, value)
+            if self.Update then
+                coroutine.wrap(self.Update)()
+            end
+        end,
+        __index = function(t, key)
+            return rawget(t, key) or ESP.CustomSettings[key]
+        end
+    })
+    
+    if settings then
+        for k, v in pairs(settings) do
+            self.Settings[k] = v
+        end
+    end
+    
     self.Drawings = {}
     self.Connections = {}
+    self.Highlight = nil
     
-    if self.Settings.Boxes then
-        self.Drawings.BoxOutline = Drawing.new("Square")
-        self.Drawings.BoxOutline.Thickness = 2
-        self.Drawings.BoxOutline.Filled = false
-        self.Drawings.BoxOutline.Visible = false
-        self.Drawings.BoxOutline.ZIndex = 2
-        
-        self.Drawings.Box = Drawing.new("Square")
-        self.Drawings.Box.Thickness = 1
-        self.Drawings.Box.Filled = false
-        self.Drawings.Box.Visible = false
-        self.Drawings.Box.ZIndex = 3
-    end
-    
-    if self.Settings.Name then
-        self.Drawings.Name = Drawing.new("Text")
-        self.Drawings.Name.Center = true
-        self.Drawings.Name.Outline = ESP.Settings.TextOutline
-        self.Drawings.Name.OutlineColor = ESP.Settings.TextOutlineColor
-        self.Drawings.Name.Size = self.Settings.NameSize or ESP.Settings.NameSize
-        self.Drawings.Name.Font = ESP.Settings.TextFont
-        self.Drawings.Name.Visible = false
-        self.Drawings.Name.ZIndex = 4
-    end
-    
-    local humanoid = object:IsA("Model") and object:FindFirstChildOfClass("Humanoid")
-    if (humanoid and self.Settings.HealthBar ~= false) or self.Settings.HealthBar then
-        self.Drawings.HealthBarOutline = Drawing.new("Square")
-        self.Drawings.HealthBarOutline.Thickness = 1
-        self.Drawings.HealthBarOutline.Filled = false
-        self.Drawings.HealthBarOutline.Visible = false
-        self.Drawings.HealthBarOutline.ZIndex = 1
-        
-        self.Drawings.HealthBar = Drawing.new("Square")
-        self.Drawings.HealthBar.Thickness = 1
-        self.Drawings.HealthBar.Filled = true
-        self.Drawings.HealthBar.Visible = false
-        self.Drawings.HealthBar.ZIndex = 2
-    end
-    
-    if self.Settings.ShowDistance then
-        self.Drawings.Distance = Drawing.new("Text")
-        self.Drawings.Distance.Center = true
-        self.Drawings.Distance.Outline = ESP.Settings.TextOutline
-        self.Drawings.Distance.OutlineColor = ESP.Settings.TextOutlineColor
-        self.Drawings.Distance.Size = (self.Settings.NameSize or ESP.Settings.NameSize) - 2
-        self.Drawings.Distance.Font = ESP.Settings.TextFont
-        self.Drawings.Distance.Visible = false
-        self.Drawings.Distance.ZIndex = 4
-    end
-    
-    if self.Settings.Tracers then
-        self.Drawings.Tracer = Drawing.new("Line")
-        self.Drawings.Tracer.Thickness = 1
-        self.Drawings.Tracer.Visible = false
-        self.Drawings.Tracer.ZIndex = 1
-    end
+    self:InitializeDrawings()
     
     local function Update()
         if not ESP.Enabled or not self.Object or not self.Object.Parent then
@@ -509,33 +474,46 @@ function CustomESPObject.new(object, settings)
         local boxSize = bottomRight - topLeft
         local boxPosition = topLeft
         
-        if self.Drawings.Box and self.Settings.Boxes then
+        if self.Settings.Boxes then
+            if not self.Drawings.Box then
+                self:InitializeDrawings()
+            end
             self.Drawings.BoxOutline.Visible = true
+            self.Drawings.Box.Visible = true
+            
             self.Drawings.BoxOutline.Position = boxPosition
             self.Drawings.BoxOutline.Size = boxSize
             self.Drawings.BoxOutline.Color = Color3.new(0, 0, 0)
             
-            self.Drawings.Box.Visible = true
             self.Drawings.Box.Position = boxPosition
             self.Drawings.Box.Size = boxSize
-            self.Drawings.Box.Color = self.Settings.BoxColor or ESP.CustomSettings.BoxColor
-            self.Drawings.Box.Transparency = self.Settings.BoxTransparency or ESP.CustomSettings.BoxTransparency
-        else
-            if self.Drawings.BoxOutline then self.Drawings.BoxOutline.Visible = false end
-            if self.Drawings.Box then self.Drawings.Box.Visible = false end
+            self.Drawings.Box.Color = self.Settings.BoxColor
+            self.Drawings.Box.Transparency = self.Settings.BoxTransparency
+        elseif self.Drawings.Box then
+            self.Drawings.BoxOutline.Visible = false
+            self.Drawings.Box.Visible = false
         end
         
-        if self.Drawings.Name and self.Settings.Name then
+        if self.Settings.Name then
+            if not self.Drawings.Name then
+                self:InitializeDrawings()
+            end
             self.Drawings.Name.Visible = true
             self.Drawings.Name.Text = tostring(self.Settings.Name)
             self.Drawings.Name.Position = boxPosition + Vector2.new(boxSize.X/2, -self.Drawings.Name.TextBounds.Y - 2)
-            self.Drawings.Name.Color = self.Settings.NameColor or ESP.CustomSettings.NameColor
-            self.Drawings.Name.Transparency = self.Settings.NameTransparency or ESP.CustomSettings.NameTransparency
+            self.Drawings.Name.Color = self.Settings.NameColor
+            self.Drawings.Name.Transparency = self.Settings.NameTransparency
+            self.Drawings.Name.Size = self.Settings.NameSize
         elseif self.Drawings.Name then
             self.Drawings.Name.Visible = false
         end
         
-        if self.Drawings.HealthBar and ((humanoid and self.Settings.HealthBar ~= false) or self.Settings.HealthBar) then
+        local showHealthBar = (humanoid and self.Settings.HealthBar ~= false) or self.Settings.HealthBar
+        if showHealthBar then
+            if not self.Drawings.HealthBar then
+                self:InitializeDrawings()
+            end
+            
             local health, maxHealth = 100, 100
             if humanoid then
                 health = humanoid.Health
@@ -555,34 +533,143 @@ function CustomESPObject.new(object, settings)
             self.Drawings.HealthBar.Visible = true
             self.Drawings.HealthBar.Position = healthBarPosition
             self.Drawings.HealthBar.Size = healthBarSize
-            self.Drawings.HealthBar.Color = Color3.fromRGB(255 - (255 * healthPercent), 255 * healthPercent, 0)
-        else
-            if self.Drawings.HealthBarOutline then self.Drawings.HealthBarOutline.Visible = false end
-            if self.Drawings.HealthBar then self.Drawings.HealthBar.Visible = false end
+            self.Drawings.HealthBar.Color = lerpColor(Color3.fromRGB(161, 47, 47), Color3.fromRGB(58, 161, 47), health / maxHealth)
+            
+            if self.Drawings.HealthText then
+                self.Drawings.HealthText.Visible = true
+                self.Drawings.HealthText.Text = math.floor(health) .. "HP"
+                self.Drawings.HealthText.Position = boxPosition + Vector2.new(boxSize.X + 5, boxSize.Y/2 - 15)
+                self.Drawings.HealthText.Color = lerpColor(Color3.fromRGB(161, 47, 47), Color3.fromRGB(58, 161, 47), health / maxHealth)
+            end
+        elseif self.Drawings.HealthBar then
+            self.Drawings.HealthBarOutline.Visible = false
+            self.Drawings.HealthBar.Visible = false
+            if self.Drawings.HealthText then
+                self.Drawings.HealthText.Visible = false
+            end
         end
         
-        if self.Drawings.Distance and self.Settings.ShowDistance then
+        if self.Settings.Distance then
+            if not self.Drawings.Distance then
+                self:InitializeDrawings()
+            end
             self.Drawings.Distance.Visible = true
-            self.Drawings.Distance.Text = string.format("%.1f", distance) .. "m"
-            self.Drawings.Distance.Position = boxPosition + Vector2.new(boxSize.X/2, boxSize.Y + 5)
-            self.Drawings.Distance.Color = self.Settings.NameColor or ESP.CustomSettings.NameColor
+            self.Drawings.Distance.Text = string.format("%.0f", distance) .. "M"
+            self.Drawings.Distance.Position = boxPosition + Vector2.new(boxSize.X + 5, boxSize.Y/2)
+            self.Drawings.Distance.Color = self.Settings.NameColor
         elseif self.Drawings.Distance then
             self.Drawings.Distance.Visible = false
         end
         
-        if self.Drawings.Tracer and self.Settings.Tracers then
+        if self.Settings.Tracers then
+            if not self.Drawings.Tracer then
+                self:InitializeDrawings()
+            end
             self.Drawings.Tracer.Visible = true
             self.Drawings.Tracer.From = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y)
             self.Drawings.Tracer.To = boxPosition + Vector2.new(boxSize.X/2, boxSize.Y)
-            self.Drawings.Tracer.Color = self.Settings.TracerColor or ESP.CustomSettings.TracerColor
+            self.Drawings.Tracer.Color = self.Settings.TracerColor
         elseif self.Drawings.Tracer then
             self.Drawings.Tracer.Visible = false
+        end
+        
+        if self.Settings.Chams then
+            if not self.Highlight then
+                self.Highlight = Instance.new("Highlight")
+                self.Highlight.Parent = self.Object
+                self.Highlight.Adornee = self.Object
+            end
+            self.Highlight.FillColor = self.Settings.ChamsColor
+            self.Highlight.OutlineColor = self.Settings.ChamsColor
+            self.Highlight.FillTransparency = self.Settings.ChamsTransparency
+            self.Highlight.OutlineTransparency = 0
+            self.Highlight.Enabled = true
+        elseif self.Highlight then
+            self.Highlight.Enabled = false
+        end
+    end
+    
+    function self:InitializeDrawings()
+        for _, drawing in pairs(self.Drawings) do
+            if drawing then
+                drawing:Remove()
+            end
+        end
+        self.Drawings = {}
+        
+        if self.Settings.Boxes then
+            self.Drawings.BoxOutline = Drawing.new("Square")
+            self.Drawings.BoxOutline.Thickness = 2
+            self.Drawings.BoxOutline.Filled = false
+            self.Drawings.BoxOutline.Visible = false
+            self.Drawings.BoxOutline.ZIndex = 2
+            
+            self.Drawings.Box = Drawing.new("Square")
+            self.Drawings.Box.Thickness = 1
+            self.Drawings.Box.Filled = false
+            self.Drawings.Box.Visible = false
+            self.Drawings.Box.ZIndex = 3
+        end
+        
+        if self.Settings.Name then
+            self.Drawings.Name = Drawing.new("Text")
+            self.Drawings.Name.Center = true
+            self.Drawings.Name.Outline = ESP.Settings.TextOutline
+            self.Drawings.Name.OutlineColor = ESP.Settings.TextOutlineColor
+            self.Drawings.Name.Size = self.Settings.NameSize
+            self.Drawings.Name.Font = ESP.Settings.TextFont
+            self.Drawings.Name.Visible = false
+            self.Drawings.Name.ZIndex = 4
+        end
+        
+        local humanoid = object:IsA("Model") and object:FindFirstChildOfClass("Humanoid")
+        if (humanoid and self.Settings.HealthBar ~= false) or self.Settings.HealthBar then
+            self.Drawings.HealthBarOutline = Drawing.new("Square")
+            self.Drawings.HealthBarOutline.Thickness = 1
+            self.Drawings.HealthBarOutline.Filled = false
+            self.Drawings.HealthBarOutline.Visible = false
+            self.Drawings.HealthBarOutline.ZIndex = 1
+            
+            self.Drawings.HealthBar = Drawing.new("Square")
+            self.Drawings.HealthBar.Thickness = 1
+            self.Drawings.HealthBar.Filled = true
+            self.Drawings.HealthBar.Visible = false
+            self.Drawings.HealthBar.ZIndex = 2
+            
+            self.Drawings.HealthText = Drawing.new("Text")
+            self.Drawings.HealthText.Center = true
+            self.Drawings.HealthText.Outline = ESP.Settings.TextOutline
+            self.Drawings.HealthText.OutlineColor = ESP.Settings.TextOutlineColor
+            self.Drawings.HealthText.Size = self.Settings.NameSize - 2
+            self.Drawings.HealthText.Font = ESP.Settings.TextFont
+            self.Drawings.HealthText.Visible = false
+            self.Drawings.HealthText.ZIndex = 4
+        end
+        
+        if self.Settings.Distance then
+            self.Drawings.Distance = Drawing.new("Text")
+            self.Drawings.Distance.Center = true
+            self.Drawings.Distance.Outline = ESP.Settings.TextOutline
+            self.Drawings.Distance.OutlineColor = ESP.Settings.TextOutlineColor
+            self.Drawings.Distance.Size = self.Settings.NameSize - 2
+            self.Drawings.Distance.Font = ESP.Settings.TextFont
+            self.Drawings.Distance.Visible = false
+            self.Drawings.Distance.ZIndex = 4
+        end
+        
+        if self.Settings.Tracers then
+            self.Drawings.Tracer = Drawing.new("Line")
+            self.Drawings.Tracer.Thickness = 1
+            self.Drawings.Tracer.Visible = false
+            self.Drawings.Tracer.ZIndex = 1
         end
     end
     
     self.Update = Update
     
-    table.insert(self.Connections, RunService.Heartbeat:Connect(Update))
+    table.insert(self.Connections, RunService.Heartbeat:Connect(function()
+        self:Update()
+    end))
     
     if object:IsA("BasePart") or object:IsA("Model") then
         table.insert(self.Connections, object.AncestryChanged:Connect(function(_, parent)
@@ -601,6 +688,9 @@ function CustomESPObject:Hide()
             drawing.Visible = false
         end
     end
+    if self.Highlight then
+        self.Highlight.Enabled = false
+    end
 end
 
 function CustomESPObject:Destroy()
@@ -616,6 +706,11 @@ function CustomESPObject:Destroy()
         end
     end
     
+    if self.Highlight then
+        self.Highlight:Destroy()
+        self.Highlight = nil
+    end
+    
     for i, obj in pairs(ESP.CustomObjects) do
         if obj == self then
             table.remove(ESP.CustomObjects, i)
@@ -629,16 +724,18 @@ function ESP:AddObjectListener(object, settings)
         return nil
     end
     
-    local mergedSettings = {}
-    for k, v in pairs(ESP.CustomSettings) do
-        mergedSettings[k] = settings and settings[k] ~= nil and settings[k] or v
+    for _, existingObj in pairs(self.CustomObjects) do
+        if existingObj.Object == object then
+            if settings then
+                for k, v in pairs(settings) do
+                    existingObj.Settings[k] = v
+                end
+            end
+            return existingObj
+        end
     end
     
-    if object:IsA("Model") and object:FindFirstChildOfClass("Humanoid") and mergedSettings.HealthBar ~= false then
-        mergedSettings.HealthBar = true
-    end
-    
-    local obj = CustomESPObject.new(object, mergedSettings)
+    local obj = CustomESPObject.new(object, settings)
     table.insert(self.CustomObjects, obj)
     return obj
 end
