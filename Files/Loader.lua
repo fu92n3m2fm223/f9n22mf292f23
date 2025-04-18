@@ -18,8 +18,7 @@ local Games = {
 }
 
 local ExecutorGroups = {
-    Solara = {"Celery", "Solara"},
-    Standard = {"Wave", "Synapse Z", "AWP", "Seliware", "Potassium", "Swift", "Velocity"}
+    Solara = {"Celery", "Solara"}
 }
 
 local function LoadScript(url)
@@ -60,7 +59,7 @@ if currentGame then
     if currentGame.Scripts then
         if IsExecutorInGroup(Executor, "Solara") and currentGame.Scripts.Solara then
             LoadScript(currentGame.Scripts.Solara)
-        elseif IsExecutorInGroup(Executor, "Standard") and currentGame.Scripts.Standard then
+        elseif currentGame.Scripts.Standard then
             LoadScript(currentGame.Scripts.Standard)
         end
     end
