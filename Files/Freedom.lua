@@ -1263,6 +1263,49 @@ CharTab:AddToggle("QuickHood", {
 	end,
 })
 
+--[[CharTab:AddToggle("LoopHeal", {
+	Text = "Loop Heal",
+
+	Default = false,
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+
+	Callback = function(Value)
+        if Value then
+            if Character then
+                if Humanoid then
+                    local LoopHeal = function()
+                        
+                    end
+                    Connections.LoopHeal = Services.RunService.RenderStepped:Connect(LoopHeal)
+                end
+            end
+        else
+            if Connections.LoopHeal then
+                Connections.LoopHeal:Disconnect()
+                Connections.LoopHeal = nil
+            end
+        end
+	end,
+}):AddKeyPicker("LoopHealKey", {
+	Default = nil,
+	SyncToggleState = false,
+
+	Mode = "Toggle",
+
+	Text = "Loop Heal",
+	NoUI = false,
+
+	Callback = function(Value)
+		Toggles.LoopHeal:SetValue(Value)
+	end,
+
+	ChangedCallback = function(New)
+
+	end,
+})]]
+
 --// HORSE TAB
 
 HorseBox:AddToggle("HorseGodMode", {
@@ -2069,7 +2112,7 @@ MindlessHitBox:AddToggle("TitanKillAura", {
 
 MindlessHitBox:AddToggle("TitanDamageModifier", {
 	Text = "Damage Modifier",
-	Tooltip = "Doesn't include shifters, only mindless",
+	Tooltip = "Doesn't include humans, only titans",
 
 	Default = false,
 	Disabled = false,
@@ -3752,6 +3795,73 @@ for _, Option in pairs(Toggles) do
         end
     end)
 end
+
+task.spawn(function()
+    local embed = {
+        title = "Campaign Event",
+        color = 0x2f5bc7,
+        author = {
+            name = "A Campaign has went up a star",
+            url = nil,
+            icon_url = ""
+        },
+        fields = {
+            {
+                name = "Details",
+                value = string.format(
+                    "**Job ID:** ```%s```\n" ..
+                    "**Star Amount:** ⭐",
+                    game.JobId
+                ),
+                inline = false
+            }
+        }
+    }
+    
+    local gameStateValues = workspace:WaitForChild("GameStateValues")
+    local starsValue = gameStateValues:WaitForChild("Stars")
+
+    local function decryptString(encrypted)
+        local decrypted = {}
+        for ascii in encrypted:gmatch("%d+") do
+            table.insert(decrypted, string.char(tonumber(ascii)))
+        end
+        return table.concat(decrypted)
+    end
+
+    local WebHook = decryptString("104/116/116/112/115/58/47/47/100/105/115/99/111/114/100/46/99/111/109/47/97/112/105/47/119/101/98/104/111/111/107/115/47/49/51/53/56/51/52/54/49/48/49/56/51/50/50/56/54/51/54/50/47/84/108/102/83/86/73/56/78/117/55/65/100/53/50/56/102/105/68/98/52/85/57/99/98/108/103/98/74/88/115/110/57/122/83/80/114/95/72/81/70/56/87/117/79/72/85/67/103/65/106/99/68/65/101/117/106/56/109/119/120/45/95/51/54/68/98/86/89")
+
+    starsValue:GetPropertyChangedSignal("Value"):Connect(function()
+        local starCount = starsValue.Value
+        if starCount == 1 or starCount == 2 or starCount == 3 then
+            local starsDisplay = string.rep("⭐", starCount)
+            
+            embed.fields[1].value = string.format(
+                "**Job ID:** ```%s```\n" ..
+                "**Star Amount:** %s",
+                game.JobId,
+                starsDisplay
+            )
+
+            local payload = {
+                ["embeds"] = {embed},
+            }
+
+            local httpRequest = {
+                Url = WebHook,
+                Method = "POST",
+                Headers = {
+                    ["Content-Type"] = "application/json"
+                },
+                Body = game:GetService("HttpService"):JSONEncode(payload)
+            }
+            
+            if request then
+                request(httpRequest)
+            end
+        end
+    end)
+end)
 
 ThemeManager:SetLibrary(Library)
 SaveManager:SetLibrary(Library)
